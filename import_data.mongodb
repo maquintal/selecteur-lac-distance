@@ -1,0 +1,88 @@
+// Script MongoDB pour importer les données du CSV
+db = db.getSiblingDB('peche_plan_eau');
+
+// Supprime la collection si elle existe déjà
+// db.peche_plan_eau.drop();
+
+// Fonction utilitaire pour convertir la superficie
+function parseSuperficie(superficieStr) {
+  if (!superficieStr) return null;
+  const match = superficieStr.match(/(\d+[\.,]?\d*)\s*ha\s*\((\d+[\.,]?\d*)\s*km2\)/);
+  if (match) {
+    return [
+      { valeur: parseFloat(match[1].replace(',', '.')), unite: 'ha' },
+      { valeur: parseFloat(match[2].replace(',', '.')), unite: 'km2' }
+    ];
+  }
+  return null;
+}
+
+// Fonction pour parser le type de moteur
+function parseMoteur(moteurStr) {
+  if (!moteurStr) return null;
+  
+  // Si contient "minimum" et un chiffre ≥ 2, c'est moteur à essence obligatoire
+  const minMatch = moteurStr.match(/minimum\s*(\d+(?:[\.,]\d+)?)/);
+  if (minMatch && parseFloat(minMatch[1]) >= 2) {
+    return {
+      type: "essence",
+      puissanceMin: parseFloat(minMatch[1])
+    };
+  }
+  
+  // Sinon, c'est électrique suffisant
+  return {
+    type: "electrique"
+  };
+}
+
+// Lecture du fichier CSV et insertion ligne par ligne
+const csvLines = cat("C:/temp/selecteur-lac-distance/pecheplaneau.csv").split("\n").slice(1); // Ignore l'en-tête
+
+csvLines.forEach(line => {
+  if (!line.trim()) return; // Ignore les lignes vides
+  
+  const [region, secteur, type, nomLac, acceuil, distanceAcceuil, latitude, longitude, hebergementNom, distanceHebergement, accessible, portage, typeEmbarcation, typeMoteur, superficie, especes] = line.split(";");
+  
+  const lac = {
+    nomDuLac: nomLac,
+    juridiction: {
+      type: type.toLowerCase() === "sepaq" || type.toLowerCase() === "territoire naturel" ? "gouvernemental" : "privé",
+      organisme: type,
+      site: secteur !== "-" ? secteur : null
+    },
+    regionAdministrativeQuebec: region,
+    coordonnees: {
+      latitude: parseFloat(latitude) || null,
+      longitude: parseFloat(longitude) || null
+    },
+    acces: {
+      portage: portage,
+      acceuil: acceuil !== "-" ? acceuil : null,
+      distanceAcceuilLac: distanceAcceuil !== "-" ? parseFloat(distanceAcceuil) : null,
+      accessible: accessible
+    },
+    embarcation: {
+      type: typeEmbarcation,
+      motorisation: parseMoteur(typeMoteur)
+    },
+    superficie: parseSuperficie(superficie),
+    espece: especes ? especes.split(",").map(e => e.trim()).filter(e => e) : [],
+    hebergement: [{
+      camping: hebergementNom || null,
+      distanceCampingAcceuil: distanceHebergement !== "-" ? parseFloat(distanceHebergement) : null
+    }]
+  };
+  
+  // Insertion du document
+  db.peche_plan_eau.insertOne(lac);
+});
+
+// Création des index
+db.peche_plan_eau.createIndex({ "coordonnees.latitude": 1, "coordonnees.longitude": 1 });
+db.peche_plan_eau.createIndex({ "regionAdministrativeQuebec": 1 });
+db.peche_plan_eau.createIndex({ "juridiction.type": 1 });
+db.peche_plan_eau.createIndex({ "espece": 1 });
+
+// Vérification
+print("Nombre de documents insérés : " + db.peche_plan_eau.count());
