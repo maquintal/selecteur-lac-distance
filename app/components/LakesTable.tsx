@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import {
     useReactTable,
     getCoreRowModel,
@@ -33,11 +34,32 @@ import {
     LastPage,
     NavigateBefore,
     NavigateNext,
+    DirectionsCar,
 } from '@mui/icons-material';
 import { Lake } from '../types/lake';
 
 
 const columns: ColumnDef<Lake>[] = [
+    {
+        id: 'logo',
+        header: '',
+        cell: ({ row }) => {
+            const juridiction = row.original.juridiction;
+            if (juridiction?.organisme === "SEPAQ") {
+                return (
+                    <Image
+                        src="/sepaq_logo.png"
+                        alt="Logo SEPAQ"
+                        width={24}
+                        height={24}
+                        style={{ objectFit: 'contain' }}
+                    />
+                );
+            }
+            return null;
+        },
+        enableColumnFilter: false
+    },
     {
         accessorKey: 'regionAdministrativeQuebec',
         header: 'Région',
@@ -59,6 +81,31 @@ const columns: ColumnDef<Lake>[] = [
         accessorKey: 'nomDuLac',
         header: 'Nom du lac',
     },
+    {
+        id: 'portage',
+        header: 'Accès',
+        cell: ({ row }) => {
+            const { acces } = row.original;
+
+            if (acces?.portage === "Aucune marche d'approche nécessaire") {
+                return (
+                    <DirectionsCar 
+                        color="primary"
+                        titleAccess="Accès direct en véhicule"
+                        sx={{ 
+                            fontSize: 20,
+                            opacity: 0.8,
+                            '&:hover': {
+                                opacity: 1
+                            }
+                        }}
+                    />
+                );
+            }
+            return null;
+        },
+        enableColumnFilter: false
+    },
 ];
 
 export default function LakesTable() {
@@ -69,10 +116,8 @@ export default function LakesTable() {
     useEffect(() => {
         const fetchLakes = async () => {
             try {
-                console.log('Fetching lakes...');
                 const response = await fetch('/api/lakes');
                 const result = await response.json();
-                console.log('Received data:', result);
                 setData(result);
             } catch (error) {
                 console.error('Error fetching lakes:', error);
@@ -87,11 +132,15 @@ export default function LakesTable() {
         columns,
         state: {
             columnFilters,
+            pagination: {
+                pageSize: 100,
+                pageIndex: 0
+            }
         },
         onColumnFiltersChange: setColumnFilters,
         getCoreRowModel: getCoreRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
-        // getPaginationRowModel: getPaginationRowModel(),
+        getPaginationRowModel: getPaginationRowModel(),
     });
 
     if (loading) {
@@ -100,57 +149,55 @@ export default function LakesTable() {
 
     return (
         <div className="p-4 bg-white rounded-lg shadow">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                {/* Filtres */}
-                <div className="relative">
-                    <input
-                        type="text"
-                        placeholder="Filtrer par région"
-                        value={table.getColumn('regionAdministrativeQuebec')?.getFilterValue() as string ?? ''}
-                        onChange={e => table.getColumn('regionAdministrativeQuebec')?.setFilterValue(e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
-                    />
-                </div>
-                <div className="relative">
-                    <input
-                        type="text"
-                        placeholder="Filtrer par réserve"
-                        value={table.getColumn('juridiction')?.getFilterValue() as string ?? ''}
-                        onChange={e => table.getColumn('juridiction')?.setFilterValue(e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
-                    />
-                </div>
-                <div className="relative">
-                    <input
-                        type="text"
-                        placeholder="Filtrer par nom de lac"
-                        value={table.getColumn('nomDuLac')?.getFilterValue() as string ?? ''}
-                        onChange={e => table.getColumn('nomDuLac')?.setFilterValue(e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
-                    />
-                </div>
-            </div>
-
             <TableContainer>
                 <Table>
                     <TableHead>
                         {table.getHeaderGroups().map(headerGroup => (
-                            <TableRow key={headerGroup.id}>
-                                {headerGroup.headers.map(header => (
-                                    <TableCell
-                                        key={header.id}
-                                        sx={{
-                                            fontWeight: 'bold',
-                                            backgroundColor: 'grey.50'
-                                        }}
-                                    >
-                                        {flexRender(
-                                            header.column.columnDef.header,
-                                            header.getContext()
-                                        )}
-                                    </TableCell>
-                                ))}
-                            </TableRow>
+                            <React.Fragment key={headerGroup.id}>
+                                <TableRow key={`${headerGroup.id}-header`}>
+                                    {headerGroup.headers.map(header => (
+                                        <TableCell
+                                            key={header.id}
+                                            sx={{
+                                                fontWeight: 'bold',
+                                                backgroundColor: 'grey.50',
+                                                borderBottom: 'none',
+                                                pb: 1
+                                            }}
+                                        >
+                                            {flexRender(
+                                                header.column.columnDef.header,
+                                                header.getContext()
+                                            )}
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
+                                <TableRow key={`${headerGroup.id}-filters`}>
+                                    {headerGroup.headers.map(header => (
+                                        <TableCell 
+                                            key={`${header.id}-filter`}
+                                            sx={{
+                                                backgroundColor: 'grey.50',
+                                                pt: 0
+                                            }}
+                                        >
+                                            <TextField
+                                                placeholder={`Filtrer...`}
+                                                variant="outlined"
+                                                size="small"
+                                                fullWidth
+                                                value={header.column.getFilterValue() as string ?? ''}
+                                                onChange={e => header.column.setFilterValue(e.target.value)}
+                                                sx={{
+                                                    '& .MuiOutlinedInput-root': {
+                                                        backgroundColor: 'white'
+                                                    }
+                                                }}
+                                            />
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
+                            </React.Fragment>
                         ))}
                     </TableHead>
                     <TableBody>
@@ -223,10 +270,10 @@ export default function LakesTable() {
                         }}
                         label="Lignes par page"
                     >
-                        {[10, 25, 50].map(pageSize => (
-                            <option key={pageSize} value={pageSize}>
+                        {[10, 25, 50, 100].map(pageSize => (
+                            <MenuItem key={pageSize} value={pageSize}>
                                 Afficher {pageSize}
-                            </option>
+                            </MenuItem>
                         ))}
                     </Select>
                 </FormControl>
