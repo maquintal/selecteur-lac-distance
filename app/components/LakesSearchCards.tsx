@@ -11,12 +11,14 @@ import {
     Typography,
     Chip,
     CircularProgress,
+    Tooltip,
 } from '@mui/material';
 import Image from 'next/image';
 import ReactCardFlip from 'react-card-flip';
 import BoltOutlinedIcon from '@mui/icons-material/BoltOutlined';
 import Icon from '@mdi/react';
-import { mdiFuel, mdiMapMarkerRadiusOutline } from '@mdi/js';
+import { mdiFuel } from '@mdi/js';
+import WaterDropOutlinedIcon from '@mui/icons-material/WaterDropOutlined';
 
 type Filters = {
     region: string;
@@ -88,24 +90,89 @@ export default function LakesSearchCards() {
 
         const type = m.type?.toLowerCase() ?? '';
         const puissance = m.puissanceMin ?? m.puissanceMax ?? m.puissance ?? null;
-        const label = puissance ? `${m.type} (${puissance})` : m.type;
-
-        // if (type.includes('elect')) {
-        //     icon = <BoltOutlinedIcon sx={{ color: '#4caf50' }} />; // vert électrique ⚡
-        // } else if (type.includes('essence') || type.includes('gaz')) {
-        //     icon = <Icon path={mdiFuel} size={1} /> sx={{ color: '#f57c00' }} />; // orange essence ⛽
-        // }
 
         return (
-            // <Chip
-            //     icon={type === "electrique" ? <BoltOutlinedIcon /> : <Icon path={mdiFuel} size={1} />}
-            //     label={label}
-            //     size="small"
-            //     variant="outlined"
-            // />
-            type === "electrique" ? <BoltOutlinedIcon /> : <Icon path={mdiFuel} size={1} />
+            type === "electrique" ?
+                <BoltOutlinedIcon />
+                : <>
+                    <Tooltip title={`Puissance minimale en HP: ${puissance ?? '—'}`}>
+                        <Icon path={mdiFuel} size={1} />
+                    </Tooltip>
+                </>
         );
     };
+
+    const getLakeSizeCategory = (superficie: Array<{ valeur: number, unite: string }> | null) => {
+        // Gérer les cas null ou undefined
+        if (!superficie || !Array.isArray(superficie)) {
+            return {
+                label: 'Superficie inconnue',
+                level: 0,
+                icon: null
+            };
+        }
+
+        // Trouver la valeur en hectares
+        const superficieHa = superficie.find(s => s.unite === 'ha')?.valeur;
+
+        if (!superficieHa) {
+            return {
+                label: 'Superficie inconnue',
+                level: 0,
+                icon: null
+            };
+        }
+
+        if (superficieHa < 10) return {
+            label: 'Très petit lac',
+            level: 1,
+            icon: (
+                <>
+                    <WaterDropOutlinedIcon sx={{ fontSize: 14, color: 'primary.main' }} />
+                    <WaterDropOutlinedIcon sx={{ fontSize: 16, color: 'action.disabled' }} />
+                    <WaterDropOutlinedIcon sx={{ fontSize: 20, color: 'action.disabled' }} />
+                    <WaterDropOutlinedIcon sx={{ fontSize: 24, color: 'action.disabled' }} />
+                </>
+            )
+        };
+        if (superficieHa < 100) return {
+            label: 'Petit lac',
+            level: 2,
+            icon: (
+                <>
+                    <WaterDropOutlinedIcon sx={{ fontSize: 14, color: 'primary.main' }} />
+                    <WaterDropOutlinedIcon sx={{ fontSize: 16, color: 'primary.main' }} />
+                    <WaterDropOutlinedIcon sx={{ fontSize: 20, color: 'action.disabled' }} />
+                    <WaterDropOutlinedIcon sx={{ fontSize: 24, color: 'action.disabled' }} />
+                </>
+            )
+        };
+        if (superficieHa < 1000) return {
+            label: 'Lac moyen',
+            level: 3,
+            icon: (
+                <>
+                    <WaterDropOutlinedIcon sx={{ fontSize: 14, color: 'primary.main' }} />
+                    <WaterDropOutlinedIcon sx={{ fontSize: 16, color: 'primary.main' }} />
+                    <WaterDropOutlinedIcon sx={{ fontSize: 20, color: 'primary.main' }} />
+                    <WaterDropOutlinedIcon sx={{ fontSize: 24, color: 'action.disabled' }} />
+                </>
+            )
+        };
+        return {
+            label: 'Grand lac',
+            level: 4,
+            icon: (
+                <>
+                    <WaterDropOutlinedIcon sx={{ fontSize: 14, color: 'primary.main' }} />
+                    <WaterDropOutlinedIcon sx={{ fontSize: 16, color: 'primary.main' }} />
+                    <WaterDropOutlinedIcon sx={{ fontSize: 20, color: 'primary.main' }} />
+                    <WaterDropOutlinedIcon sx={{ fontSize: 24, color: 'primary.main' }} />
+                </>
+            )
+        };
+    };
+
     const getHebergement = (l: any) => {
         const h = l.hebergement ?? l.hebergements ?? null;
         if (!h) return null;
@@ -160,77 +227,82 @@ export default function LakesSearchCards() {
                     </Box>
                 )}
 
-                {filtered.map((l: any) => (
-                    <Box key={l._id} sx={{ display: 'flex', flexDirection: 'column' }}>
-                        <ReactCardFlip isFlipped={!!flippedCards[l._id]} flipDirection="horizontal">
-                            <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                                <CardHeader
-                                    avatar={
-                                        l.juridiction?.organisme === 'SEPAQ' ? (
-                                            <Image src="/sepaq_logo2.png" alt="sepaq" width={40} height={40} />
-                                        ) : undefined
-                                    }
-                                    title={l.nomDuLac}
-                                    subheader={
-                                        <Box display="flex" flexDirection="column">
-                                            <Typography variant="subtitle1" color="text.secondary">{l.regionAdministrativeQuebec}</Typography>
-                                            <Typography variant="subtitle2" color="text.secondary">
-                                                {l.juridiction?.organisme === 'SEPAQ' ? `${l.juridiction.site}` : `${l.juridiction?.organisme}`}
-                                            </Typography>
-                                        </Box>
-                                    }
-                                />
-                                <CardContent sx={{ flexGrow: 1 }}>
-                                    <Box display="flex" justifyContent="space-between" gap={2}>
-                                        <Box flex={1}>
-                                            {/* <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
-                                                {l.juridiction?.organisme === 'SEPAQ' ? `Site: ${l.juridiction.site || '—'}` : `Organisme: ${l.juridiction?.organisme || '—'}`}
-                                            </Typography> */}
+                {filtered.map((l: any) => {
+                    const { label, icon } = getLakeSizeCategory(l.superficie);
+                    return (
 
-                                            <Box mt={0.5} display="flex" gap={1} flexWrap="wrap">
-                                                {getEspeces(l).slice(0, 6).map((sp: string) => (
-                                                    <Chip key={sp} label={sp} size="small" />
-                                                ))}
-                                            </Box>
-
-                                            <Box mt={2}>
-                                                <Typography variant="body2"><strong>Accès</strong></Typography>
-                                                <Typography variant="caption" color="textSecondary">
-                                                    {l.acces?.portage ? `${l.acces.portage}` : ''}
-                                                    {l.acces?.acceuil ? ` • Accueil: ${l.acces.acceuil}` : ''}
-                                                    {l.acces?.distanceAcceuilLac != null ? ` • ${l.acces.distanceAcceuilLac} km` : ''}
+                        <Box key={l._id} sx={{ display: 'flex', flexDirection: 'column' }}>
+                            <ReactCardFlip isFlipped={!!flippedCards[l._id]} flipDirection="horizontal">
+                                <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                                    <CardHeader
+                                        avatar={
+                                            l.juridiction?.organisme === 'SEPAQ' ? (
+                                                <Image src="/sepaq_logo2.png" alt="sepaq" width={40} height={40} />
+                                            ) : undefined
+                                        }
+                                        title={l.nomDuLac}
+                                        subheader={
+                                            <Box display="flex" flexDirection="column">
+                                                <Typography variant="subtitle1" color="text.secondary">{l.regionAdministrativeQuebec}</Typography>
+                                                <Typography variant="subtitle2" color="text.secondary">
+                                                    {l.juridiction?.organisme === 'SEPAQ' ? `${l.juridiction.site}` : `${l.juridiction?.organisme}`}
                                                 </Typography>
                                             </Box>
-                                            {/* This is the front of the card.
-                                            <button onClick={() => handleFlip(l._id)}>Click to flip</button> */}
-                                        </Box>
+                                        }
+                                    />
+                                    <CardContent sx={{ flexGrow: 1 }}>
+                                        <Box display="flex" justifyContent="space-between" gap={2}>
+                                            <Box flex={1}>
+                                                <Box mt={0.5} display="flex" gap={1} flexWrap="wrap">
+                                                    {getEspeces(l).slice(0, 6).map((sp: string) => (
+                                                        <Chip key={sp} label={sp} size="small" />
+                                                    ))}
+                                                </Box>
 
-                                        <Box sx={{ width: 160, textAlign: 'right' }}>
-                                            <Box>
-                                                {getMotorisationChip(l)}
+                                                <Box mt={2}>
+                                                    <Typography variant="body2"><strong>Accès</strong></Typography>
+                                                    <Typography variant="caption" color="textSecondary">
+                                                        {l.acces?.acceuil ? `Accueil: ${l.acces.acceuil}` : ''}
+                                                        {l.acces?.distanceAcceuilLac != null ? ` • ${l.acces.distanceAcceuilLac} km` : ''}<br />
+                                                        {l.acces?.portage ? `${l.acces.portage}` : ''}
+                                                    </Typography>
+                                                </Box>
+                                                {/* This is the front of the card.
+                                            <button onClick={() => handleFlip(l._id)}>Click to flip</button> */}
                                             </Box>
-                                            <Box mt={1}>
-                                                <Typography variant="caption" color="textSecondary">Superficie</Typography>
-                                                <Typography variant="body2">{getSuperficieText(l) ?? '—'}</Typography>
-                                            </Box>
-                                            <Box mt={1}>
-                                                <Typography variant="caption" color="textSecondary">Hébergement</Typography>
-                                                {/* <FlipCard content={getHebergement(l)} /> */}
+
+                                            <Box sx={{ width: 160, textAlign: 'right' }}>
+                                                <Box>
+                                                    {getMotorisationChip(l)}
+                                                </Box>
+                                                <Box mt={1}>
+                                                    <Typography variant="caption" color="textSecondary">
+                                                        Superficie
+                                                    </Typography>
+                                                    <Typography variant="body2">{getSuperficieText(l) ?? '—'}</Typography>
+                                                    {/* <Typography variant="body2"> */}
+                                                    {icon}
+                                                    {/* </Typography> */}
+                                                </Box>
+                                                <Box mt={1}>
+                                                    <Typography variant="caption" color="textSecondary">Hébergement</Typography>
+                                                    {/* <FlipCard content={getHebergement(l)} /> */}
+                                                </Box>
                                             </Box>
                                         </Box>
+                                    </CardContent>
+                                    <Box sx={{ p: 1 }}>
+                                        <Typography variant="caption" color="textSecondary">Lat: {getLatitude(l) ?? '—'} • Lon: {getLongitude(l) ?? '—'}</Typography>
                                     </Box>
-                                </CardContent>
-                                <Box sx={{ p: 1 }}>
-                                    <Typography variant="caption" color="textSecondary">Lat: {getLatitude(l) ?? '—'} • Lon: {getLongitude(l) ?? '—'}</Typography>
-                                </Box>
-                            </Card>
-                            <>
-                                <div>This is the back of the card.</div>
-                                <button onClick={() => handleFlip(l._id)}>Click to flip</button>
-                            </>
-                        </ReactCardFlip>
-                    </Box>
-                ))}
+                                </Card>
+                                <>
+                                    <div>This is the back of the card.</div>
+                                    <button onClick={() => handleFlip(l._id)}>Click to flip</button>
+                                </>
+                            </ReactCardFlip>
+                        </Box>
+                    )
+                })}
             </Box>
         </Box >
     );
