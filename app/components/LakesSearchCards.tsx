@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
-import { Lake } from '../types/lake';
+import { Lake, Superficie } from '../types/lake';
 import {
     Box,
     TextField,
@@ -12,7 +12,6 @@ import {
     Chip,
     CircularProgress,
     Tooltip,
-    Button,
     CardActions,
     IconButton,
 } from '@mui/material';
@@ -66,14 +65,14 @@ export default function LakesSearchCards() {
     }, [data, filters]);
 
     // Helper getters that tolerate both shapes in JSON
-    const getLatitude = (l: any) => l.latitude ?? l.coordonnees?.latitude ?? null;
-    const getLongitude = (l: any) => l.longitude ?? l.coordonnees?.longitude ?? null;
-    const getEspeces = (l: any) => l.especes ?? l.espece ?? [];
-    const getSuperficieText = (l: any) => {
+    const getLatitude = (l: Lake) => l.coordonnees.latitude ?? l.coordonnees?.latitude ?? null;
+    const getLongitude = (l: Lake) => l.coordonnees.longitude ?? l.coordonnees?.longitude ?? null;
+    const getEspeces = (l: Lake) => l.especes ?? [];
+    const getSuperficieText = (l: Lake) => {
         const s = l.superficie;
         if (!s) return null;
         if (Array.isArray(s)) {
-            const ha = s.find((x: any) => x.unite === 'ha' || x.unite === 'hectare');
+            const ha = s.find((x: Superficie) => x.unite === 'ha');
             if (ha) return `${ha.valeur} ha`;
             const first = s[0];
             return first ? `${first.valeur} ${first.unite}` : null;
@@ -81,20 +80,13 @@ export default function LakesSearchCards() {
         // if it's a string
         return String(s);
     };
-    const getMotorisationText = (l: any) => {
-        const m = l.embarcation?.motorisation ?? l.motorisation ?? null;
-        if (!m) return '—';
-        const type = m.type ?? '—';
-        const puissance = m.puissanceMin ?? m.puissanceMax ?? m.puissance ?? null;
-        return puissance ? `${type} (${puissance})` : String(type);
-    };
 
-    const getMotorisationChip = (l: any) => {
-        const m = l.embarcation?.motorisation ?? l.motorisation ?? null;
+    const getMotorisationChip = (l: Lake) => {
+        const m = l.embarcation?.motorisation ?? null;
         if (!m) return <Chip label="—" size="small" />;
 
         const type = m.type?.toLowerCase() ?? '';
-        const puissance = m.puissanceMin ?? m.puissanceMax ?? m.puissance ?? null;
+        const puissance = m.puissanceMin ?? null;
 
         return (
             type === "electrique" ?
@@ -246,8 +238,8 @@ export default function LakesSearchCards() {
                     </Box>
                 )}
 
-                {filtered.map((l: any) => {
-                    const { label, icon } = getLakeSizeCategory(l.superficie);
+                {filtered.map((l: Lake) => {
+                    const { icon } = getLakeSizeCategory(l.superficie);
 
                     // Header commun pour ce lac spécifique
                     const cardHeader = (

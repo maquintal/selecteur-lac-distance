@@ -9,8 +9,18 @@ export interface Embarcation {
     type: string;
     motorisation: {
         type: "electrique" | "essence";
-        puissanceMax: number; // en HP
+        puissanceMin: number; // en HP
     };
+}
+
+export interface Superficie {
+    valeur: number;
+    unite: "ha" | "km2";
+}
+
+export interface Hebergement {
+    camping: string;
+    distanceCampingAcceuil: number;
 }
 
 export interface Lake {
@@ -26,6 +36,10 @@ export interface Lake {
     embarcation: Embarcation
     especes: string[];
     camping: boolean;
-    latitude: number;
-    longitude: number;
+    coordonnees: {
+        latitude: number;
+        longitude: number;
+    }
+    superficie: Superficie[] | null
+    hebergement: Hebergement[] | null
 }
