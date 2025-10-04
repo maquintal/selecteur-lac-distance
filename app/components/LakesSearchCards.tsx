@@ -1,4 +1,4 @@
- 'use client';
+'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { Lake } from '../types/lake';
@@ -13,6 +13,10 @@ import {
     CircularProgress,
 } from '@mui/material';
 import Image from 'next/image';
+import ReactCardFlip from 'react-card-flip';
+import BoltOutlinedIcon from '@mui/icons-material/BoltOutlined';
+import Icon from '@mdi/react';
+import { mdiFuel, mdiMapMarkerRadiusOutline } from '@mdi/js';
 
 type Filters = {
     region: string;
@@ -20,88 +24,11 @@ type Filters = {
     nom: string;
 };
 
-function FlipCard({ content }: { content: any }) {
-    const [flipped, setFlipped] = React.useState(false);
-    const frontText = content?.camping ?? content?.nom ?? '—';
-    const backLines: string[] = [];
-    if (content?.distanceCampingAcceuil != null) backLines.push(`Distance: ${content.distanceCampingAcceuil} km`);
-    if (content?.acceuil) backLines.push(`Accueil: ${content.acceuil}`);
-    if (content?.details) backLines.push(content.details);
-
-    return (
-        <Box
-            onMouseEnter={() => setFlipped(true)}
-            onMouseLeave={() => setFlipped(false)}
-            onClick={() => setFlipped(f => !f)}
-            sx={{
-                width: '100%',
-                perspective: 800,
-                mt: 0.5,
-            }}
-        >
-            <Box sx={{ position: 'relative', width: '100%', height: 56 }}>
-                <Box
-                    sx={{
-                        position: 'absolute',
-                        width: '100%',
-                        height: '100%',
-                        transition: 'transform 0.45s',
-                        transformStyle: 'preserve-3d',
-                        transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)'
-                    }}
-                >
-                    <Box
-                        sx={{
-                            backfaceVisibility: 'hidden',
-                            position: 'absolute',
-                            width: '100%',
-                            height: '100%',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            bgcolor: 'grey.100',
-                            borderRadius: 1,
-                            px: 1,
-                        }}
-                    >
-                        <Typography variant="body2">{frontText}</Typography>
-                    </Box>
-
-                    <Box
-                        sx={{
-                            backfaceVisibility: 'hidden',
-                            transform: 'rotateY(180deg)',
-                            position: 'absolute',
-                            width: '100%',
-                            height: '100%',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            bgcolor: 'grey.200',
-                            borderRadius: 1,
-                            px: 1,
-                        }}
-                    >
-                        <Box>
-                            {backLines.length === 0 ? (
-                                <Typography variant="caption">Aucun détail</Typography>
-                            ) : (
-                                backLines.map((ln, i) => (
-                                    <Typography key={i} variant="caption" display="block">{ln}</Typography>
-                                ))
-                            )}
-                        </Box>
-                    </Box>
-                </Box>
-            </Box>
-        </Box>
-    );
-}
-
 export default function LakesSearchCards() {
     const [data, setData] = useState<Lake[]>([]);
     const [loading, setLoading] = useState(true);
     const [filters, setFilters] = useState<Filters>({ region: '', reserve: '', nom: '' });
+    const [flippedCards, setFlippedCards] = useState<{ [key: string]: boolean }>({});
 
     useEffect(() => {
         const fetchLakes = async () => {
@@ -154,6 +81,31 @@ export default function LakesSearchCards() {
         const puissance = m.puissanceMin ?? m.puissanceMax ?? m.puissance ?? null;
         return puissance ? `${type} (${puissance})` : String(type);
     };
+
+    const getMotorisationChip = (l: any) => {
+        const m = l.embarcation?.motorisation ?? l.motorisation ?? null;
+        if (!m) return <Chip label="—" size="small" />;
+
+        const type = m.type?.toLowerCase() ?? '';
+        const puissance = m.puissanceMin ?? m.puissanceMax ?? m.puissance ?? null;
+        const label = puissance ? `${m.type} (${puissance})` : m.type;
+
+        // if (type.includes('elect')) {
+        //     icon = <BoltOutlinedIcon sx={{ color: '#4caf50' }} />; // vert électrique ⚡
+        // } else if (type.includes('essence') || type.includes('gaz')) {
+        //     icon = <Icon path={mdiFuel} size={1} /> sx={{ color: '#f57c00' }} />; // orange essence ⛽
+        // }
+
+        return (
+            // <Chip
+            //     icon={type === "electrique" ? <BoltOutlinedIcon /> : <Icon path={mdiFuel} size={1} />}
+            //     label={label}
+            //     size="small"
+            //     variant="outlined"
+            // />
+            type === "electrique" ? <BoltOutlinedIcon /> : <Icon path={mdiFuel} size={1} />
+        );
+    };
     const getHebergement = (l: any) => {
         const h = l.hebergement ?? l.hebergements ?? null;
         if (!h) return null;
@@ -162,6 +114,10 @@ export default function LakesSearchCards() {
     };
 
     if (loading) return <Box className="p-6"><CircularProgress /></Box>;
+
+    const handleFlip = (id: string) => {
+        setFlippedCards(prev => ({ ...prev, [id]: !prev[id] }));
+    };
 
     return (
         <Box className="p-4 bg-white rounded-lg shadow">
@@ -194,8 +150,9 @@ export default function LakesSearchCards() {
                         xs: '1fr',
                         sm: '1fr 1fr',
                         md: 'repeat(3, 1fr)'
-                    }
+                    },
                 }}
+
             >
                 {filtered.length === 0 && (
                     <Box>
@@ -205,61 +162,76 @@ export default function LakesSearchCards() {
 
                 {filtered.map((l: any) => (
                     <Box key={l._id} sx={{ display: 'flex', flexDirection: 'column' }}>
-                        <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                            <CardHeader
-                                avatar={
-                                    l.juridiction?.organisme === 'SEPAQ' ? (
-                                        <Image src="/sepaq_logo2.png" alt="sepaq" width={40} height={40} />
-                                    ) : undefined
-                                }
-                                title={l.nomDuLac}
-                                subheader={l.regionAdministrativeQuebec}
-                            />
-                            <CardContent sx={{ flexGrow: 1 }}>
-                                <Box display="flex" justifyContent="space-between" gap={2}>
-                                    <Box flex={1}>
-                                        <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
-                                            {l.juridiction?.organisme === 'SEPAQ' ? `Site: ${l.juridiction.site || '—'}` : `Organisme: ${l.juridiction?.organisme || '—'}`}
-                                        </Typography>
-
-                                        <Box mt={0.5} display="flex" gap={1} flexWrap="wrap">
-                                            {getEspeces(l).slice(0, 6).map((sp: string) => (
-                                                <Chip key={sp} label={sp} size="small" />
-                                            ))}
-                                        </Box>
-
-                                        <Box mt={2}>
-                                            <Typography variant="body2"><strong>Accès</strong></Typography>
-                                            <Typography variant="caption" color="textSecondary">
-                                                {l.acces?.portage ? `${l.acces.portage}` : ''}
-                                                {l.acces?.acceuil ? ` • Accueil: ${l.acces.acceuil}` : ''}
-                                                {l.acces?.distanceAcceuilLac != null ? ` • ${l.acces.distanceAcceuilLac} km` : ''}
+                        <ReactCardFlip isFlipped={!!flippedCards[l._id]} flipDirection="horizontal">
+                            <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                                <CardHeader
+                                    avatar={
+                                        l.juridiction?.organisme === 'SEPAQ' ? (
+                                            <Image src="/sepaq_logo2.png" alt="sepaq" width={40} height={40} />
+                                        ) : undefined
+                                    }
+                                    title={l.nomDuLac}
+                                    subheader={
+                                        <Box display="flex" flexDirection="column">
+                                            <Typography variant="subtitle1" color="text.secondary">{l.regionAdministrativeQuebec}</Typography>
+                                            <Typography variant="subtitle2" color="text.secondary">
+                                                {l.juridiction?.organisme === 'SEPAQ' ? `${l.juridiction.site}` : `${l.juridiction?.organisme}`}
                                             </Typography>
                                         </Box>
-                                    </Box>
+                                    }
+                                />
+                                <CardContent sx={{ flexGrow: 1 }}>
+                                    <Box display="flex" justifyContent="space-between" gap={2}>
+                                        <Box flex={1}>
+                                            {/* <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
+                                                {l.juridiction?.organisme === 'SEPAQ' ? `Site: ${l.juridiction.site || '—'}` : `Organisme: ${l.juridiction?.organisme || '—'}`}
+                                            </Typography> */}
 
-                                    <Box sx={{ width: 160, textAlign: 'right' }}>
-                                        <Box>
-                                            <Chip label={getMotorisationText(l)} size="small" />
+                                            <Box mt={0.5} display="flex" gap={1} flexWrap="wrap">
+                                                {getEspeces(l).slice(0, 6).map((sp: string) => (
+                                                    <Chip key={sp} label={sp} size="small" />
+                                                ))}
+                                            </Box>
+
+                                            <Box mt={2}>
+                                                <Typography variant="body2"><strong>Accès</strong></Typography>
+                                                <Typography variant="caption" color="textSecondary">
+                                                    {l.acces?.portage ? `${l.acces.portage}` : ''}
+                                                    {l.acces?.acceuil ? ` • Accueil: ${l.acces.acceuil}` : ''}
+                                                    {l.acces?.distanceAcceuilLac != null ? ` • ${l.acces.distanceAcceuilLac} km` : ''}
+                                                </Typography>
+                                            </Box>
+                                            {/* This is the front of the card.
+                                            <button onClick={() => handleFlip(l._id)}>Click to flip</button> */}
                                         </Box>
-                                        <Box mt={1}>
-                                            <Typography variant="caption" color="textSecondary">Superficie</Typography>
-                                            <Typography variant="body2">{getSuperficieText(l) ?? '—'}</Typography>
-                                        </Box>
-                                        <Box mt={1}>
-                                            <Typography variant="caption" color="textSecondary">Hébergement</Typography>
-                                            <FlipCard content={getHebergement(l)} />
+
+                                        <Box sx={{ width: 160, textAlign: 'right' }}>
+                                            <Box>
+                                                {getMotorisationChip(l)}
+                                            </Box>
+                                            <Box mt={1}>
+                                                <Typography variant="caption" color="textSecondary">Superficie</Typography>
+                                                <Typography variant="body2">{getSuperficieText(l) ?? '—'}</Typography>
+                                            </Box>
+                                            <Box mt={1}>
+                                                <Typography variant="caption" color="textSecondary">Hébergement</Typography>
+                                                {/* <FlipCard content={getHebergement(l)} /> */}
+                                            </Box>
                                         </Box>
                                     </Box>
+                                </CardContent>
+                                <Box sx={{ p: 1 }}>
+                                    <Typography variant="caption" color="textSecondary">Lat: {getLatitude(l) ?? '—'} • Lon: {getLongitude(l) ?? '—'}</Typography>
                                 </Box>
-                            </CardContent>
-                            <Box sx={{ p: 1 }}>
-                                <Typography variant="caption" color="textSecondary">Lat: {getLatitude(l) ?? '—'} • Lon: {getLongitude(l) ?? '—'}</Typography>
-                            </Box>
-                        </Card>
+                            </Card>
+                            <>
+                                <div>This is the back of the card.</div>
+                                <button onClick={() => handleFlip(l._id)}>Click to flip</button>
+                            </>
+                        </ReactCardFlip>
                     </Box>
                 ))}
             </Box>
-        </Box>
+        </Box >
     );
 }
