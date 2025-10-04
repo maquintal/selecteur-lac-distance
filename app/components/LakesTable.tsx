@@ -37,7 +37,10 @@ import {
     DirectionsCar,
 } from '@mui/icons-material';
 import { Lake } from '../types/lake';
-
+import Icon from '@mdi/react';
+import { mdiFuel, mdiMapMarkerRadiusOutline } from '@mdi/js';
+import OfflineBoltOutlinedIcon from '@mui/icons-material/OfflineBoltOutlined';
+import BoltOutlinedIcon from '@mui/icons-material/BoltOutlined';
 
 const columns: ColumnDef<Lake>[] = [
     {
@@ -48,10 +51,10 @@ const columns: ColumnDef<Lake>[] = [
             if (juridiction?.organisme === "SEPAQ") {
                 return (
                     <Image
-                        src="/sepaq_logo.png"
+                        src="/sepaq_logo2.png"
                         alt="Logo SEPAQ"
-                        width={24}
-                        height={24}
+                        width={30}
+                        height={30}
                         style={{ objectFit: 'contain' }}
                     />
                 );
@@ -82,6 +85,30 @@ const columns: ColumnDef<Lake>[] = [
         header: 'Nom du lac',
     },
     {
+        id: 'motorisation',
+        header: 'Motorisation',
+        cell: ({ row }) => {
+            const { embarcation } = row.original;
+
+            return embarcation.motorisation.type === "electrique" ?
+                // <OfflineBoltOutlinedIcon />
+                <BoltOutlinedIcon />
+                : <Icon path={mdiFuel} size={1} />;
+
+            // if (embarcation.motorisation.type === "electrique") {
+            //     return (
+            //         <Icon path={mdiMapMarkerRadiusOutline} size={1} />
+            //     );
+            // } else if (embarcation.motorisation.type === "essence") {
+            //     return (
+            //         <Icon path={mdiMapMarkerRadiusOutline} size={1} />
+            //     );
+            // }
+            // return null;
+        },
+        enableColumnFilter: false
+    },
+    {
         id: 'portage',
         header: 'Accès',
         cell: ({ row }) => {
@@ -89,17 +116,7 @@ const columns: ColumnDef<Lake>[] = [
 
             if (acces?.portage === "Aucune marche d'approche nécessaire") {
                 return (
-                    <DirectionsCar 
-                        color="primary"
-                        titleAccess="Accès direct en véhicule"
-                        sx={{ 
-                            fontSize: 20,
-                            opacity: 0.8,
-                            '&:hover': {
-                                opacity: 1
-                            }
-                        }}
-                    />
+                    <Icon path={mdiMapMarkerRadiusOutline} size={1} />
                 );
             }
             return null;
@@ -174,7 +191,7 @@ export default function LakesTable() {
                                 </TableRow>
                                 <TableRow key={`${headerGroup.id}-filters`}>
                                     {headerGroup.headers.map(header => (
-                                        <TableCell 
+                                        <TableCell
                                             key={`${header.id}-filter`}
                                             sx={{
                                                 backgroundColor: 'grey.50',

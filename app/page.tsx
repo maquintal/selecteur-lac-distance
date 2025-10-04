@@ -1,13 +1,13 @@
 'use client';
 
-import LakesTable from './components/LakesTable';
+import LakesSearchCards from './components/LakesSearchCards';
 
 export default function Home() {
   return (
     <main className="min-h-screen p-8">
-      <h1 className="text-2xl font-bold mb-6">Liste des Lacs</h1>
-      <div className="w-full h-[600px]">
-        <LakesTable />
+      <h1 className="text-2xl font-bold mb-6">Recherche de Lacs</h1>
+      <div className="w-full">
+        <LakesSearchCards />
       </div>
     </main>
   );

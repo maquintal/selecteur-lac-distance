@@ -5,6 +5,14 @@ export interface Acces {
     accessible: "auto" | "véhicule utilitaire sport (VUS)" | "camion 4x4"
 }
 
+export interface Embarcation {
+    type: string;
+    motorisation: {
+        type: "electrique" | "essence";
+        puissanceMax: number; // en HP
+    };
+}
+
 export interface Lake {
     _id: string;
     nomDuLac: string;
@@ -15,6 +23,7 @@ export interface Lake {
     };
     reserveFaunique?: string;
     acces: Acces;
+    embarcation: Embarcation
     especes: string[];
     camping: boolean;
     latitude: number;
