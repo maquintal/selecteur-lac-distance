@@ -12,13 +12,18 @@ import {
     Chip,
     CircularProgress,
     Tooltip,
+    Button,
+    CardActions,
+    IconButton,
 } from '@mui/material';
 import Image from 'next/image';
 import ReactCardFlip from 'react-card-flip';
 import BoltOutlinedIcon from '@mui/icons-material/BoltOutlined';
 import Icon from '@mdi/react';
-import { mdiFuel } from '@mdi/js';
+import { mdiFuel, mdiMapSearchOutline } from '@mdi/js';
 import WaterDropOutlinedIcon from '@mui/icons-material/WaterDropOutlined';
+import { ButtonBase } from '@mui/material';
+import ReplyOutlinedIcon from '@mui/icons-material/ReplyOutlined';
 
 type Filters = {
     region: string;
@@ -173,11 +178,25 @@ export default function LakesSearchCards() {
         };
     };
 
-    const getHebergement = (l: any) => {
-        const h = l.hebergement ?? l.hebergements ?? null;
-        if (!h) return null;
-        if (Array.isArray(h) && h.length > 0) return h[0];
-        return h;
+    const getHebergement = (hebergement: Array<{ camping: string, distanceCampingAcceuil: number }> | null) => {
+        if (!hebergement || hebergement.length === 0) {
+            return <Typography variant="body2" color="text.secondary">—</Typography>;
+        }
+
+        return (
+            hebergement.map((h, index) => (
+                <Box key={index} sx={{ p: 2 }}>
+                    <Typography variant="body2" color="text.secondary">{h.camping} • {h.distanceCampingAcceuil} min</Typography>
+                </Box>
+            ))
+
+        );
+    };
+
+    const handleButtonClick = (e: React.MouseEvent, latitude: number, longitude: number) => {
+        e.preventDefault();
+        const googleMapsUrl = `https://www.google.com/maps/search/camping/@${latitude},${longitude},13z`;
+        window.open(googleMapsUrl, '_blank', 'noopener,noreferrer');
     };
 
     if (loading) return <Box className="p-6"><CircularProgress /></Box>;
@@ -229,27 +248,38 @@ export default function LakesSearchCards() {
 
                 {filtered.map((l: any) => {
                     const { label, icon } = getLakeSizeCategory(l.superficie);
+
+                    // Header commun pour ce lac spécifique
+                    const cardHeader = (
+                        <CardHeader
+                            avatar={
+                                l.juridiction?.organisme === 'SEPAQ' ? (
+                                    <Image src="/sepaq_logo2.png" alt="sepaq" width={40} height={40} />
+                                ) : undefined
+                            }
+                            title={l.nomDuLac}
+                            subheader={
+                                <Box display="flex" flexDirection="column">
+                                    <Typography variant="subtitle1" color="text.secondary">
+                                        {l.regionAdministrativeQuebec}
+                                    </Typography>
+                                    <Typography variant="subtitle2" color="text.secondary">
+                                        {l.juridiction?.organisme === 'SEPAQ'
+                                            ? `${l.juridiction.site}`
+                                            : `${l.juridiction?.organisme}`
+                                        }
+                                    </Typography>
+                                </Box>
+                            }
+                        />
+                    );
                     return (
 
                         <Box key={l._id} sx={{ display: 'flex', flexDirection: 'column' }}>
                             <ReactCardFlip isFlipped={!!flippedCards[l._id]} flipDirection="horizontal">
                                 <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                                    <CardHeader
-                                        avatar={
-                                            l.juridiction?.organisme === 'SEPAQ' ? (
-                                                <Image src="/sepaq_logo2.png" alt="sepaq" width={40} height={40} />
-                                            ) : undefined
-                                        }
-                                        title={l.nomDuLac}
-                                        subheader={
-                                            <Box display="flex" flexDirection="column">
-                                                <Typography variant="subtitle1" color="text.secondary">{l.regionAdministrativeQuebec}</Typography>
-                                                <Typography variant="subtitle2" color="text.secondary">
-                                                    {l.juridiction?.organisme === 'SEPAQ' ? `${l.juridiction.site}` : `${l.juridiction?.organisme}`}
-                                                </Typography>
-                                            </Box>
-                                        }
-                                    />
+                                    {cardHeader}
+                                    {/* FRONT */}
                                     <CardContent sx={{ flexGrow: 1 }}>
                                         <Box display="flex" justifyContent="space-between" gap={2}>
                                             <Box flex={1}>
@@ -285,8 +315,27 @@ export default function LakesSearchCards() {
                                                     {/* </Typography> */}
                                                 </Box>
                                                 <Box mt={1}>
-                                                    <Typography variant="caption" color="textSecondary">Hébergement</Typography>
-                                                    {/* <FlipCard content={getHebergement(l)} /> */}
+                                                    <Tooltip title={"voir les hébergements"}>
+                                                        <ButtonBase
+                                                            onClick={() => { handleFlip(l._id) }}
+                                                            sx={{
+                                                                width: '100%',
+                                                                display: 'flex',
+                                                                justifyContent: 'flex-end',
+                                                                // '&:hover': {
+                                                                //     backgroundColor: 'action.hover',
+                                                                //     borderColor: 'primary.main'
+                                                                // },
+                                                                transition: 'all 0.2s'
+                                                            }}
+                                                        >
+                                                            <Box sx={{ textAlign: 'right' }}>
+                                                                <Typography variant="caption" color="textSecondary" display="block">
+                                                                    Hébergement
+                                                                </Typography>
+                                                            </Box>
+                                                        </ButtonBase>
+                                                    </Tooltip>
                                                 </Box>
                                             </Box>
                                         </Box>
@@ -295,10 +344,29 @@ export default function LakesSearchCards() {
                                         <Typography variant="caption" color="textSecondary">Lat: {getLatitude(l) ?? '—'} • Lon: {getLongitude(l) ?? '—'}</Typography>
                                     </Box>
                                 </Card>
-                                <>
-                                    <div>This is the back of the card.</div>
-                                    <button onClick={() => handleFlip(l._id)}>Click to flip</button>
-                                </>
+
+                                {/* BACK */}
+                                <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                                    {cardHeader}
+                                    <CardContent sx={{ flexGrow: 1 }}>
+                                        {getHebergement(l.hebergement)}
+                                    </CardContent>
+                                    <CardActions sx={{ justifyContent: 'space-between' }}>
+
+                                        <IconButton
+                                            aria-label="voir les campings sur Google Maps"
+                                            onClick={(e) => handleButtonClick(e, getLatitude(l), getLongitude(l))}
+                                        >
+                                            <Icon path={mdiMapSearchOutline} size={1} />
+                                        </IconButton>
+                                        <IconButton
+                                            aria-label="retour à la recherche"
+                                            onClick={() => handleFlip(l._id)}
+                                        >
+                                            <ReplyOutlinedIcon />
+                                        </IconButton>
+                                    </CardActions>
+                                </Card>
                             </ReactCardFlip>
                         </Box>
                     )
