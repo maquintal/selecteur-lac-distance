@@ -99,7 +99,7 @@ export default function LakesSearchCards() {
         );
     };
 
-    const getLakeSizeCategory = (superficie: Array<{ valeur: number, unite: string }> | null) => {
+    const getLakeSizeCategory = (superficie: Superficie[] | null) => {
         // Gérer les cas null ou undefined
         if (!superficie || !Array.isArray(superficie)) {
             return {

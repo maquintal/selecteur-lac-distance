@@ -49,6 +49,6 @@ export interface Lake {
         latitude: number;
         longitude: number;
     }
-    superficie?: Superficie[] | null
-    hebergement?: Hebergement[] | null
+    superficie: Superficie[] | null
+    hebergement: Hebergement[] | null
 }
