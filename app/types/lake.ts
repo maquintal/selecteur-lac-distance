@@ -19,8 +19,17 @@ export interface Superficie {
 }
 
 export interface Hebergement {
-    camping: string;
-    distanceCampingAcceuil: number;
+    camping: "Camping Manoir Lac Caché",
+    distanceCampingAcceuil: {
+        temps: number, // en millisecondes
+        kilometrage: number // en km
+    },
+    eau: boolean,
+    electricite: boolean,
+    coordonnees: {
+        latitude: number,
+        longitude: number
+    }
 }
 
 export interface Lake {
@@ -40,6 +49,6 @@ export interface Lake {
         latitude: number;
         longitude: number;
     }
-    superficie: Superficie[] | null
-    hebergement: Hebergement[] | null
+    superficie?: Superficie[] | null
+    hebergement?: Hebergement[] | null
 }

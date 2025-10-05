@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
-import { Lake, Superficie } from '../types/lake';
+import { Hebergement, Lake, Superficie } from '../types/lake';
 import {
     Box,
     TextField,
@@ -170,7 +170,7 @@ export default function LakesSearchCards() {
         };
     };
 
-    const getHebergement = (hebergement: Array<{ camping: string, distanceCampingAcceuil: number }> | null) => {
+    const getHebergement = (hebergement: Hebergement[] | null) => {
         if (!hebergement || hebergement.length === 0) {
             return <Typography variant="body2" color="text.secondary">—</Typography>;
         }
@@ -178,7 +178,7 @@ export default function LakesSearchCards() {
         return (
             hebergement.map((h, index) => (
                 <Box key={index} sx={{ p: 2 }}>
-                    <Typography variant="body2" color="text.secondary">{h.camping} • {h.distanceCampingAcceuil} min</Typography>
+                    <Typography variant="body2" color="text.secondary">{h.camping} • {/* h.distanceCampingAcceuil */} min</Typography>
                 </Box>
             ))
 
