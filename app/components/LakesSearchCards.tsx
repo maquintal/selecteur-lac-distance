@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
-import { Hebergement, Lake, Superficie } from '../types/lake';
+import { Acces, Hebergement, Lake, Superficie } from '../types/lake';
 import {
     Box,
     TextField,
@@ -170,20 +170,74 @@ export default function LakesSearchCards() {
         };
     };
 
-    const getHebergement = (hebergement: Hebergement[] | null) => {
-        if (!hebergement || hebergement.length === 0) {
-            return <Typography variant="body2" color="text.secondary">—</Typography>;
-        }
+    // const getHebergement = (acces: Acces | undefined, hebergement: Hebergement[] | null) => {
 
-        return (
-            hebergement.map((h, index) => (
-                <Box key={index} sx={{ p: 2 }}>
-                    <Typography variant="body2" color="text.secondary">{h.camping} • {/* h.distanceCampingAcceuil */} min</Typography>
-                </Box>
-            ))
+    //     if (!hebergement || hebergement.length === 0) {
+    //         return <Typography variant="body2" color="text.secondary">—</Typography>;
+    //     }
 
-        );
-    };
+    //     return (
+    //         hebergement.map((h, index) => (
+    //             // <Box key={index} sx={{ p: 2 }}>
+    //                 <Typography variant="body2" color="text.secondary">{h.camping} • {h.distanceCampingAcceuil?.kilometrage} km + {acces?.distanceAcceuilLac.kilometrage} km ({h.distanceCampingAcceuil?.temps + acces?.distanceAcceuilLac?.temps} min)</Typography>
+    //                 // {l.acces?.distanceAcceuilLac != null ?
+    //                 //                                         ` • ${l.acces.distanceAcceuilLac.kilometrage} km (${l.acces.distanceAcceuilLac.temps} min)`
+    //                 //                                         : ''}
+    //             // </Box>
+    //         ))
+
+    //     );
+    // };
+
+const getHebergement = (acces: Acces | undefined, hebergement: Hebergement[] | null) => {
+    
+    if (!hebergement || hebergement.length === 0) {
+        return <Typography variant="body2" color="text.secondary">—</Typography>;
+    }
+
+    return (
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+            {hebergement.map((h, index) => {
+                const distanceCampingAcceuil = h.distanceCampingAcceuil?.kilometrage || 0;
+                const tempsCampingAcceuil = h.distanceCampingAcceuil?.temps || 0;
+                const distanceAcceuilLac = acces?.distanceAcceuilLac?.kilometrage || 0;
+                const tempsAcceuilLac = acces?.distanceAcceuilLac?.temps || 0;
+                
+                const distanceTotale = distanceCampingAcceuil + distanceAcceuilLac;
+                const tempsTotale = tempsCampingAcceuil + tempsAcceuilLac;
+
+                return (
+                    <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        {/* Colonne gauche : Nom + distances détaillées */}
+                        <Box sx={{ flex: 1 }}>
+                            <Typography variant="body2" fontWeight="medium" sx={{ mb: 0.25 }}>
+                                {h.camping}
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                                Camping → Accueil : {distanceCampingAcceuil} km ({tempsCampingAcceuil} min)
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                                Accueil → Lac : {distanceAcceuilLac} km ({tempsAcceuilLac} min)
+                            </Typography>
+                        </Box>
+
+                        {/* Colonne droite : Total + services */}
+                        <Box sx={{ textAlign: 'right', minWidth: '150px' }}>
+                            <Typography variant="body2" color="primary.main" fontWeight="500">
+                                {distanceTotale.toFixed(2)} km ({tempsTotale} min)
+                            </Typography>
+                            {(h.eau || h.electricite) && (
+                                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.25 }}>
+                                    {[h.eau && 'Eau', h.electricite && 'Électricité'].filter(Boolean).join(' • ')}
+                                </Typography>
+                            )}
+                        </Box>
+                    </Box>
+                );
+            })}
+        </Box>
+    );
+};
 
     const handleButtonClick = (e: React.MouseEvent, latitude: number, longitude: number) => {
         e.preventDefault();
@@ -285,7 +339,9 @@ export default function LakesSearchCards() {
                                                     <Typography variant="body2"><strong>Accès</strong></Typography>
                                                     <Typography variant="caption" color="textSecondary">
                                                         {l.acces?.acceuil ? `Accueil: ${l.acces.acceuil}` : ''}
-                                                        {l.acces?.distanceAcceuilLac != null ? ` • ${l.acces.distanceAcceuilLac} km` : ''}<br />
+                                                        {l.acces?.distanceAcceuilLac != null ?
+                                                            ` • ${l.acces.distanceAcceuilLac.kilometrage} km (${l.acces.distanceAcceuilLac.temps} min)`
+                                                            : ''}<br />
                                                         {l.acces?.portage ? `${l.acces.portage}` : ''}
                                                     </Typography>
                                                 </Box>
@@ -341,7 +397,7 @@ export default function LakesSearchCards() {
                                 <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                                     {cardHeader}
                                     <CardContent sx={{ flexGrow: 1 }}>
-                                        {getHebergement(l.hebergement)}
+                                        {getHebergement(l.acces, l.hebergement)}
                                     </CardContent>
                                     <CardActions sx={{ justifyContent: 'space-between' }}>
 

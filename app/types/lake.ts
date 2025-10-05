@@ -1,7 +1,10 @@
 export interface Acces {
     portage: "Aucune marche d'approche nécessaire",
     acceuil: string,
-    distanceAcceuilLac: number,
+    distanceAcceuilLac: {
+        temps?: number, // en minutes
+        kilometrage?: number // en km
+    },
     accessible: "auto" | "véhicule utilitaire sport (VUS)" | "camion 4x4"
 }
 
@@ -21,7 +24,7 @@ export interface Superficie {
 export interface Hebergement {
     camping: "Camping Manoir Lac Caché",
     distanceCampingAcceuil: {
-        temps: number, // en millisecondes
+        temps: number, // en minutes
         kilometrage: number // en km
     },
     eau: boolean,
@@ -41,8 +44,8 @@ export interface Lake {
         site: string;
     };
     reserveFaunique?: string;
-    acces: Acces;
-    embarcation: Embarcation
+    acces: Acces | undefined;
+    embarcation: Embarcation;
     especes: string[];
     camping: boolean;
     coordonnees: {
