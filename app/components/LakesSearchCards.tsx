@@ -14,6 +14,7 @@ import {
     Tooltip,
     CardActions,
     IconButton,
+    Button,
 } from '@mui/material';
 import Image from 'next/image';
 import ReactCardFlip from 'react-card-flip';
@@ -23,6 +24,7 @@ import { mdiFuel, mdiMapSearchOutline } from '@mdi/js';
 import WaterDropOutlinedIcon from '@mui/icons-material/WaterDropOutlined';
 import { ButtonBase } from '@mui/material';
 import ReplyOutlinedIcon from '@mui/icons-material/ReplyOutlined';
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 
 type Filters = {
     region: string;
@@ -170,74 +172,56 @@ export default function LakesSearchCards() {
         };
     };
 
-    // const getHebergement = (acces: Acces | undefined, hebergement: Hebergement[] | null) => {
+    const getHebergement = (acces: Acces | undefined, hebergement: Hebergement[] | null) => {
 
-    //     if (!hebergement || hebergement.length === 0) {
-    //         return <Typography variant="body2" color="text.secondary">—</Typography>;
-    //     }
+        if (!hebergement || hebergement.length === 0) {
+            return <Typography variant="body2" color="text.secondary">—</Typography>;
+        }
 
-    //     return (
-    //         hebergement.map((h, index) => (
-    //             // <Box key={index} sx={{ p: 2 }}>
-    //                 <Typography variant="body2" color="text.secondary">{h.camping} • {h.distanceCampingAcceuil?.kilometrage} km + {acces?.distanceAcceuilLac.kilometrage} km ({h.distanceCampingAcceuil?.temps + acces?.distanceAcceuilLac?.temps} min)</Typography>
-    //                 // {l.acces?.distanceAcceuilLac != null ?
-    //                 //                                         ` • ${l.acces.distanceAcceuilLac.kilometrage} km (${l.acces.distanceAcceuilLac.temps} min)`
-    //                 //                                         : ''}
-    //             // </Box>
-    //         ))
+        return (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                {hebergement.map((h, index) => {
+                    const distanceCampingAcceuil = h.distanceCampingAcceuil?.kilometrage || 0;
+                    const tempsCampingAcceuil = h.distanceCampingAcceuil?.temps || 0;
+                    const distanceAcceuilLac = acces?.distanceAcceuilLac?.kilometrage || 0;
+                    const tempsAcceuilLac = acces?.distanceAcceuilLac?.temps || 0;
 
-    //     );
-    // };
+                    const distanceTotale = distanceCampingAcceuil + distanceAcceuilLac;
+                    const tempsTotale = tempsCampingAcceuil + tempsAcceuilLac;
 
-const getHebergement = (acces: Acces | undefined, hebergement: Hebergement[] | null) => {
-    
-    if (!hebergement || hebergement.length === 0) {
-        return <Typography variant="body2" color="text.secondary">—</Typography>;
-    }
-
-    return (
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-            {hebergement.map((h, index) => {
-                const distanceCampingAcceuil = h.distanceCampingAcceuil?.kilometrage || 0;
-                const tempsCampingAcceuil = h.distanceCampingAcceuil?.temps || 0;
-                const distanceAcceuilLac = acces?.distanceAcceuilLac?.kilometrage || 0;
-                const tempsAcceuilLac = acces?.distanceAcceuilLac?.temps || 0;
-                
-                const distanceTotale = distanceCampingAcceuil + distanceAcceuilLac;
-                const tempsTotale = tempsCampingAcceuil + tempsAcceuilLac;
-
-                return (
-                    <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                        {/* Colonne gauche : Nom + distances détaillées */}
-                        <Box sx={{ flex: 1 }}>
-                            <Typography variant="body2" fontWeight="medium" sx={{ mb: 0.25 }}>
-                                {h.camping}
-                            </Typography>
-                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
-                                Camping → Accueil : {distanceCampingAcceuil} km ({tempsCampingAcceuil} min)
-                            </Typography>
-                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
-                                Accueil → Lac : {distanceAcceuilLac} km ({tempsAcceuilLac} min)
-                            </Typography>
-                        </Box>
-
-                        {/* Colonne droite : Total + services */}
-                        <Box sx={{ textAlign: 'right', minWidth: '150px' }}>
-                            <Typography variant="body2" color="primary.main" fontWeight="500">
-                                {distanceTotale.toFixed(2)} km ({tempsTotale} min)
-                            </Typography>
-                            {(h.eau || h.electricite) && (
-                                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.25 }}>
-                                    {[h.eau && 'Eau', h.electricite && 'Électricité'].filter(Boolean).join(' • ')}
+                    return (
+                        <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                            {/* Colonne gauche : Nom + distances détaillées */}
+                            <Box sx={{ flex: 1 }}>
+                                <Typography variant="subtitle1" fontWeight="medium" sx={{ mb: 0.25 }}>
+                                    {h.camping}
                                 </Typography>
-                            )}
+                                <Chip label={h.organisme} size="small" />
+                                <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                                    Camping → Accueil : {distanceCampingAcceuil} km ({tempsCampingAcceuil} min)
+                                </Typography>
+                                <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                                    Accueil → Lac : {distanceAcceuilLac} km ({tempsAcceuilLac} min)
+                                </Typography>
+                            </Box>
+
+                            {/* Colonne droite : Total + services */}
+                            <Box sx={{ textAlign: 'right', minWidth: '150px' }}>
+                                <Typography variant="body2" color="primary.main" fontWeight="500">
+                                    {distanceTotale.toFixed(2)} km ({tempsTotale} min)
+                                </Typography>
+                                {(h.eau || h.electricite) && (
+                                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.25 }}>
+                                        {[h.eau && 'Eau', h.electricite && 'Électricité'].filter(Boolean).join(' • ')}
+                                    </Typography>
+                                )}
+                            </Box>
                         </Box>
-                    </Box>
-                );
-            })}
-        </Box>
-    );
-};
+                    );
+                })}
+            </Box>
+        );
+    };
 
     const handleButtonClick = (e: React.MouseEvent, latitude: number, longitude: number) => {
         e.preventDefault();
@@ -342,25 +326,30 @@ const getHebergement = (acces: Acces | undefined, hebergement: Hebergement[] | n
                                                         {l.acces?.distanceAcceuilLac != null ?
                                                             ` • ${l.acces.distanceAcceuilLac.kilometrage} km (${l.acces.distanceAcceuilLac.temps} min)`
                                                             : ''}<br />
+                                                        {l.acces?.accessible ? `${l.acces.accessible}` : ''}<br />
                                                         {l.acces?.portage ? `${l.acces.portage}` : ''}
                                                     </Typography>
                                                 </Box>
-                                                {/* This is the front of the card.
-                                            <button onClick={() => handleFlip(l._id)}>Click to flip</button> */}
+                                                {/* <Box mt={1}>
+                                                    <Typography variant="caption" color="textSecondary">
+                                                        {l.embarcation?.type ?? '—'}
+                                                    </Typography>
+                                                </Box> */}
                                             </Box>
 
                                             <Box sx={{ width: 160, textAlign: 'right' }}>
-                                                <Box>
-                                                    {getMotorisationChip(l)}
-                                                </Box>
                                                 <Box mt={1}>
                                                     <Typography variant="caption" color="textSecondary">
                                                         Superficie
                                                     </Typography>
                                                     <Typography variant="body2">{getSuperficieText(l) ?? '—'}</Typography>
-                                                    {/* <Typography variant="body2"> */}
                                                     {icon}
-                                                    {/* </Typography> */}
+                                                </Box>
+                                                <Typography variant="caption" color="textSecondary">
+                                                    Motorisation
+                                                </Typography>
+                                                <Box>
+                                                    {getMotorisationChip(l)}
                                                 </Box>
                                                 <Box mt={1}>
                                                     <Tooltip title={"voir les hébergements"}>
@@ -379,9 +368,10 @@ const getHebergement = (acces: Acces | undefined, hebergement: Hebergement[] | n
                                                         >
                                                             <Box sx={{ textAlign: 'right' }}>
                                                                 <Typography variant="caption" color="textSecondary" display="block">
-                                                                    Hébergement
+                                                                    Hébergement ({l.hebergement?.length ?? 0})
                                                                 </Typography>
                                                             </Box>
+                                                            <KeyboardArrowRightIcon />
                                                         </ButtonBase>
                                                     </Tooltip>
                                                 </Box>

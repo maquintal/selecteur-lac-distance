@@ -23,6 +23,7 @@ export interface Superficie {
 
 export interface Hebergement {
     camping: "Camping Manoir Lac Caché",
+    organisme: string,
     distanceCampingAcceuil: {
         temps: number, // en minutes
         kilometrage: number // en km
