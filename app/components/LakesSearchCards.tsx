@@ -193,9 +193,23 @@ export default function LakesSearchCards() {
                         <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                             {/* Colonne gauche : Nom + distances détaillées */}
                             <Box sx={{ flex: 1 }}>
-                                <Typography variant="subtitle1" fontWeight="medium" sx={{ mb: 0.25 }}>
-                                    {h.camping}
-                                </Typography>
+                                <CardHeader
+                                    title={h.camping}
+                                    avatar={
+                                        h.organisme === 'SEPAQ' ? (
+                                            <Image src="/sepaq_logo2-transparent.png" alt="sepaq" width={15} height={15} />
+                                        ) : (
+                                            h.organisme === 'Pourvoirie' ? (
+                                                <Image src="/FPQ.png" alt="pourvoirie" width={15} height={15} />
+                                            ) : (
+                                                h.organisme === 'Camping' ? (
+                                                    <Image src="/campingquebec.png" alt="camping" width={15} height={15} />
+                                                ) : undefined
+                                            )
+                                        )
+                                    }
+                                />
+
                                 {/* <Chip label={h.organisme} size="small" /> */}
                                 {/* <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
                                     Camping → Accueil : {distanceCampingAcceuil} km ({tempsCampingAcceuil} min)
@@ -288,8 +302,16 @@ export default function LakesSearchCards() {
                         <CardHeader
                             avatar={
                                 l.juridiction?.organisme === 'SEPAQ' ? (
-                                    <Image src="/sepaq_logo2.png" alt="sepaq" width={40} height={40} />
-                                ) : undefined
+                                    <Image src="/sepaq_logo2-transparent.png" alt="sepaq" width={40} height={40} />
+                                ) : (
+                                    l.juridiction?.organisme === 'Pourvoirie' ? (
+                                        <Image src="/FPQ.png" alt="pourvoirie" width={35} height={35} />
+                                    ) : (
+                                        l.juridiction?.organisme === 'Camping' ? (
+                                            <Image src="/campingquebec.png" alt="camping" width={40} height={40} />
+                                        ) : undefined
+                                    )
+                                )
                             }
                             title={l.nomDuLac}
                             subheader={
