@@ -67,8 +67,8 @@ export default function LakesSearchCards() {
     }, [data, filters]);
 
     // Helper getters that tolerate both shapes in JSON
-    // const getLatitude = (l: Lake) => l.coordonnees.latitude ?? l.coordonnees?.latitude ?? null;
-    // const getLongitude = (l: Lake) => l.coordonnees.longitude ?? l.coordonnees?.longitude ?? null;
+    const getLatitude = (l: Lake) => l.coordonnees.latitude ?? null;
+    const getLongitude = (l: Lake) => l.coordonnees.longitude ?? null;
     const getEspeces = (l: Lake) => l.especes ?? [];
     const getSuperficieText = (l: Lake) => {
         const s = l.superficie;
@@ -383,7 +383,7 @@ export default function LakesSearchCards() {
                                         </Box>
                                     </CardContent>
                                     <Box sx={{ p: 1 }}>
-                                        {/* <Typography variant="caption" color="textSecondary">Lat: {getLatitude(l) ?? '—'} • Lon: {getLongitude(l) ?? '—'}</Typography> */}
+                                        <Typography variant="caption" color="textSecondary">Lat: {getLatitude(l) ?? '—'} • Lon: {getLongitude(l) ?? '—'}</Typography>
                                     </Box>
                                 </Card>
 
@@ -397,7 +397,7 @@ export default function LakesSearchCards() {
 
                                         <IconButton
                                             aria-label="voir les campings sur Google Maps"
-                                            // onClick={(e) => handleButtonClick(e, getLatitude(l), getLongitude(l))}
+                                            onClick={(e) => handleButtonClick(e, getLatitude(l), getLongitude(l))}
                                         >
                                             <Icon path={mdiMapSearchOutline} size={1} />
                                         </IconButton>
