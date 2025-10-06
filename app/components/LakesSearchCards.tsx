@@ -67,8 +67,8 @@ export default function LakesSearchCards() {
     }, [data, filters]);
 
     // Helper getters that tolerate both shapes in JSON
-    const getLatitude = (l: Lake) => l.coordonnees.latitude ?? l.coordonnees?.latitude ?? null;
-    const getLongitude = (l: Lake) => l.coordonnees.longitude ?? l.coordonnees?.longitude ?? null;
+    // const getLatitude = (l: Lake) => l.coordonnees.latitude ?? l.coordonnees?.latitude ?? null;
+    // const getLongitude = (l: Lake) => l.coordonnees.longitude ?? l.coordonnees?.longitude ?? null;
     const getEspeces = (l: Lake) => l.especes ?? [];
     const getSuperficieText = (l: Lake) => {
         const s = l.superficie;
@@ -181,13 +181,13 @@ export default function LakesSearchCards() {
         return (
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
                 {hebergement.map((h, index) => {
-                    const distanceCampingAcceuil = h.distanceCampingAcceuil?.kilometrage || 0;
-                    const tempsCampingAcceuil = h.distanceCampingAcceuil?.temps || 0;
-                    const distanceAcceuilLac = acces?.distanceAcceuilLac?.kilometrage || 0;
-                    const tempsAcceuilLac = acces?.distanceAcceuilLac?.temps || 0;
+                    // const distanceCampingAcceuil = h.distanceCampingAcceuil?.kilometrage || 0;
+                    // const tempsCampingAcceuil = h.distanceCampingAcceuil?.temps || 0;
+                    // const distanceAcceuilLac = acces?.distanceAcceuilLac?.kilometrage || 0;
+                    // const tempsAcceuilLac = acces?.distanceAcceuilLac?.temps || 0;
 
-                    const distanceTotale = distanceCampingAcceuil + distanceAcceuilLac;
-                    const tempsTotale = tempsCampingAcceuil + tempsAcceuilLac;
+                    // const distanceTotale = distanceCampingAcceuil + distanceAcceuilLac;
+                    // const tempsTotale = tempsCampingAcceuil + tempsAcceuilLac;
 
                     return (
                         <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -196,19 +196,23 @@ export default function LakesSearchCards() {
                                 <Typography variant="subtitle1" fontWeight="medium" sx={{ mb: 0.25 }}>
                                     {h.camping}
                                 </Typography>
-                                <Chip label={h.organisme} size="small" />
-                                <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                                {/* <Chip label={h.organisme} size="small" /> */}
+                                {/* <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
                                     Camping → Accueil : {distanceCampingAcceuil} km ({tempsCampingAcceuil} min)
                                 </Typography>
                                 <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
                                     Accueil → Lac : {distanceAcceuilLac} km ({tempsAcceuilLac} min)
-                                </Typography>
+                                </Typography> */}
+                                {/* <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                                    {h?.distanceCampingLac?.kilometrage} km ({h?.distanceCampingLac?.temps} min) du camping au lac
+                                </Typography> */}
                             </Box>
 
                             {/* Colonne droite : Total + services */}
                             <Box sx={{ textAlign: 'right', minWidth: '150px' }}>
                                 <Typography variant="body2" color="primary.main" fontWeight="500">
-                                    {distanceTotale.toFixed(2)} km ({tempsTotale} min)
+                                    {/* {distanceTotale.toFixed(2)} km ({tempsTotale} min) */}
+                                    {h?.distanceCampingLac?.kilometrage.toFixed(2)} km ({h?.distanceCampingLac?.temps} min)
                                 </Typography>
                                 {(h.eau || h.electricite) && (
                                     <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.25 }}>
@@ -277,7 +281,7 @@ export default function LakesSearchCards() {
                 )}
 
                 {filtered.map((l: Lake) => {
-                    const { icon } = getLakeSizeCategory(l.superficie);
+                    // const { icon } = getLakeSizeCategory(l.superficie);
 
                     // Header commun pour ce lac spécifique
                     const cardHeader = (
@@ -343,7 +347,7 @@ export default function LakesSearchCards() {
                                                         Superficie
                                                     </Typography>
                                                     <Typography variant="body2">{getSuperficieText(l) ?? '—'}</Typography>
-                                                    {icon}
+                                                    {/* {icon} */}
                                                 </Box>
                                                 <Typography variant="caption" color="textSecondary">
                                                     Motorisation
@@ -379,7 +383,7 @@ export default function LakesSearchCards() {
                                         </Box>
                                     </CardContent>
                                     <Box sx={{ p: 1 }}>
-                                        <Typography variant="caption" color="textSecondary">Lat: {getLatitude(l) ?? '—'} • Lon: {getLongitude(l) ?? '—'}</Typography>
+                                        {/* <Typography variant="caption" color="textSecondary">Lat: {getLatitude(l) ?? '—'} • Lon: {getLongitude(l) ?? '—'}</Typography> */}
                                     </Box>
                                 </Card>
 
@@ -393,7 +397,7 @@ export default function LakesSearchCards() {
 
                                         <IconButton
                                             aria-label="voir les campings sur Google Maps"
-                                            onClick={(e) => handleButtonClick(e, getLatitude(l), getLongitude(l))}
+                                            // onClick={(e) => handleButtonClick(e, getLatitude(l), getLongitude(l))}
                                         >
                                             <Icon path={mdiMapSearchOutline} size={1} />
                                         </IconButton>

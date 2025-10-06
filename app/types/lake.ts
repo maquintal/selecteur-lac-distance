@@ -28,6 +28,10 @@ export interface Hebergement {
         temps: number, // en minutes
         kilometrage: number // en km
     },
+    distanceCampingLac: {
+        temps: number, // en minutes
+        kilometrage: number // en km
+    },
     eau: boolean,
     electricite: boolean,
     coordonnees: {
