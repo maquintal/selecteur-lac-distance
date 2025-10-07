@@ -179,16 +179,8 @@ export default function LakesSearchCards() {
         }
 
         return (
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                 {hebergement.map((h, index) => {
-                    // const distanceCampingAcceuil = h.distanceCampingAcceuil?.kilometrage || 0;
-                    // const tempsCampingAcceuil = h.distanceCampingAcceuil?.temps || 0;
-                    // const distanceAcceuilLac = acces?.distanceAcceuilLac?.kilometrage || 0;
-                    // const tempsAcceuilLac = acces?.distanceAcceuilLac?.temps || 0;
-
-                    // const distanceTotale = distanceCampingAcceuil + distanceAcceuilLac;
-                    // const tempsTotale = tempsCampingAcceuil + tempsAcceuilLac;
-
                     return (
                         <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                             {/* Colonne gauche : Nom + distances détaillées */}
@@ -200,7 +192,7 @@ export default function LakesSearchCards() {
                                             <Image src="/sepaq_logo2-transparent.png" alt="sepaq" width={15} height={15} />
                                         ) : (
                                             h.organisme === 'Pourvoirie' ? (
-                                                <Image src="/FPQ.png" alt="pourvoirie" width={15} height={15} />
+                                                <Image src="/fpq2.png" alt="pourvoirie" width={15} height={15} />
                                             ) : (
                                                 h.organisme === 'Camping' ? (
                                                     <Image src="/campingquebec.png" alt="camping" width={15} height={15} />
@@ -209,23 +201,11 @@ export default function LakesSearchCards() {
                                         )
                                     }
                                 />
-
-                                {/* <Chip label={h.organisme} size="small" /> */}
-                                {/* <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
-                                    Camping → Accueil : {distanceCampingAcceuil} km ({tempsCampingAcceuil} min)
-                                </Typography>
-                                <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
-                                    Accueil → Lac : {distanceAcceuilLac} km ({tempsAcceuilLac} min)
-                                </Typography> */}
-                                {/* <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
-                                    {h?.distanceCampingLac?.kilometrage} km ({h?.distanceCampingLac?.temps} min) du camping au lac
-                                </Typography> */}
                             </Box>
 
                             {/* Colonne droite : Total + services */}
                             <Box sx={{ textAlign: 'right', minWidth: '150px' }}>
                                 <Typography variant="body2" color="primary.main" fontWeight="500">
-                                    {/* {distanceTotale.toFixed(2)} km ({tempsTotale} min) */}
                                     {h?.distanceCampingLac?.kilometrage.toFixed(2)} km ({h?.distanceCampingLac?.temps} min)
                                 </Typography>
                                 {(h.eau || h.electricite) && (
@@ -295,7 +275,7 @@ export default function LakesSearchCards() {
                 )}
 
                 {filtered.map((l: Lake) => {
-                    // const { icon } = getLakeSizeCategory(l.superficie);
+                    const { icon } = getLakeSizeCategory(l.superficie);
 
                     // Header commun pour ce lac spécifique
                     const cardHeader = (
@@ -305,7 +285,7 @@ export default function LakesSearchCards() {
                                     <Image src="/sepaq_logo2-transparent.png" alt="sepaq" width={40} height={40} />
                                 ) : (
                                     l.juridiction?.organisme === 'Pourvoirie' ? (
-                                        <Image src="/FPQ.png" alt="pourvoirie" width={35} height={35} />
+                                        <Image src="/fpq2.png" alt="pourvoirie" width={40} height={40} />
                                     ) : (
                                         l.juridiction?.organisme === 'Camping' ? (
                                             <Image src="/campingquebec.png" alt="camping" width={40} height={40} />
@@ -356,11 +336,6 @@ export default function LakesSearchCards() {
                                                         {l.acces?.portage ? `${l.acces.portage}` : ''}
                                                     </Typography>
                                                 </Box>
-                                                {/* <Box mt={1}>
-                                                    <Typography variant="caption" color="textSecondary">
-                                                        {l.embarcation?.type ?? '—'}
-                                                    </Typography>
-                                                </Box> */}
                                             </Box>
 
                                             <Box sx={{ width: 160, textAlign: 'right' }}>
@@ -369,7 +344,7 @@ export default function LakesSearchCards() {
                                                         Superficie
                                                     </Typography>
                                                     <Typography variant="body2">{getSuperficieText(l) ?? '—'}</Typography>
-                                                    {/* {icon} */}
+                                                    {icon}
                                                 </Box>
                                                 <Typography variant="caption" color="textSecondary">
                                                     Motorisation
