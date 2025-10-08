@@ -79,15 +79,15 @@ interface LakeStats {
   };
 }
 
-const StatCard = ({ 
-  title, 
-  value, 
-  icon: Icon, 
+const StatCard = ({
+  title,
+  value,
+  icon: Icon,
   color = '#1976d2',
-  subtitle 
-}: { 
-  title: string; 
-  value: string | number; 
+  subtitle
+}: {
+  title: string;
+  value: string | number;
   icon: React.ElementType;
   color?: string;
   subtitle?: string;
@@ -112,19 +112,17 @@ const StatCard = ({
   </Card>
 );
 
-const ProgressBar = ({ 
-  value, 
-  max, 
-  label, 
-  color = '#1976d2' 
-}: { 
-  value: number; 
-  max: number; 
-  label: string; 
-  color?: string 
+const ProgressBar = ({
+  value,
+  pourcentage,
+  label,
+  color = '#1976d2'
+}: {
+  value: number;
+  pourcentage: number;
+  label: string;
+  color?: string
 }) => {
-  const percentage = (value / max) * 100;
-  
   return (
     <Box mb={2}>
       <Box display="flex" justifyContent="space-between" mb={0.5}>
@@ -132,25 +130,25 @@ const ProgressBar = ({
           {label}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          {value} ({percentage.toFixed(1)}%)
+          {value} ({pourcentage.toFixed(1)}%)
         </Typography>
       </Box>
-      <Box 
-        sx={{ 
-          width: '100%', 
-          height: 8, 
-          bgcolor: 'grey.200', 
+      <Box
+        sx={{
+          width: '100%',
+          height: 8,
+          bgcolor: 'grey.200',
           borderRadius: 4,
           overflow: 'hidden'
         }}
       >
-        <Box 
-          sx={{ 
-            width: `${percentage}%`, 
-            height: '100%', 
+        <Box
+          sx={{
+            width: `${pourcentage}%`,
+            height: '100%',
             bgcolor: color,
             transition: 'width 0.3s ease'
-          }} 
+          }}
         />
       </Box>
     </Box>
@@ -195,9 +193,6 @@ export default function LakeStatsDashboard() {
   }
 
   if (!stats) return null;
-
-  const maxRegion = Math.max(...stats.parRegion.map(r => r.nombreLacs));
-  const maxSite = Math.max(...stats.parSite.map(s => s.nombreLacs));
 
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
@@ -270,7 +265,7 @@ export default function LakeStatsDashboard() {
               key={index}
               label={region.region}
               value={region.nombreLacs}
-              max={maxRegion}
+              pourcentage={region.pourcentage}
               color="#1976d2"
             />
           ))}
@@ -289,7 +284,7 @@ export default function LakeStatsDashboard() {
               key={index}
               label={site.site}
               value={site.nombreLacs}
-              max={maxSite}
+              pourcentage={site.pourcentage}
               color="#2e7d32"
             />
           ))}
@@ -313,34 +308,34 @@ export default function LakeStatsDashboard() {
                         <Typography variant="body1" fontWeight={index < 3 ? 'bold' : 'regular'}>
                           {index + 1}. {espece.espece}
                         </Typography>
-                        <Chip 
-                          label={`${espece.nombreLacs} lacs`} 
-                          size="small" 
+                        <Chip
+                          label={`${espece.nombreLacs} lacs`}
+                          size="small"
                           color={index < 3 ? 'primary' : 'default'}
                         />
                       </Box>
                     }
                     secondary={
-                      <Box 
+                      <Box
                         component="span"
-                        sx={{ 
+                        sx={{
                           display: 'block',
-                          width: '100%', 
-                          height: 4, 
-                          bgcolor: 'grey.200', 
+                          width: '100%',
+                          height: 4,
+                          bgcolor: 'grey.200',
                           borderRadius: 2,
                           mt: 0.5,
                           overflow: 'hidden'
                         }}
                       >
-                        <Box 
+                        <Box
                           component="span"
-                          sx={{ 
+                          sx={{
                             display: 'block',
-                            width: `${espece.pourcentage}%`, 
-                            height: '100%', 
+                            width: `${espece.pourcentage}%`,
+                            height: '100%',
                             bgcolor: index < 3 ? '#0288d1' : '#90caf9'
-                          }} 
+                          }}
                         />
                       </Box>
                     }
@@ -365,7 +360,7 @@ export default function LakeStatsDashboard() {
               key={index}
               label={acces.type}
               value={acces.nombreLacs}
-              max={stats.global.totalLacs}
+              pourcentage={acces.pourcentage}
               color="#ed6c02"
             />
           ))}
@@ -401,5 +396,5 @@ export default function LakeStatsDashboard() {
         </Paper>
       </Box>
     </Container>
-  );
-}
+  )
+};
