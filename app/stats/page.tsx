@@ -88,7 +88,7 @@ const StatCard = ({
 }: { 
   title: string; 
   value: string | number; 
-  icon: any; 
+  icon: React.ElementType;
   color?: string;
   subtitle?: string;
 }) => (
@@ -202,7 +202,7 @@ export default function LakeStatsDashboard() {
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
       <Typography variant="h3" fontWeight="bold" gutterBottom mb={4}>
-        📊 Statistiques des Plans d'Eau
+        📊 {`Statistiques des Plans d'Eau`}
       </Typography>
 
       {/* Statistiques Globales */}
@@ -357,7 +357,7 @@ export default function LakeStatsDashboard() {
           <Box display="flex" alignItems="center" gap={1} mb={3}>
             <Navigation size={28} color="#ed6c02" />
             <Typography variant="h5" fontWeight="bold">
-              Par Type d'Accessibilité
+              {`Par Type d'Accessibilité`}
             </Typography>
           </Box>
           {stats.parAccessibilite.map((acces, index) => (
@@ -382,7 +382,7 @@ export default function LakeStatsDashboard() {
             {stats.distancesMoyennes.globale} km
           </Typography>
           <Typography variant="body2" color="text.secondary" mb={2}>
-            Distance moyenne entre l'accueil et les lacs
+            {`Distance moyenne entre l'accueil et les lacs`}
           </Typography>
 
           <Divider sx={{ my: 2 }} />

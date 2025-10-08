@@ -14,7 +14,6 @@ import {
     Tooltip,
     CardActions,
     IconButton,
-    Button,
 } from '@mui/material';
 import Image from 'next/image';
 import ReactCardFlip from 'react-card-flip';

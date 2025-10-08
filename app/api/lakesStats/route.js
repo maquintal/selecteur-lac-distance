@@ -1,64 +1,64 @@
 import { NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
-import { Lake } from '@/app/types/lake';
+// import { Lake } from '@/app/types/lake';
 
-interface LakeStats {
-  global: {
-    totalLacs: number;
-    lacsAvecHebergement: number;
-    lacsMoteurElectrique: number;
-    lacsMoteurEssence: number;
-    lacsSansMotorisation: number;
-  };
-  parRegion: Array<{
-    region: string;
-    nombreLacs: number;
-    pourcentage: number;
-  }>;
-  parSite: Array<{
-    site: string;
-    nombreLacs: number;
-    pourcentage: number;
-  }>;
-  parOrganisme: Array<{
-    organisme: string;
-    nombreLacs: number;
-    pourcentage: number;
-  }>;
-  parMotorisation: Array<{
-    type: string;
-    nombreLacs: number;
-    pourcentage: number;
-  }>;
-  parTypeEmbarcation: Array<{
-    type: string;
-    nombreLacs: number;
-    pourcentage: number;
-  }>;
-  parAccessibilite: Array<{
-    type: string;
-    nombreLacs: number;
-    pourcentage: number;
-  }>;
-  especesPopulaires: Array<{
-    espece: string;
-    nombreLacs: number;
-    pourcentage: number;
-  }>;
-  distancesMoyennes: {
-    globale: number;
-    parSite: Array<{
-      site: string;
-      distanceMoyenne: number;
-    }>;
-  };
-}
+// interface LakeStats {
+//   global: {
+//     totalLacs: number;
+//     lacsAvecHebergement: number;
+//     lacsMoteurElectrique: number;
+//     lacsMoteurEssence: number;
+//     lacsSansMotorisation: number;
+//   };
+//   parRegion: Array<{
+//     region: string;
+//     nombreLacs: number;
+//     pourcentage: number;
+//   }>;
+//   parSite: Array<{
+//     site: string;
+//     nombreLacs: number;
+//     pourcentage: number;
+//   }>;
+//   parOrganisme: Array<{
+//     organisme: string;
+//     nombreLacs: number;
+//     pourcentage: number;
+//   }>;
+//   parMotorisation: Array<{
+//     type: string;
+//     nombreLacs: number;
+//     pourcentage: number;
+//   }>;
+//   parTypeEmbarcation: Array<{
+//     type: string;
+//     nombreLacs: number;
+//     pourcentage: number;
+//   }>;
+//   parAccessibilite: Array<{
+//     type: string;
+//     nombreLacs: number;
+//     pourcentage: number;
+//   }>;
+//   especesPopulaires: Array<{
+//     espece: string;
+//     nombreLacs: number;
+//     pourcentage: number;
+//   }>;
+//   distancesMoyennes: {
+//     globale: number;
+//     parSite: Array<{
+//       site: string;
+//       distanceMoyenne: number;
+//     }>;
+//   };
+// }
 
 export async function GET() {
   try {
     const client = await clientPromise;
     const db = client.db("peche_plan_eau");
-    const collection = db.collection<Lake>("peche_plan_eau");
+    const collection = db.collection/* <Lake> */("peche_plan_eau");
 
     // Obtenir le total de lacs
     const totalLacs = await collection.countDocuments();
@@ -321,7 +321,7 @@ export async function GET() {
       }
     ]).toArray();
 
-    const stats: LakeStats = {
+    const stats/* : LakeStats */ = {
       global: {
         totalLacs,
         lacsAvecHebergement: globalStats[0].avecHebergement[0]?.count || 0,
