@@ -17,15 +17,34 @@ export async function GET() {
                                 then: { $size: "$hebergement" },
                                 else: 0
                             }
+                        },
+                        motorisationPriority: {
+                            $switch: {
+                                branches: [
+                                    {
+                                        case: { $eq: ["$embarcation.motorisation.type", "electrique"] },
+                                        then: 1
+                                    },
+                                    {
+                                        case: { $eq: ["$embarcation.motorisation.type", "essence"] },
+                                        then: 2
+                                    }
+                                ],
+                                default: 3
+                            }
                         }
                     }
                 },
                 {
-                    $sort: { hebergementCount: -1 }
+                    $sort: { 
+                        hebergementCount: -1,
+                        motorisationPriority: 1
+                    }
                 },
                 {
                     $project: {
-                        hebergementCount: 0  // Optionnel : retire le champ temporaire
+                        hebergementCount: 0,
+                        motorisationPriority: 0
                     }
                 }
             ])

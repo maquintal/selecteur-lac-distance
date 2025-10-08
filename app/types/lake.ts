@@ -45,8 +45,10 @@ export interface Lake {
     nomDuLac: string;
     regionAdministrativeQuebec: string;
     juridiction: {
+        type: string;
         organisme: string;
         site: string;
+        zone: number;
     };
     reserveFaunique?: string;
     acces: Acces | undefined;
