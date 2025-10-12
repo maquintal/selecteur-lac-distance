@@ -28,13 +28,14 @@ import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 type Filters = {
     region: string;
     reserve: string;
+    organisme: string;
     nom: string;
 };
 
 export default function LakesSearchCards() {
     const [data, setData] = useState<Lake[]>([]);
     const [loading, setLoading] = useState(true);
-    const [filters, setFilters] = useState<Filters>({ region: '', reserve: '', nom: '' });
+    const [filters, setFilters] = useState<Filters>({ region: '', reserve: '', organisme: '', nom: '' });
     const [flippedCards, setFlippedCards] = useState<{ [key: string]: boolean }>({});
 
     useEffect(() => {
@@ -60,8 +61,9 @@ export default function LakesSearchCards() {
                 : true;
             const reserveSite = l.juridiction?.organisme === 'SEPAQ' ? (l.juridiction.site || '') : '';
             const reserveMatch = filters.reserve ? reserveSite.toLowerCase().includes(filters.reserve.toLowerCase()) : true;
+            const organismeMatch = filters.organisme ? (l.juridiction?.organisme || '').toLowerCase().includes(filters.organisme.toLowerCase()) : true;
             const nomMatch = filters.nom ? (l.nomDuLac || '').toLowerCase().includes(filters.nom.toLowerCase()) : true;
-            return regionMatch && reserveMatch && nomMatch;
+            return regionMatch && organismeMatch && reserveMatch && nomMatch;
         });
     }, [data, filters]);
 
@@ -246,6 +248,12 @@ export default function LakesSearchCards() {
                     size="small"
                     value={filters.reserve}
                     onChange={e => setFilters(f => ({ ...f, reserve: e.target.value }))}
+                />
+                <TextField
+                    label="Organisme"
+                    size="small"
+                    value={filters.organisme}
+                    onChange={e => setFilters(f => ({ ...f, organisme: e.target.value }))}
                 />
                 <TextField
                     label="Nom du lac"
