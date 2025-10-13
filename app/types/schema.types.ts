@@ -55,7 +55,10 @@ export const defaultLacInput: NewLacInput = {
   acces: {
     portage: "",
     acceuil: "",
-    distanceAcceuilLac: 0,
+    distanceAcceuilLac: {
+      temps: 0,
+      kilometrage: 0,
+    },
     accessible: "",
   },
   embarcation: {
@@ -87,8 +90,8 @@ export const defaultCampingInput: NewCampingInput = {
 
 export const defaultEspeceInput: NewEspeceInput = {
   nomCommun: "",
-  nomScientifique: undefined,
-  aliases: [],
+  nomScientifique: "",
+  // aliases: [],
   categorie: undefined,
 };
 

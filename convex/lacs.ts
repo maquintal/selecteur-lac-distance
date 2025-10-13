@@ -60,6 +60,26 @@ export const updateCamping = mutation({
     return await ctx.db.patch(id, data);
   },
 });
+
+export const updateEspece = mutation({
+  args: {
+    id: v.id("especes"),
+    nomCommun: v.string(),
+    nomScientifique: v.optional(v.string()),
+    // aliases: v.optional(v.array(v.string())),
+    categorie: v.optional(
+      v.union(
+        v.literal("salmonidés"),
+        v.literal("carnassiers"),
+      )
+    ),
+  },
+  handler: async (ctx, args) => {
+    const { id, ...data } = args;
+    return await ctx.db.patch(id, data);
+  },
+});
+
 export const removeCampingFromLac = mutation({
   args: {
     lacId: v.id("lacs"),
@@ -197,9 +217,9 @@ export const getLacsWithDetails = query({
     // Filtrer par espèce si nécessaire et s'assurer que especeId est défini
     const filteredLacs = args.especeId !== undefined
       ? lacs.filter((lac) => {
-          const especeId = args.especeId;
-          return especeId !== undefined && lac.especeIds.includes(especeId);
-        })
+        const especeId = args.especeId;
+        return especeId !== undefined && lac.especeIds.includes(especeId);
+      })
       : lacs;
 
     // Enrichir avec les données liées
@@ -283,9 +303,9 @@ export const getLacsNearby = query({
       const a =
         Math.sin(dLat / 2) * Math.sin(dLat / 2) +
         Math.cos((lat1 * Math.PI) / 180) *
-          Math.cos((lat2 * Math.PI) / 180) *
-          Math.sin(dLon / 2) *
-          Math.sin(dLon / 2);
+        Math.cos((lat2 * Math.PI) / 180) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
       return R * c;
     };
@@ -309,6 +329,12 @@ export const getLacsNearby = query({
 export const getAllCampings = query({
   handler: async (ctx) => {
     return await ctx.db.query("campings").collect();
+  },
+});
+
+export const getAllEspeces = query({
+  handler: async (ctx) => {
+    return await ctx.db.query("especes").collect();
   },
 });
 
@@ -351,28 +377,109 @@ export const addLac = mutation({
       hectares: v.number(),
       km2: v.number(),
     })),
+    especeIds: v.optional(v.array(v.id("especes"))),
+    hebergements: v.optional(v.array(v.object({
+      campingId: v.id("campings"),
+      distanceDepuisLac: v.optional(v.object({
+        temps: v.number(),
+        kilometrage: v.number(),
+      })),
+    }))),
+    acces: v.object({
+      portage: v.string(),
+      acceuil: v.string(),
+      distanceAcceuilLac: v.union(
+        v.object({
+          temps: v.number(),
+          kilometrage: v.number(),
+        })
+      ),
+      accessible: v.string(),
+    }),
+    embarcation: v.object({
+      type: v.union(
+        v.literal("Embarcation Sépaq fournie"),
+        v.literal("Embarcation Pourvoirie fournie"),
+        v.literal("Location")
+      ),
+      motorisation: v.object({
+        type: v.union(
+          v.literal("electrique"),
+          v.literal("essence"),
+          v.literal("aucune")
+        ),
+        puissanceMin: v.optional(v.number()),
+      }),
+    }),
+
   },
   handler: async (ctx, args) => {
     return await ctx.db.insert("lacs", {
       ...args,
-      acces: {
-        portage: "",
-        acceuil: "",
-        distanceAcceuilLac: 0,
-        accessible: "",
-      },
-      embarcation: {
-        type: "",
-        motorisation: {
-          type: "aucune",
-        },
-      },
-      especeIds: [],
-      hebergements: [],
+      especeIds: args.especeIds || [],
+      hebergements: args.hebergements || [],
       createdAt: Date.now(),
     });
   },
 });
+
+export const updateLac = mutation({
+  args: {
+    lacId: v.id("lacs"),
+    nomDuLac: v.string(),
+    regionAdministrativeQuebec: v.string(),
+    coordonnees: v.object({
+      latitude: v.number(),
+      longitude: v.number(),
+    }),
+    acces: v.object({
+      portage: v.string(),
+      acceuil: v.string(),
+      distanceAcceuilLac: v.union(
+        v.object({
+          temps: v.number(),
+          kilometrage: v.number(),
+        })
+      ),
+      accessible: v.string(),
+    }),
+    embarcation: v.object({
+      type: v.union(
+        v.literal("Embarcation Sépaq fournie"),
+        v.literal("Embarcation Pourvoirie fournie"),
+        v.literal("Location")
+      ),
+      motorisation: v.object({
+        type: v.union(
+          v.literal("electrique"),
+          v.literal("essence"),
+          v.literal("aucune")
+        ),
+        puissanceMin: v.optional(v.number()),
+      }),
+    }),
+    zone: v.optional(v.number()),
+    siteId: v.optional(v.id("sites")),
+    superficie: v.optional(
+      v.object({
+        hectares: v.number(),
+        km2: v.number(),
+      })
+    ),
+    especeIds: v.optional(v.array(v.id("especes"))),
+  },
+  handler: async (ctx, args) => {
+    const { lacId, ...updateData } = args;
+
+    await ctx.db.patch(lacId, {
+      ...updateData,
+      updatedAt: Date.now(),
+    });
+
+    return lacId;
+  },
+});
+
 
 // Ajouter un camping à un lac
 export const addCampingToLac = mutation({
@@ -404,6 +511,44 @@ export const addCampingToLac = mutation({
           distanceDepuisLac: args.distanceDepuisLac,
         },
       ],
+      updatedAt: Date.now(),
+    });
+  },
+});
+
+export const addEspece = mutation({
+  args: {
+    nomCommun: v.string(),
+    nomScientifique: v.optional(v.string()),
+    // aliases: v.optional(v.array(v.string())),
+    categorie: v.optional(
+      v.union(
+        v.literal("salmonidés"),
+        v.literal("carnassiers"),
+      )
+    ),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.insert("especes", args);
+  },
+});
+
+export const addEspeceToLac = mutation({
+  args: {
+    lacId: v.id("lacs"),
+    especeId: v.id("especes"),
+  },
+  handler: async (ctx, args) => {
+    const lac = await ctx.db.get(args.lacId);
+    if (!lac) throw new Error("Lac non trouvé");
+
+    // Vérifier si l'espèce n'est pas déjà liée
+    if (lac.especeIds.includes(args.especeId)) {
+      throw new Error("Cette espèce est déjà liée à ce lac");
+    }
+
+    return await ctx.db.patch(args.lacId, {
+      especeIds: [...lac.especeIds, args.especeId],
       updatedAt: Date.now(),
     });
   },

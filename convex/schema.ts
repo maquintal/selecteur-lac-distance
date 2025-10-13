@@ -39,13 +39,11 @@ export default defineSchema({
   especes: defineTable({
     nomCommun: v.string(),
     nomScientifique: v.optional(v.string()),
-    aliases: v.array(v.string()),
+    // aliases: v.optional(v.array(v.string())),
     categorie: v.optional(
       v.union(
-        v.literal("truite"),
-        v.literal("brochet"),
-        v.literal("doré"),
-        v.literal("autre")
+        v.literal("salmonidés"),
+        v.literal("carnassiers"),
       )
     ),
   })
@@ -89,7 +87,6 @@ export default defineSchema({
       portage: v.string(),
       acceuil: v.string(),
       distanceAcceuilLac: v.union(
-        v.number(),
         v.object({
           temps: v.number(), // en minutes
           kilometrage: v.number(),
@@ -99,7 +96,10 @@ export default defineSchema({
     }),
 
     embarcation: v.object({
-      type: v.string(),
+      type: v.union(
+        v.literal("Embarcation Sépaq fournie"),
+        v.literal("Embarcation Pourvoirie fournie"),
+        v.literal("Location")),
       motorisation: v.object({
         type: v.union(
           v.literal("electrique"),

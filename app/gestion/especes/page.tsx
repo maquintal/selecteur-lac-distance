@@ -11,28 +11,28 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
-import { CampingDoc } from '../../../app/types/schema.types';
-import CampingDialog from '../../../app/components/CampingDialog';
+import { EspeceDoc } from '../../../app/types/schema.types';
 import GestionNavBar from '../../../app/components/GestionNavBar';
+import EspeceDialog from '@/app/components/EspeceDialog';
 
-export default function GestionCampings() {
+export default function GestionEspeces() {
   const [openDialog, setOpenDialog] = useState(false);
-  const [selectedCamping, setSelectedCamping] = useState<CampingDoc | undefined>(undefined);
+  const [selectedEspece, setSelectedEspece] = useState<EspeceDoc | any>();
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
   const [dialogMode, setDialogMode] = useState<'create' | 'edit'>('create');
 
   // Queries Convex
-  const campings = useQuery(api.lacs.getAllCampings) || [];
+  const especes = useQuery(api.lacs.getAllEspeces) || [];
 
-  const handleOpenDialog = (mode: 'create' | 'edit', camping?: CampingDoc) => {
+  const handleOpenDialog = (mode: 'create' | 'edit', espece?: EspeceDoc) => {
     setDialogMode(mode);
-    setSelectedCamping(camping);
+    setSelectedEspece(espece);
     setOpenDialog(true);
   };
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
-    setSelectedCamping(undefined);
+    setSelectedEspece(undefined);
   };
 
   const handleSnackbar = (message: string, severity: 'success' | 'error') => {
@@ -46,14 +46,14 @@ export default function GestionCampings() {
       <Box sx={{ mt: 4, mb: 4 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
           <Typography variant="h4" component="h1">
-            Gestion des campings
+            Gestion des espèces
           </Typography>
           <Button
             variant="contained"
             startIcon={<AddIcon />}
             onClick={() => handleOpenDialog('create')}
           >
-            Ajouter un camping
+            Ajouter une espèce
           </Button>
         </Box>
 
@@ -61,25 +61,21 @@ export default function GestionCampings() {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Nom</TableCell>
-                <TableCell>Organisme</TableCell>
-                <TableCell>Région administrative</TableCell>
-                <TableCell>Commodités</TableCell>
-                <TableCell>Actions</TableCell>
+                <TableCell>Nom commun</TableCell>
+                <TableCell>Nom scientifique</TableCell>
+                {/* <TableCell>Région administrative</TableCell> */}
+                {/* <TableCell>Commodités</TableCell> */}
+                {/* <TableCell>Actions</TableCell> */}
               </TableRow>
             </TableHead>
             <TableBody>
-              {campings.map((camping) => (
-                <TableRow key={camping._id}>
-                  <TableCell>{camping.nom}</TableCell>
-                  <TableCell>{camping.organisme}</TableCell>
-                  <TableCell>{camping.regionAdministrative}</TableCell>
+              {especes.map((espece) => (
+                <TableRow key={espece._id}>
+                  <TableCell>{espece.nomCommun}</TableCell>
+                  {/* <TableCell>{espece.nomScientifique}</TableCell> */}
+                  {/* <TableCell>{espece.regionAdministrative}</TableCell> */}
                   <TableCell>
-                    {camping.commodites.eau && 'Eau '}
-                    {camping.commodites.electricite && 'Électricité'}
-                  </TableCell>
-                  <TableCell>
-                    <IconButton onClick={() => handleOpenDialog('edit', camping)}>
+                    <IconButton onClick={() => handleOpenDialog('edit', espece)}>
                       <EditIcon />
                     </IconButton>
                   </TableCell>
@@ -90,10 +86,10 @@ export default function GestionCampings() {
         </TableContainer>
       </Box>
 
-      <CampingDialog
+      <EspeceDialog
         open={openDialog}
         onClose={handleCloseDialog}
-        camping={selectedCamping}
+        espece={selectedEspece}
         mode={dialogMode}
       />
 

@@ -11,7 +11,8 @@ import {
   Typography
 } from '@mui/material';
 import WaterIcon from '@mui/icons-material/Water';
-import CampingIcon from '@mui/icons-material/Campaign';
+import Icon from '@mdi/react';
+import { mdiFish, mdiTent } from '@mdi/js';
 
 export default function GestionNavBar() {
   const pathname = usePathname();
@@ -43,7 +44,7 @@ export default function GestionNavBar() {
             <Button
               component={Link}
               href="/gestion/campings"
-              startIcon={<CampingIcon />}
+              startIcon={<Icon path={mdiTent} size={1} />}
               color={isActive('/gestion/campings') ? 'primary' : 'inherit'}
               sx={{ 
                 color: isActive('/gestion/campings') ? 'primary.main' : 'text.primary',
@@ -51,6 +52,19 @@ export default function GestionNavBar() {
               }}
             >
               Campings
+            </Button>
+
+            <Button
+              component={Link}
+              href="/gestion/especes"
+              startIcon={<Icon path={mdiFish} size={1} />}
+              color={isActive('/gestion/especes') ? 'primary' : 'inherit'}
+              sx={{ 
+                color: isActive('/gestion/especes') ? 'primary.main' : 'text.primary',
+                textDecoration: 'none'
+              }}
+            >
+              Espèces
             </Button>
           </Box>
         </Toolbar>

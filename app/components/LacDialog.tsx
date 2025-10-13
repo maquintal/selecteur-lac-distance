@@ -1,14 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useMutation, useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
-import { 
-  Box, TextField, Button, 
+import {
+  Box, TextField, Button,
   Dialog, DialogTitle, DialogContent, DialogActions,
   Select, MenuItem, FormControl, InputLabel,
   Typography, Table, TableBody, TableCell, TableContainer,
-  TableHead, TableRow, Paper, IconButton, Tooltip
+  TableHead, TableRow, Paper, IconButton, Tooltip,
+  Chip
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
@@ -34,11 +35,14 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
     acces: {
       portage: "",
       acceuil: "",
-      distanceAcceuilLac: 0,
+      distanceAcceuilLac: {
+        temps: 0,
+        kilometrage: 0,
+      },
       accessible: "",
     },
     embarcation: {
-      type: "",
+      type: "Location",
       motorisation: {
         type: "aucune",
       },
@@ -50,6 +54,56 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
     superficie: undefined,
   });
 
+  // ✅ Synchroniser formData avec le lac sélectionné
+  useEffect(() => {
+    if (open) {
+      if (lac) {
+        setFormData({
+          nomDuLac: lac.nomDuLac,
+          regionAdministrativeQuebec: lac.regionAdministrativeQuebec,
+          coordonnees: lac.coordonnees,
+          acces: lac.acces,
+          embarcation: lac.embarcation,
+          especeIds: lac.especeIds,
+          hebergements: lac.hebergements,
+          zone: lac.zone,
+          siteId: lac.siteId,
+          superficie: lac.superficie,
+        });
+      } else {
+        // Réinitialiser pour le mode création
+        setFormData({
+          nomDuLac: "",
+          regionAdministrativeQuebec: "",
+          coordonnees: {
+            latitude: 0,
+            longitude: 0,
+          },
+          acces: {
+            portage: "",
+            acceuil: "",
+            distanceAcceuilLac: {
+              temps: 0,
+              kilometrage: 0,
+            },
+            accessible: "",
+          },
+          embarcation: {
+            type: "Location",
+            motorisation: {
+              type: "aucune",
+            },
+          },
+          especeIds: [],
+          hebergements: [],
+          zone: undefined,
+          siteId: undefined,
+          superficie: undefined,
+        });
+      }
+    }
+  }, [open, lac]);
+
   const [hebergement, setHebergement] = useState<Omit<HebergementLac, 'campingId'> & { campingId: Id<"campings"> | null }>({
     campingId: null,
     distanceDepuisLac: {
@@ -59,20 +113,14 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
   });
 
   const addLac = useMutation(api.lacs.addLac);
+  const updateLac = useMutation(api.lacs.updateLac);
   const addHebergement = useMutation(api.lacs.addCampingToLac);
   const campings = useQuery(api.lacs.getAllCampings);
   const removeCampingFromLac = useMutation(api.lacs.removeCampingFromLac);
+  const especes = useQuery(api.lacs.getAllEspeces);
 
   const handleInputChange = (field: keyof NewLacInput, value: any) => {
-    if (field === 'coordonnees') {
-      setFormData(prev => ({
-        ...prev,
-        coordonnees: {
-          ...prev.coordonnees,
-          ...(typeof value === 'object' ? value : {})
-        }
-      }));
-    } else if (field === 'superficie') {
+    if (field === 'superficie') {
       setFormData(prev => ({
         ...prev,
         superficie: value ? {
@@ -95,6 +143,11 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
           ...prev.embarcation,
           ...value
         }
+      }));
+    } else if (field === 'especeIds') {
+      setFormData(prev => ({
+        ...prev,
+        especeIds: typeof value === 'string' ? [value] : value
       }));
     } else {
       setFormData(prev => ({
@@ -121,6 +174,16 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
     }
   };
 
+  const handleCoordChange = (field: 'latitude' | 'longitude', value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      coordonnees: {
+        ...prev.coordonnees,
+        [field]: value === '' ? 0 : parseFloat(value)
+      }
+    }));
+  };
+
   const handleSubmit = async () => {
     try {
       if (mode === 'create') {
@@ -131,6 +194,23 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
           zone: formData.zone,
           siteId: formData.siteId,
           superficie: formData.superficie,
+          especeIds: formData.especeIds,
+          acces: formData.acces,
+          embarcation: formData.embarcation
+        });
+      }
+      else if (mode === 'edit' && lac) { // ✅ Ajoutez cette condition
+        await updateLac({
+          lacId: lac._id,
+          nomDuLac: formData.nomDuLac,
+          regionAdministrativeQuebec: formData.regionAdministrativeQuebec,
+          coordonnees: formData.coordonnees,
+          acces: formData.acces,
+          embarcation: formData.embarcation,
+          zone: formData.zone,
+          siteId: formData.siteId,
+          superficie: formData.superficie,
+          especeIds: formData.especeIds,
         });
       }
       onClose();
@@ -153,14 +233,14 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
 
   const handleAddHebergement = async () => {
     if (!lac || !hebergement.campingId) return;
-    
+
     try {
       await addHebergement({
         lacId: lac._id,
         campingId: hebergement.campingId,
         distanceDepuisLac: hebergement.distanceDepuisLac
       });
-      
+
       // Réinitialiser le formulaire d'hébergement
       setHebergement({
         campingId: null,
@@ -193,27 +273,21 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
             value={formData.regionAdministrativeQuebec}
             onChange={(e) => handleInputChange('regionAdministrativeQuebec', e.target.value)}
           />
-          
+
           <Box sx={{ display: 'flex', gap: 2 }}>
             <TextField
               fullWidth
               type="number"
               label="Latitude"
-              value={formData.coordonnees.latitude}
-              onChange={(e) => handleInputChange('coordonnees', {
-                ...formData.coordonnees,
-                latitude: parseFloat(e.target.value)
-              })}
+              value={formData.coordonnees.latitude || ''}
+              onChange={(e) => handleCoordChange('latitude', e.target.value)}
             />
             <TextField
               fullWidth
               type="number"
               label="Longitude"
-              value={formData.coordonnees.longitude}
-              onChange={(e) => handleInputChange('coordonnees', {
-                ...formData.coordonnees,
-                longitude: parseFloat(e.target.value)
-              })}
+              value={formData.coordonnees.longitude || ''}
+              onChange={(e) => handleCoordChange('longitude', e.target.value)}
             />
           </Box>
 
@@ -248,22 +322,55 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
               value={formData.acces.acceuil}
               onChange={(e) => handleInputChange('acces', { acceuil: e.target.value })}
             />
+            <TextField
+              fullWidth
+              label="Distance d'accueil au lac (m)"
+              type="number"
+              value={formData.acces.distanceAcceuilLac.kilometrage || 0}
+              onChange={(e) => handleInputChange('acces', { distanceAcceuilLac: { kilometrage: e.target.value ? parseInt(e.target.value) : 0, temps: formData.acces.distanceAcceuilLac.temps } })}
+            />
+            <TextField
+              fullWidth
+              label="Temps d'accueil au lac (min)"
+              type="number"
+              value={formData.acces.distanceAcceuilLac.temps || 0}
+              onChange={(e) => handleInputChange('acces', { distanceAcceuilLac: { kilometrage: formData.acces.distanceAcceuilLac.kilometrage, temps: e.target.value ? parseInt(e.target.value) : 0 } })}
+            />
+            <TextField
+              fullWidth
+              label="Accessible"
+              value={formData.acces.accessible}
+              onChange={(e) => handleInputChange('acces', { accessible: e.target.value })}
+            />
           </Box>
 
           <Typography variant="h6" sx={{ mt: 2 }}>Embarcation</Typography>
           <Box sx={{ display: 'flex', gap: 2 }}>
-            <TextField
+            {/* <TextField
               fullWidth
               label="Type d'embarcation"
               value={formData.embarcation.type}
               onChange={(e) => handleInputChange('embarcation', { type: e.target.value })}
-            />
+            /> */}
+
+            <FormControl fullWidth>
+              <InputLabel>Type d'embarcation</InputLabel>
+              <Select
+                value={formData.embarcation.type}
+                onChange={(e) => handleInputChange('embarcation', { type: e.target.value })}
+              >
+                <MenuItem value="Embarcation Sépaq fournie">Embarcation Sépaq fournie</MenuItem>
+                <MenuItem value="Embarcation Pourvoirie fournie">Embarcation Pourvoirie fournie</MenuItem>
+                <MenuItem value="Location">Location</MenuItem>
+              </Select>
+            </FormControl>
+
             <FormControl fullWidth>
               <InputLabel>Type de motorisation</InputLabel>
               <Select
                 value={formData.embarcation.motorisation.type}
                 label="Type de motorisation"
-                onChange={(e) => handleInputChange('embarcation', { 
+                onChange={(e) => handleInputChange('embarcation', {
                   motorisation: { type: e.target.value as "electrique" | "essence" | "aucune" }
                 })}
               >
@@ -277,7 +384,7 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
           {mode === 'edit' && lac && (
             <>
               <Typography variant="h6" sx={{ mt: 2 }}>Hébergements</Typography>
-              
+
               {/* Liste des hébergements existants */}
               <TableContainer component={Paper} sx={{ mt: 1, mb: 2 }}>
                 <Table size="small">
@@ -325,7 +432,7 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
                     label="Camping"
                     onChange={(e) => handleHebergementChange('campingId', e.target.value)}
                   >
-                    {campings?.filter(camping => 
+                    {campings?.filter(camping =>
                       !lac.hebergements.some(h => h.campingId === camping._id)
                     ).map((camping) => (
                       <MenuItem key={camping._id} value={camping._id}>
@@ -367,6 +474,32 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
                   </span>
                 </Tooltip>
               </Box>
+              <Typography variant="h6" sx={{ mt: 2 }}>Espèces</Typography>
+              <FormControl fullWidth>
+                <InputLabel>Espèces présentes</InputLabel>
+                <Select
+                  multiple
+                  value={formData.especeIds}
+                  label="Espèces présentes"
+                  onChange={(e) => handleInputChange('especeIds', e.target.value)}
+                  renderValue={(selected) => (
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                      {(selected as Id<"especes">[]).map((id) => {
+                        const espece = especes?.find(e => e._id === id);
+                        return (
+                          <Chip key={id} label={espece?.nomCommun || id} size="small" />
+                        );
+                      })}
+                    </Box>
+                  )}
+                >
+                  {especes?.map((espece) => (
+                    <MenuItem key={espece._id} value={espece._id}>
+                      {espece.nomCommun}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </>
           )}
         </Box>
