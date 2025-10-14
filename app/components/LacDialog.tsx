@@ -305,12 +305,6 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
               value={formData.acces.distanceAcceuilLac.temps || 0}
               onChange={(e) => handleInputChange('acces', { distanceAcceuilLac: { kilometrage: formData.acces.distanceAcceuilLac.kilometrage, temps: e.target.value ? parseInt(e.target.value) : 0 } })}
             />
-            {/* <TextField
-              fullWidth
-              label="Accessible"
-              value={formData.acces.accessible}
-              onChange={(e) => handleInputChange('acces', { accessible: e.target.value })}
-            /> */}
             <FormControl fullWidth>
               <InputLabel>Accessible</InputLabel>
               <Select

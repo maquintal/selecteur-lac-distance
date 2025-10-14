@@ -67,12 +67,6 @@ export default function EspeceDialog({ open, onClose, espece, mode }: EspeceDial
             value={formData.nomScientifique}
             onChange={(e) => handleInputChange('nomScientifique', e.target.value)}
           />
-          {/* <TextField
-            fullWidth
-            label="Alias (séparés par des virgules)"
-            value={formData.aliases?.join(", ")}
-            onChange={(e) => handleInputChange('aliases', e.target.value.split(", ").map(alias => alias.trim()))}
-          /> */}
           <FormControl fullWidth>
             <InputLabel id="categorie-label">Catégorie</InputLabel>
             <Select
