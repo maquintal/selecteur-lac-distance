@@ -23,13 +23,13 @@ export default defineSchema({
       eau: v.boolean(),
       electricite: v.boolean(),
     }),
-    regionAdministrative: v.string(),
+    regionAdministrative: v.optional(v.string()),
   })
     .index("by_nom", ["nom"])
-    .index("by_region", ["regionAdministrative"])
+    // .index("by_region", ["regionAdministrative"])
     .searchIndex("search_nom", {
       searchField: "nom",
-      filterFields: ["regionAdministrative"],
+      // filterFields: ["regionAdministrative"],
     }),
 
   // ============================================
@@ -53,18 +53,18 @@ export default defineSchema({
       filterFields: ["categorie"],
     }),
 
-  // ============================================
-  // TABLE: sites
-  // Sites SEPAQ et autres organismes
-  // ============================================
-  sites: defineTable({
-    nom: v.string(),
-    organisme: v.string(),
-    type: v.union(v.literal("gouvernemental"), v.literal("privé")),
-    regionAdministrative: v.string(),
-  })
-    .index("by_organisme", ["organisme"])
-    .index("by_region", ["regionAdministrative"]),
+  // // ============================================
+  // // TABLE: sites
+  // // Sites SEPAQ et autres organismes
+  // // ============================================
+  // sites: defineTable({
+  //   nom: v.string(),
+  //   organisme: v.string(),
+  //   type: v.union(v.literal("gouvernemental"), v.literal("privé")),
+  //   regionAdministrative: v.string(),
+  // })
+  //   .index("by_organisme", ["organisme"])
+  //   .index("by_region", ["regionAdministrative"]),
 
   // ============================================
   // TABLE: lacs (optimisée)
@@ -73,7 +73,7 @@ export default defineSchema({
     nomDuLac: v.string(),
 
     // Références au lieu de données répétées
-    siteId: v.optional(v.id("sites")),
+    site: v.optional(v.string()),
     zone: v.optional(v.number()),
 
     regionAdministrativeQuebec: v.string(),
@@ -92,19 +92,23 @@ export default defineSchema({
           kilometrage: v.number(),
         })
       ),
-      accessible: v.string(),
+      accessible: v.union(
+        v.literal("véhicule utilitaire sport (VUS)"),
+        v.literal("auto"),
+        v.literal("camion 4x4")
+      ),
     }),
 
     embarcation: v.object({
       type: v.union(
         v.literal("Embarcation Sépaq fournie"),
         v.literal("Embarcation Pourvoirie fournie"),
-        v.literal("Location")),
+        v.literal("Location")
+      ),
       motorisation: v.object({
         type: v.union(
           v.literal("electrique"),
           v.literal("essence"),
-          v.literal("aucune")
         ),
         puissanceMin: v.optional(v.number()),
       }),
@@ -147,7 +151,7 @@ export default defineSchema({
     updatedAt: v.optional(v.number()),
   })
     .index("by_region", ["regionAdministrativeQuebec"])
-    .index("by_site", ["siteId"])
+    // .index("by_site", ["siteId"])
     .index("by_coordonnees", ["coordonnees.latitude", "coordonnees.longitude"])
     .searchIndex("search_nom", {
       searchField: "nomDuLac",

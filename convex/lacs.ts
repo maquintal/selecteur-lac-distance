@@ -28,7 +28,7 @@ export const createCamping = mutation({
       eau: v.boolean(),
       electricite: v.boolean(),
     }),
-    regionAdministrative: v.string(),
+    regionAdministrative: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     return await ctx.db.insert("campings", args);
@@ -53,7 +53,7 @@ export const updateCamping = mutation({
       eau: v.boolean(),
       electricite: v.boolean(),
     }),
-    regionAdministrative: v.string(),
+    regionAdministrative: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const { id, ...data } = args;
@@ -226,9 +226,9 @@ export const getLacsWithDetails = query({
     return Promise.all(
       filteredLacs.map(async (lac) => {
         // Récupérer le site
-        const site = lac.siteId
-          ? await ctx.db.get(lac.siteId)
-          : null;
+        // const site = lac.siteId
+        //   ? await ctx.db.get(lac.siteId)
+        //   : null;
 
         // Récupérer les espèces
         const especes = await Promise.all(
@@ -249,7 +249,7 @@ export const getLacsWithDetails = query({
 
         return {
           ...lac,
-          site,
+          // site,
           especes: especes.filter((e) => e !== null),
           hebergements,
         };
@@ -372,7 +372,7 @@ export const addLac = mutation({
       longitude: v.number(),
     }),
     zone: v.optional(v.number()),
-    siteId: v.optional(v.id("sites")),
+    site: v.optional(v.string()),
     superficie: v.optional(v.object({
       hectares: v.number(),
       km2: v.number(),
@@ -394,7 +394,11 @@ export const addLac = mutation({
           kilometrage: v.number(),
         })
       ),
-      accessible: v.string(),
+      accessible: v.union(
+        v.literal("véhicule utilitaire sport (VUS)"),
+        v.literal("auto"),
+        v.literal("camion 4x4")
+      ),
     }),
     embarcation: v.object({
       type: v.union(
@@ -406,7 +410,6 @@ export const addLac = mutation({
         type: v.union(
           v.literal("electrique"),
           v.literal("essence"),
-          v.literal("aucune")
         ),
         puissanceMin: v.optional(v.number()),
       }),
@@ -441,7 +444,11 @@ export const updateLac = mutation({
           kilometrage: v.number(),
         })
       ),
-      accessible: v.string(),
+      accessible: v.union(
+        v.literal("véhicule utilitaire sport (VUS)"),
+        v.literal("auto"),
+        v.literal("camion 4x4")
+      ),
     }),
     embarcation: v.object({
       type: v.union(
@@ -453,13 +460,12 @@ export const updateLac = mutation({
         type: v.union(
           v.literal("electrique"),
           v.literal("essence"),
-          v.literal("aucune")
         ),
         puissanceMin: v.optional(v.number()),
       }),
     }),
     zone: v.optional(v.number()),
-    siteId: v.optional(v.id("sites")),
+    site: v.optional(v.string()),
     superficie: v.optional(
       v.object({
         hectares: v.number(),
@@ -479,7 +485,6 @@ export const updateLac = mutation({
     return lacId;
   },
 });
-
 
 // Ajouter un camping à un lac
 export const addCampingToLac = mutation({

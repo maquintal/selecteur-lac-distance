@@ -94,13 +94,6 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
             </Select>
           </FormControl>
 
-          <TextField
-            fullWidth
-            label="Région administrative"
-            value={formData.regionAdministrative}
-            onChange={(e) => handleInputChange('regionAdministrative', e.target.value)}
-          />
-
           <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
             <TextField
               type="number"

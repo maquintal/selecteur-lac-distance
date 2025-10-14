@@ -63,7 +63,6 @@ export default function GestionCampings() {
               <TableRow>
                 <TableCell>Nom</TableCell>
                 <TableCell>Organisme</TableCell>
-                <TableCell>Région administrative</TableCell>
                 <TableCell>Commodités</TableCell>
                 <TableCell>Actions</TableCell>
               </TableRow>
@@ -73,7 +72,6 @@ export default function GestionCampings() {
                 <TableRow key={camping._id}>
                   <TableCell>{camping.nom}</TableCell>
                   <TableCell>{camping.organisme}</TableCell>
-                  <TableCell>{camping.regionAdministrative}</TableCell>
                   <TableCell>
                     {camping.commodites.eau && 'Eau '}
                     {camping.commodites.electricite && 'Électricité'}

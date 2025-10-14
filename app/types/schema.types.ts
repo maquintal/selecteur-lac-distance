@@ -5,14 +5,14 @@ export type { Doc } from "../../convex/_generated/dataModel";
 export type LacDoc = Doc<"lacs">;
 export type CampingDoc = Doc<"campings">;
 export type EspeceDoc = Doc<"especes">;
-export type SiteDoc = Doc<"sites">;
+// export type SiteDoc = Doc<"sites">;
 export type HebergementLacDoc = Doc<"hebergement_lacs">;
 
 // Types pour les nouveaux documents (sans les champs système)
 export type NewLacInput = Omit<LacDoc, "_id" | "_creationTime" | "createdAt" | "updatedAt">;
 export type NewCampingInput = Omit<CampingDoc, "_id" | "_creationTime">;
 export type NewEspeceInput = Omit<EspeceDoc, "_id" | "_creationTime">;
-export type NewSiteInput = Omit<SiteDoc, "_id" | "_creationTime">;
+// export type NewSiteInput = Omit<SiteDoc, "_id" | "_creationTime">;
 export type NewHebergementLacInput = Omit<HebergementLacDoc, "_id" | "_creationTime">;
 
 // Type pour les relations d'hébergement dans un lac
@@ -30,7 +30,7 @@ export type HebergementLac = {
 
 // Type enrichi pour un lac avec ses relations
 export type LacWithDetails = LacDoc & {
-  site: SiteDoc | null;
+  // site: SiteDoc | null;
   especes: EspeceDoc[];
   hebergements: (CampingDoc & {
     distanceDepuisAcceuil?: number | {
@@ -53,24 +53,24 @@ export const defaultLacInput: NewLacInput = {
     longitude: 0,
   },
   acces: {
-    portage: "",
+    portage: "Aucune marche d'approche nécessaire",
     acceuil: "",
     distanceAcceuilLac: {
       temps: 0,
       kilometrage: 0,
     },
-    accessible: "",
+    accessible: "véhicule utilitaire sport (VUS)",
   },
   embarcation: {
-    type: "",
+    type: "Location",
     motorisation: {
-      type: "aucune",
+      type: "electrique",
     },
   },
   especeIds: [],
   hebergements: [],
   zone: undefined,
-  siteId: undefined,
+  site: "",
   superficie: undefined,
 };
 
@@ -85,7 +85,6 @@ export const defaultCampingInput: NewCampingInput = {
     eau: false,
     electricite: false,
   },
-  regionAdministrative: "",
 };
 
 export const defaultEspeceInput: NewEspeceInput = {
@@ -95,9 +94,9 @@ export const defaultEspeceInput: NewEspeceInput = {
   categorie: undefined,
 };
 
-export const defaultSiteInput: NewSiteInput = {
-  nom: "",
-  organisme: "",
-  type: "gouvernemental",
-  regionAdministrative: "",
-};
+// export const defaultSiteInput: NewSiteInput = {
+//   nom: "",
+//   organisme: "",
+//   type: "gouvernemental",
+//   regionAdministrative: "",
+// };
