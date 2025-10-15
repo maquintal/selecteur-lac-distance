@@ -24,8 +24,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [mode, setMode] = useState<ThemeMode>('light');
   const [mounted, setMounted] = useState(false);
 
-  // Éviter les problèmes d'hydratation
+  // Avoid hydration mismatch by setting mounted state after first render
   useEffect(() => {
+    const root = window?.document?.documentElement;
+    root?.style?.setProperty('--initial-color-mode', mode);
     setMounted(true);
   }, []);
 
@@ -73,11 +75,15 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
   };
 
+  if (!mounted) {
+    return null;
+  }
+
   return (
     <ThemeContext.Provider value={{ mode, toggleTheme }}>
       <MuiThemeProvider theme={theme}>
         <CssBaseline />
-        {mounted ? children : <div style={{ visibility: 'hidden' }}>{children}</div>}
+        {children}
       </MuiThemeProvider>
     </ThemeContext.Provider>
   );

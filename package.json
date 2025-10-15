@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@clerk/clerk-react": "^5.51.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@mdi/js": "^7.4.47",
@@ -17,6 +18,7 @@
     "@mui/material": "^7.3.3",
     "@mui/x-data-grid": "^8.13.1",
     "@tanstack/react-table": "^8.21.3",
+    "convex": "^1.27.5",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.545.0",
     "mongodb": "^6.20.0",
@@ -29,11 +31,13 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@types/leaflet": "^1.9.20",
-    "@types/node": "^20",
+    "@types/node": "^20.19.20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv": "^17.2.3",
     "eslint": "^9",
     "eslint-config-next": "15.5.4",
-    "typescript": "^5"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
   }
 }
