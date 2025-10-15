@@ -36,14 +36,14 @@ export default function GestionLacs() {
     setSelectedLac(undefined);
   };
 
-  const handleDialogSuccess = (message: string) => {
+  /* const handleDialogSuccess = (message: string) => {
     setSnackbar({ open: true, message, severity: 'success' });
     handleCloseDialog();
-  };
+  }; */
 
-  const handleDialogError = (message: string) => {
+  /* const handleDialogError = (message: string) => {
     setSnackbar({ open: true, message, severity: 'error' });
-  };
+  }; */
 
   return (
     <>
