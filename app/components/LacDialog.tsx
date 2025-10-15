@@ -31,6 +31,7 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
   useEffect(() => {
     if (open) {
       if (lac) {
+        
         setFormData({
           nomDuLac: lac.nomDuLac,
           regionAdministrativeQuebec: lac.regionAdministrativeQuebec,
@@ -65,7 +66,6 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
   const removeCampingFromLac = useMutation(api.lacs.removeCampingFromLac);
   const especes = useQuery(api.lacs.getAllEspeces);
 
-  // @ts-ignore en attente de ia
   const handleInputChange = (field: keyof NewLacInput, value: any) => {
     if (field === 'superficie') {
       setFormData(prev => ({
@@ -142,9 +142,7 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
           site: formData.site,
           superficie: formData.superficie,
           especeIds: formData.especeIds,
-          // @ts-ignore en attendant de ia
           acces: formData.acces,
-          // @ts-ignore en attendant de ia
           embarcation: formData.embarcation
         });
       }
@@ -154,9 +152,7 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
           nomDuLac: formData.nomDuLac,
           regionAdministrativeQuebec: formData.regionAdministrativeQuebec,
           coordonnees: formData.coordonnees,
-          // @ts-ignore en attendant de ia
           acces: formData.acces,
-          // @ts-ignore en attendant de ia
           embarcation: formData.embarcation,
           zone: formData.zone,
           site: formData.site,
@@ -300,18 +296,14 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
               fullWidth
               label="Distance d'accueil au lac (m)"
               type="number"
-              // @ts-ignore en attendant de ia
               value={formData.acces.distanceAcceuilLac.kilometrage || 0}
-              // @ts-ignore en attendant de ia
               onChange={(e) => handleInputChange('acces', { distanceAcceuilLac: { kilometrage: e.target.value ? parseInt(e.target.value) : 0, temps: formData.acces.distanceAcceuilLac.temps } })}
             />
             <TextField
               fullWidth
               label="Temps d'accueil au lac (min)"
               type="number"
-              // @ts-ignore en attendant de ia
               value={formData.acces.distanceAcceuilLac.temps || 0}
-              // @ts-ignore en attendant de ia
               onChange={(e) => handleInputChange('acces', { distanceAcceuilLac: { kilometrage: formData.acces.distanceAcceuilLac.kilometrage, temps: e.target.value ? parseInt(e.target.value) : 0 } })}
             />
             <FormControl fullWidth>
@@ -406,11 +398,9 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
                         <TableRow key={h.campingId}>
                           <TableCell>{camping?.nom || 'N/A'}</TableCell>
                           <TableCell>{
-                            // @ts-ignore en attendant de ia
                             h.distanceDepuisLac?.kilometrage || 'N/A'
                           }</TableCell>
                           <TableCell>{
-                            // @ts-ignore en attendant de ia
                             h.distanceDepuisLac?.temps || 'N/A'
                           }</TableCell>
                           <TableCell>

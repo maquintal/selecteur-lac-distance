@@ -17,7 +17,7 @@ import EspeceDialog from '@/app/components/EspeceDialog';
 
 export default function GestionEspeces() {
   const [openDialog, setOpenDialog] = useState(false);
-  const [selectedEspece, setSelectedEspece] = useState<EspeceDoc | any>();
+  const [selectedEspece, setSelectedEspece] = useState<EspeceDoc>();
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
   const [dialogMode, setDialogMode] = useState<'create' | 'edit'>('create');
 
@@ -35,9 +35,9 @@ export default function GestionEspeces() {
     setSelectedEspece(undefined);
   };
 
-  const handleSnackbar = (message: string, severity: 'success' | 'error') => {
+  /* const handleSnackbar = (message: string, severity: 'success' | 'error') => {
     setSnackbar({ open: true, message, severity });
-  };
+  }; */
 
   return (
     <>

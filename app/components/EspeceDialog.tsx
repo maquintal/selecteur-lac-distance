@@ -13,7 +13,7 @@ import { EspeceDoc, NewEspeceInput, defaultEspeceInput } from '../types/schema.t
 type EspeceDialogProps = {
   open: boolean;
   onClose: () => void;
-  espece: EspeceDoc;
+  espece?: EspeceDoc;
   mode: 'create' | 'edit';
 };
 
@@ -24,7 +24,6 @@ export default function EspeceDialog({ open, onClose, espece, mode }: EspeceDial
   const createEspece = useMutation(api.lacs.addEspece);
   const updateEspece = useMutation(api.lacs.updateEspece);
 
-  // @ts-ignore en attente de ia
   const handleInputChange = (field: keyof NewEspeceInput, value: any) => {
     setFormData(prev => ({
       ...prev,

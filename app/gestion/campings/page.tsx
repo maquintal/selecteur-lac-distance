@@ -35,9 +35,9 @@ export default function GestionCampings() {
     setSelectedCamping(undefined);
   };
 
-  const handleSnackbar = (message: string, severity: 'success' | 'error') => {
+  /* const handleSnackbar = (message: string, severity: 'success' | 'error') => {
     setSnackbar({ open: true, message, severity });
-  };
+  }; */
 
   return (
     <>
