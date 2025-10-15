@@ -65,6 +65,7 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
   const removeCampingFromLac = useMutation(api.lacs.removeCampingFromLac);
   const especes = useQuery(api.lacs.getAllEspeces);
 
+  // @ts-ignore en attente de ia
   const handleInputChange = (field: keyof NewLacInput, value: any) => {
     if (field === 'superficie') {
       setFormData(prev => ({
