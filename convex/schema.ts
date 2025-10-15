@@ -1,4 +1,5 @@
 // convex/schema.ts
+// Schéma optimisé pour tes données de lacs du Québec
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
@@ -26,10 +27,8 @@ export default defineSchema({
     regionAdministrative: v.optional(v.string()),
   })
     .index("by_nom", ["nom"])
-    // .index("by_region", ["regionAdministrative"])
     .searchIndex("search_nom", {
       searchField: "nom",
-      // filterFields: ["regionAdministrative"],
     }),
 
   // ============================================
@@ -39,7 +38,6 @@ export default defineSchema({
   especes: defineTable({
     nomCommun: v.string(),
     nomScientifique: v.optional(v.string()),
-    // aliases: v.optional(v.array(v.string())),
     categorie: v.optional(
       v.union(
         v.literal("salmonidés"),
@@ -48,23 +46,11 @@ export default defineSchema({
     ),
   })
     .index("by_nom", ["nomCommun"])
+    .index("by_categorie", ["categorie"])
     .searchIndex("search_espece", {
       searchField: "nomCommun",
       filterFields: ["categorie"],
     }),
-
-  // // ============================================
-  // // TABLE: sites
-  // // Sites SEPAQ et autres organismes
-  // // ============================================
-  // sites: defineTable({
-  //   nom: v.string(),
-  //   organisme: v.string(),
-  //   type: v.union(v.literal("gouvernemental"), v.literal("privé")),
-  //   regionAdministrative: v.string(),
-  // })
-  //   .index("by_organisme", ["organisme"])
-  //   .index("by_region", ["regionAdministrative"]),
 
   // ============================================
   // TABLE: lacs (optimisée)
@@ -72,7 +58,7 @@ export default defineSchema({
   lacs: defineTable({
     nomDuLac: v.string(),
 
-    // Références au lieu de données répétées
+    // Informations juridiques
     site: v.optional(v.string()),
     zone: v.optional(v.number()),
 
@@ -86,25 +72,19 @@ export default defineSchema({
     acces: v.object({
       portage: v.string(),
       acceuil: v.string(),
+      // Supporte à la fois les nombres simples (32) et les objets complexes
       distanceAcceuilLac: v.union(
+        v.number(),
         v.object({
           temps: v.number(), // en minutes
           kilometrage: v.number(),
         })
       ),
-      accessible: v.union(
-        v.literal("véhicule utilitaire sport (VUS)"),
-        v.literal("auto"),
-        v.literal("camion 4x4")
-      ),
+      accessible: v.string(), // Plus flexible pour supporter toutes les variantes
     }),
 
     embarcation: v.object({
-      type: v.union(
-        v.literal("Embarcation Sépaq fournie"),
-        v.literal("Embarcation Pourvoirie fournie"),
-        v.literal("Location")
-      ),
+      type: v.string(), // Plus flexible pour tous les types
       motorisation: v.object({
         type: v.union(
           v.literal("electrique"),
@@ -138,10 +118,13 @@ export default defineSchema({
           )
         ),
         distanceDepuisLac: v.optional(
-          v.object({
-            temps: v.number(),
-            kilometrage: v.number(),
-          })
+          v.union(
+            v.number(),
+            v.object({
+              temps: v.number(),
+              kilometrage: v.number(),
+            })
+          )
         ),
       })
     ),
@@ -151,26 +134,38 @@ export default defineSchema({
     updatedAt: v.optional(v.number()),
   })
     .index("by_region", ["regionAdministrativeQuebec"])
-    // .index("by_site", ["siteId"])
+    .index("by_site", ["site"])
+    .index("by_zone", ["zone"])
     .index("by_coordonnees", ["coordonnees.latitude", "coordonnees.longitude"])
     .searchIndex("search_nom", {
       searchField: "nomDuLac",
-      filterFields: ["regionAdministrativeQuebec"],
+      filterFields: ["regionAdministrativeQuebec", "site"],
     }),
 
   // ============================================
   // TABLE: hebergement_lacs (table de jonction)
-  // Alternative si vous préférez une table de relation séparée
+  // Alternative pour des requêtes plus flexibles
   // ============================================
   hebergement_lacs: defineTable({
     lacId: v.id("lacs"),
     campingId: v.id("campings"),
-    distanceDepuisAcceuil: v.optional(v.number()),
+    distanceDepuisAcceuil: v.optional(
+      v.union(
+        v.number(),
+        v.object({
+          temps: v.number(),
+          kilometrage: v.number(),
+        })
+      )
+    ),
     distanceDepuisLac: v.optional(
-      v.object({
-        temps: v.number(),
-        kilometrage: v.number(),
-      })
+      v.union(
+        v.number(),
+        v.object({
+          temps: v.number(),
+          kilometrage: v.number(),
+        })
+      )
     ),
   })
     .index("by_lac", ["lacId"])

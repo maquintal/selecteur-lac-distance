@@ -1,0 +1,3236 @@
+[
+  {
+    "nomDuLac": "lac Joseph",
+    "juridiction": {
+      "type": "privé",
+      "organisme": "Camping",
+      "site": null,
+      "zone": 10
+    },
+    "regionAdministrativeQuebec": "Chaudière-Appalaches",
+    "coordonnees": {
+      "latitude": 46.17807698987254,
+      "longitude": -71.56375201268006
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Camping Des Bois Francs",
+      "distanceAcceuilLac": {
+        "temps": 0,
+        "kilometrage": 0
+      },
+      "accessible": "véhicule utilitaire sport (VUS)"
+    },
+    "embarcation": {
+      "type": "location embarcation",
+      "motorisation": {
+        "type": "essence"
+      }
+    },
+    "superficie": null,
+    "espece": [],
+    "hebergement": [
+      {
+        "camping": "Camping Des Bois Francs",
+        "organisme": "privé",
+        "distanceCampingAcceuil": {
+          "temps": 0,
+          "kilometrage": 0
+        },
+        "distanceCampingLac": {
+          "temps": 0,
+          "kilometrage": 0
+        },
+        "eau": true,
+        "electricite": true,
+        "coordonnees": {
+          "latitude": 46.17807698987254,
+          "longitude": -71.56375201268006
+        }
+      }
+    ]
+  },
+  {
+    "nomDuLac": "lac William",
+    "juridiction": {
+      "type": "privé",
+      "organisme": "Camping",
+      "site": null,
+      "zone": 7
+    },
+    "regionAdministrativeQuebec": "Chaudière-Appalaches",
+    "coordonnees": {
+      "latitude": 46.12808125442616,
+      "longitude": -71.58266991075185
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Camping Plage de la Baie",
+      "distanceAcceuilLac": {
+        "temps": 0,
+        "kilometrage": 0
+      },
+      "accessible": "véhicule utilitaire sport (VUS)"
+    },
+    "embarcation": {
+      "type": "location embarcation",
+      "motorisation": {
+        "type": "essence"
+      }
+    },
+    "superficie": null,
+    "espece": [],
+    "hebergement": [
+      {
+        "camping": "Camping Plage de la Baie",
+        "organisme": "privé",
+        "distanceCampingAcceuil": {
+          "temps": 0,
+          "kilometrage": 0
+        },
+        "distanceCampingLac": {
+          "temps": 0,
+          "kilometrage": 0
+        },
+        "eau": true,
+        "electricite": true,
+        "coordonnees": {
+          "latitude": 46.12808125442616,
+          "longitude": -71.58266991075185
+        }
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Lac-des-Îles",
+    "juridiction": {
+      "type": "privé",
+      "organisme": "Camping",
+      "site": null,
+      "zone": null
+    },
+    "regionAdministrativeQuebec": "Laurentides",
+    "coordonnees": {
+      "latitude": 46.42228248432321,
+      "longitude": -75.52798495620966
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Camping Plein Air",
+      "distanceAcceuilLac": {
+        "temps": 0,
+        "kilometrage": 0
+      },
+      "accessible": "véhicule utilitaire sport (VUS)"
+    },
+    "embarcation": {
+      "type": "location embarcation",
+      "motorisation": {
+        "type": "essence"
+      }
+    },
+    "superficie": null,
+    "espece": [],
+    "hebergement": [
+      {
+        "camping": "Camping Plein Air",
+        "organisme": "privé",
+        "distanceCampingAcceuil": {
+          "temps": 0,
+          "kilometrage": 0
+        },
+        "distanceCampingLac": {
+          "temps": 0,
+          "kilometrage": 0
+        },
+        "eau": true,
+        "electricite": true,
+        "coordonnees": {
+          "latitude": 46.42228248432321,
+          "longitude": -75.52798495620966
+        }
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Lac Tapani",
+    "juridiction": {
+      "type": "privé",
+      "organisme": "Pourvoirie",
+      "site": null,
+      "zone": 11
+    },
+    "regionAdministrativeQuebec": "Laurentides",
+    "coordonnees": {
+      "latitude": 46.90705,
+      "longitude": -75.31496
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Pourvoirie du Pêcheur",
+      "distanceAcceuilLac": {
+        "temps": 0,
+        "kilometrage": 0
+      },
+      "accessible": "véhicule utilitaire sport (VUS)"
+    },
+    "embarcation": {
+      "type": "location embarcation",
+      "motorisation": {
+        "type": "essence"
+      }
+    },
+    "superficie": null,
+    "espece": [
+      "dorés, brochets, perchaudes, corégones, truites rouges"
+    ],
+    "hebergement": [
+      {
+        "camping": "Pourvoirie du Pêcheur",
+        "organisme": "Pourvoirie",
+        "distanceCampingAcceuil": {
+          "temps": 0,
+          "kilometrage": 0
+        },
+        "distanceCampingLac": {
+          "temps": 0,
+          "kilometrage": 0
+        },
+        "eau": true,
+        "electricite": true,
+        "coordonnees": {
+          "latitude": 46.90705,
+          "longitude": -75.31496
+        }
+      }
+    ]
+  },
+  {
+    "nomDuLac": "lac Trudeau",
+    "juridiction": {
+      "type": "privé",
+      "organisme": "Pourvoirie",
+      "site": null,
+      "zone": 15
+    },
+    "regionAdministrativeQuebec": "Lanaudiere",
+    "coordonnees": {
+      "latitude": 46.49807,
+      "longitude": -73.73903
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Pourvoirie Évasion Plein Air Trudeau",
+      "distanceAcceuilLac": {
+        "temps": 0,
+        "kilometrage": 0
+      },
+      "accessible": "véhicule utilitaire sport (VUS)"
+    },
+    "embarcation": {
+      "type": "location embarcation",
+      "motorisation": {
+        "type": "electrique"
+      }
+    },
+    "superficie": null,
+    "espece": [
+      "Truite"
+    ],
+    "hebergement": [
+      {
+        "camping": "Pourvoirie Évasion Plein Air Trudeau",
+        "organisme": "Pourvoirie",
+        "distanceCampingAcceuil": {
+          "temps": 0,
+          "kilometrage": 0
+        },
+        "distanceCampingLac": {
+          "temps": 0,
+          "kilometrage": 0
+        },
+        "eau": true,
+        "electricite": true,
+        "coordonnees": {
+          "latitude": 46.49807,
+          "longitude": -73.73903
+        }
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Lac Bois Franc",
+    "juridiction": {
+      "type": "privé",
+      "organisme": "Pourvoirie",
+      "site": null,
+      "zone": 15
+    },
+    "regionAdministrativeQuebec": "Lanaudiere",
+    "coordonnees": {
+      "latitude": 46.50277,
+      "longitude": -73.71192
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Pourvoirie St-Zénon",
+      "distanceAcceuilLac": {
+        "temps": 0,
+        "kilometrage": 0
+      },
+      "accessible": "véhicule utilitaire sport (VUS)"
+    },
+    "embarcation": {
+      "type": "location embarcation",
+      "motorisation": {
+        "type": "electrique"
+      }
+    },
+    "superficie": null,
+    "espece": [
+      "Truite"
+    ],
+    "hebergement": [
+      {
+        "camping": "Lac Bois Franc",
+        "organisme": "Pourvoirie",
+        "distanceCampingAcceuil": {
+          "temps": 0,
+          "kilometrage": 0
+        },
+        "distanceCampingLac": {
+          "temps": 0,
+          "kilometrage": 0
+        },
+        "eau": true,
+        "electricite": true,
+        "coordonnees": {
+          "latitude": 46.50277,
+          "longitude": -73.71192
+        }
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Wessonneau (rivière)",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Saint-Maurice"
+    },
+    "regionAdministrativeQuebec": "Mauricie",
+    "coordonnees": {
+      "latitude": 47.04981909253088,
+      "longitude": -73.09915197945534
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Matawin",
+      "distanceAcceuilLac": 32,
+      "accessible": "auto"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "electrique"
+      }
+    },
+    "superficie": null,
+    "espece": [
+      "Truite mouchetée (omble de fontaine)"
+    ],
+    "hebergement": [
+      {
+        "camping": null,
+        "distanceCampingAcceuil": 0
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Pluie (lac à la)",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Saint-Maurice"
+    },
+    "regionAdministrativeQuebec": "Mauricie",
+    "coordonnees": {
+      "latitude": 47.126744426137854,
+      "longitude": -73.11087117520351
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Matawin",
+      "distanceAcceuilLac": 47,
+      "accessible": "véhicule utilitaire sport (VUS)"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "electrique"
+      }
+    },
+    "superficie": null,
+    "espece": [
+      "Truite mouchetée (omble de fontaine)"
+    ],
+    "hebergement": [
+      {
+        "camping": null,
+        "distanceCampingAcceuil": 0
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Pechina (lac)",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Rouge-Matawin"
+    },
+    "regionAdministrativeQuebec": "Lanaudiere",
+    "coordonnees": {
+      "latitude": 46.68962398123464,
+      "longitude": -74.45315347770928
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "St-Michel",
+      "distanceAcceuilLac": 32,
+      "accessible": "auto"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "essence",
+        "puissanceMin": 2
+      }
+    },
+    "superficie": null,
+    "espece": [
+      "Grand Brochet",
+      "Perchaude"
+    ],
+    "hebergement": [
+      {
+        "camping": null,
+        "distanceCampingAcceuil": 0
+      }
+    ]
+  },
+  {
+    "nomDuLac": "ODELIN",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Rouge-Matawin"
+    },
+    "regionAdministrativeQuebec": "Lanaudiere",
+    "coordonnees": {
+      "latitude": 46.65653541786981,
+      "longitude": -74.38233359500906
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "St-Michel",
+      "distanceAcceuilLac": 25,
+      "accessible": "auto"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "essence",
+        "puissanceMin": 2
+      }
+    },
+    "superficie": null,
+    "espece": [
+      "Grand Brochet",
+      "Perchaude"
+    ],
+    "hebergement": [
+      {
+        "camping": null,
+        "distanceCampingAcceuil": 0
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Mosquic (petit lac)",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Rouge-Matawin"
+    },
+    "regionAdministrativeQuebec": "Lanaudiere",
+    "coordonnees": {
+      "latitude": 46.66654591128418,
+      "longitude": -74.4554710256335
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "St-Michel",
+      "distanceAcceuilLac": 30,
+      "accessible": "auto"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "electrique"
+      }
+    },
+    "superficie": null,
+    "espece": [
+      "Grand Brochet",
+      "Perchaude"
+    ],
+    "hebergement": [
+      {
+        "camping": null,
+        "distanceCampingAcceuil": 0
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Mosquic (grand lac)",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Rouge-Matawin"
+    },
+    "regionAdministrativeQuebec": "Lanaudiere",
+    "coordonnees": {
+      "latitude": 46.64953971912676,
+      "longitude": -74.4575635702445
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "St-Michel",
+      "distanceAcceuilLac": 31,
+      "accessible": "auto"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "essence",
+        "puissanceMin": 2
+      }
+    },
+    "superficie": null,
+    "espece": [
+      "Grand Brochet",
+      "Perchaude"
+    ],
+    "hebergement": [
+      {
+        "camping": null,
+        "distanceCampingAcceuil": 0
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Lac du Nord",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Rouge-Matawin"
+    },
+    "regionAdministrativeQuebec": "Lanaudiere",
+    "coordonnees": {
+      "latitude": 46.678034397409476,
+      "longitude": -74.47026651193028
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "St-Michel",
+      "distanceAcceuilLac": 31,
+      "accessible": "auto"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "essence",
+        "puissanceMin": 2
+      }
+    },
+    "superficie": null,
+    "espece": [
+      "Grand Brochet",
+      "Perchaude"
+    ],
+    "hebergement": [
+      {
+        "camping": null,
+        "distanceCampingAcceuil": 0
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Lac Cazo",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Rouge-Matawin"
+    },
+    "regionAdministrativeQuebec": "Lanaudiere",
+    "coordonnees": {
+      "latitude": 46.62704915557623,
+      "longitude": -74.28409341498941
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "St-Michel",
+      "distanceAcceuilLac": 13,
+      "accessible": "auto"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "electrique"
+      }
+    },
+    "superficie": null,
+    "espece": [
+      "Grand Brochet"
+    ],
+    "hebergement": [
+      {
+        "camping": null,
+        "distanceCampingAcceuil": 0
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Sheship (lac)",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Rouge-Matawin"
+    },
+    "regionAdministrativeQuebec": "Laurentides",
+    "coordonnees": {
+      "latitude": 46.692374169099146,
+      "longitude": -74.56857356848624
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "La Macaza",
+      "distanceAcceuilLac": 21,
+      "accessible": "camion 4x4"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "essence",
+        "puissanceMin": 2
+      }
+    },
+    "superficie": null,
+    "espece": [
+      "Truite mouchetée (omble de fontaine)"
+    ],
+    "hebergement": [
+      {
+        "camping": null,
+        "distanceCampingAcceuil": 0
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Jamet (lac)",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Rouge-Matawin"
+    },
+    "regionAdministrativeQuebec": "Laurentides",
+    "coordonnees": {
+      "latitude": 46.56516237751694,
+      "longitude": -74.50571013516593
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "La Macaza",
+      "distanceAcceuilLac": 16,
+      "accessible": "auto"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "essence",
+        "puissanceMin": 2
+      }
+    },
+    "superficie": null,
+    "espece": [
+      "Grand Brochet",
+      "Doré"
+    ],
+    "hebergement": [
+      {
+        "camping": null,
+        "distanceCampingAcceuil": 0
+      }
+    ]
+  },
+  {
+    "nomDuLac": "ECUYER",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Rouge-Matawin"
+    },
+    "regionAdministrativeQuebec": "Laurentides",
+    "coordonnees": {
+      "latitude": null,
+      "longitude": null
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "La Macaza",
+      "distanceAcceuilLac": 8,
+      "accessible": "auto"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "essence",
+        "puissanceMin": 2
+      }
+    },
+    "superficie": null,
+    "espece": [
+      "Grand Brochet"
+    ],
+    "hebergement": [
+      {
+        "camping": null,
+        "distanceCampingAcceuil": 0
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Cinq Doigts (lac)",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Rouge-Matawin"
+    },
+    "regionAdministrativeQuebec": "Laurentides",
+    "coordonnees": {
+      "latitude": 46.58475115294619,
+      "longitude": -74.53824611988074
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "La Macaza",
+      "distanceAcceuilLac": 20,
+      "accessible": "auto"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "essence",
+        "puissanceMin": 2
+      }
+    },
+    "superficie": null,
+    "espece": [
+      "Truite mouchetée (omble de fontaine)"
+    ],
+    "hebergement": [
+      {
+        "camping": null,
+        "distanceCampingAcceuil": 0
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Desrochers (lac)",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Portneuf"
+    },
+    "regionAdministrativeQuebec": "Capitale-Nationale",
+    "coordonnees": {
+      "latitude": 47.25206608996315,
+      "longitude": -72.47780820374646
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Rivière-à-Pierre",
+      "distanceAcceuilLac": 52,
+      "accessible": "auto"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "essence",
+        "puissanceMin": 2
+      }
+    },
+    "superficie": null,
+    "espece": [
+      "Maskinongé"
+    ],
+    "hebergement": [
+      {
+        "camping": null,
+        "distanceCampingAcceuil": 0
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Crapet (lac)",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Portneuf"
+    },
+    "regionAdministrativeQuebec": "Capitale-Nationale",
+    "coordonnees": {
+      "latitude": 47.17670785619077,
+      "longitude": -72.43651708862703
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Rivière-à-Pierre",
+      "distanceAcceuilLac": 38,
+      "accessible": "auto"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "essence",
+        "puissanceMin": 2
+      }
+    },
+    "superficie": null,
+    "espece": [
+      "Truite mouchetée (omble de fontaine)"
+    ],
+    "hebergement": [
+      {
+        "camping": null,
+        "distanceCampingAcceuil": 0
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Canton (lac)",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Portneuf"
+    },
+    "regionAdministrativeQuebec": "Capitale-Nationale",
+    "coordonnees": {
+      "latitude": 47.06597978688071,
+      "longitude": -72.06420702263716
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Rivière-à-Pierre",
+      "distanceAcceuilLac": 13,
+      "accessible": "auto"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "electrique"
+      }
+    },
+    "superficie": null,
+    "espece": [
+      "Truite mouchetée (omble de fontaine)"
+    ],
+    "hebergement": [
+      {
+        "camping": null,
+        "distanceCampingAcceuil": 0
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Narcisses (lac des)",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Portneuf"
+    },
+    "regionAdministrativeQuebec": "Capitale-Nationale",
+    "coordonnees": {
+      "latitude": 47.177525019585985,
+      "longitude": -72.26489503318369
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Bureau Administratif via Talbot",
+      "distanceAcceuilLac": 28,
+      "accessible": "auto"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "electrique"
+      }
+    },
+    "superficie": null,
+    "espece": [
+      "Truite mouchetée (omble de fontaine)"
+    ],
+    "hebergement": [
+      {
+        "camping": null,
+        "distanceCampingAcceuil": 0
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Mousses (lac des)",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Portneuf"
+    },
+    "regionAdministrativeQuebec": "Capitale-Nationale",
+    "coordonnees": {
+      "latitude": 47.04967735008645,
+      "longitude": -72.20056724777226
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Bureau Administratif via Talbot",
+      "distanceAcceuilLac": 3,
+      "accessible": "auto"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "electrique"
+      }
+    },
+    "superficie": null,
+    "espece": [
+      "Truite mouchetée (omble de fontaine)"
+    ],
+    "hebergement": [
+      {
+        "camping": null,
+        "distanceCampingAcceuil": 0
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Jumeau (lac premier)",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Portneuf"
+    },
+    "regionAdministrativeQuebec": "Capitale-Nationale",
+    "coordonnees": {
+      "latitude": 47.131707867234184,
+      "longitude": -72.42129285812547
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Bureau Administratif via Talbot",
+      "distanceAcceuilLac": {
+        "temps": 41,
+        "kilometrage": 32.9
+      },
+      "accessible": "auto"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "electrique"
+      }
+    },
+    "superficie": [
+      {
+        "valeur": 24,
+        "unite": "ha"
+      },
+      {
+        "valeur": 0.024,
+        "unite": "km2"
+      }
+    ],
+    "espece": [
+      "Truite mouchetée (omble de fontaine)",
+      "Truite (omble moulac)"
+    ],
+    "hebergement": [
+      {
+        "camping": "Camping Lapeyrère",
+        "organisme": "SEPAQ",
+        "distanceCampingAcceuil": {
+          "temps": null,
+          "kilometrage": null
+        },
+        "distanceCampingLac": {
+          "temps": 14,
+          "kilometrage": 10.1
+        },
+        "eau": false,
+        "electricite": false,
+        "coordonnees": {
+          "latitude": 47.18029775896917,
+          "longitude": -72.3678089525723
+        }
+      },
+      {
+        "camping": "Camping Lac Beaujour",
+        "organisme": "SEPAQ",
+        "distanceCampingAcceuil": {
+          "temps": null,
+          "kilometrage": null
+        },
+        "distanceCampingLac": {
+          "temps": 14,
+          "kilometrage": 10.6
+        },
+        "eau": false,
+        "electricite": false,
+        "coordonnees": {
+          "latitude": 47.18462142278802,
+          "longitude": -72.36229960298857
+        }
+      },
+      {
+        "camping": "Camping Presqu'île",
+        "organisme": "SEPAQ",
+        "distanceCampingAcceuil": {
+          "temps": null,
+          "kilometrage": null
+        },
+        "distanceCampingLac": {
+          "temps": 24,
+          "kilometrage": 16.4
+        },
+        "eau": false,
+        "electricite": false,
+        "coordonnees": {
+          "latitude": 47.22926818260867,
+          "longitude": -72.35809238651856
+        }
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Jumeau (lac deuxième)",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Portneuf"
+    },
+    "regionAdministrativeQuebec": "Capitale-Nationale",
+    "coordonnees": {
+      "latitude": 47.1279122559925,
+      "longitude": -72.41425474194637
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Bureau Administratif via Talbot",
+      "distanceAcceuilLac": 31,
+      "accessible": "auto"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "electrique"
+      }
+    },
+    "superficie": null,
+    "espece": [
+      "Truite mouchetée (omble de fontaine)",
+      "Truite (omble moulac)"
+    ],
+    "hebergement": [
+      {
+        "camping": "Camping Lapeyrère",
+        "organisme": "SEPAQ",
+        "distanceCampingAcceuil": {
+          "temps": null,
+          "kilometrage": null
+        },
+        "distanceCampingLac": {
+          "temps": 13,
+          "kilometrage": 9.8
+        },
+        "eau": false,
+        "electricite": false,
+        "coordonnees": {
+          "latitude": 47.18029775896917,
+          "longitude": -72.3678089525723
+        }
+      },
+      {
+        "camping": "Camping Lac Beaujour",
+        "organisme": "SEPAQ",
+        "distanceCampingAcceuil": {
+          "temps": null,
+          "kilometrage": null
+        },
+        "distanceCampingLac": {
+          "temps": 14,
+          "kilometrage": 10.3
+        },
+        "eau": false,
+        "electricite": false,
+        "coordonnees": {
+          "latitude": 47.18462142278802,
+          "longitude": -72.36229960298857
+        }
+      },
+      {
+        "camping": "Camping Presqu'île",
+        "organisme": "SEPAQ",
+        "distanceCampingAcceuil": {
+          "temps": null,
+          "kilometrage": null
+        },
+        "distanceCampingLac": {
+          "temps": 23,
+          "kilometrage": 16.2
+        },
+        "eau": false,
+        "electricite": false,
+        "coordonnees": {
+          "latitude": 47.22926818260867,
+          "longitude": -72.35809238651856
+        }
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Dussault (lac)",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Portneuf"
+    },
+    "regionAdministrativeQuebec": "Capitale-Nationale",
+    "coordonnees": {
+      "latitude": 47.18175013619987,
+      "longitude": -72.4657393686753
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Bureau Administratif via Talbot",
+      "distanceAcceuilLac": 32,
+      "accessible": "auto"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "electrique"
+      }
+    },
+    "superficie": null,
+    "espece": [
+      "Maskinongé"
+    ],
+    "hebergement": [
+      {
+        "camping": null,
+        "distanceCampingAcceuil": 0
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Dechêne (lac)",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Portneuf"
+    },
+    "regionAdministrativeQuebec": "Capitale-Nationale",
+    "coordonnees": {
+      "latitude": 47.085095101137405,
+      "longitude": -72.1824811924952
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Bureau administratif via Talbot",
+      "distanceAcceuilLac": 19,
+      "accessible": "auto"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "electrique"
+      }
+    },
+    "superficie": null,
+    "espece": [
+      "Truite mouchetée (omble de fontaine)"
+    ],
+    "hebergement": [
+      {
+        "camping": null,
+        "distanceCampingAcceuil": 0
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Boisvert (lac)",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Portneuf"
+    },
+    "regionAdministrativeQuebec": "Capitale-Nationale",
+    "coordonnees": {
+      "latitude": 47.13042682616656,
+      "longitude": -72.40412297845256
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Bureau administratif via Talbot",
+      "distanceAcceuilLac": 32,
+      "accessible": "auto"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "essence",
+        "puissanceMin": 2
+      }
+    },
+    "superficie": null,
+    "espece": [
+      "Truite mouchetée (omble de fontaine)"
+    ],
+    "hebergement": [
+      {
+        "camping": null,
+        "distanceCampingAcceuil": 0
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Perdrix (lac)",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Portneuf"
+    },
+    "regionAdministrativeQuebec": "Capitale-Nationale",
+    "coordonnees": {
+      "latitude": 47.057582421711125,
+      "longitude": -72.11208668277764
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Bureau Administratif via Rivière-À-Pierre",
+      "distanceAcceuilLac": 8,
+      "accessible": "auto"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "electrique"
+      }
+    },
+    "superficie": null,
+    "espece": [
+      "Truite mouchetée (omble de fontaine)"
+    ],
+    "hebergement": [
+      {
+        "camping": null,
+        "distanceCampingAcceuil": 0
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Orignal (lac l')",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Portneuf"
+    },
+    "regionAdministrativeQuebec": "Capitale-Nationale",
+    "coordonnees": {
+      "latitude": 47.074028089690515,
+      "longitude": -72.07807003728061
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Bureau Administratif via Rivière-À-Pierre",
+      "distanceAcceuilLac": 12,
+      "accessible": "auto"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "electrique"
+      }
+    },
+    "superficie": null,
+    "espece": [
+      "Truite mouchetée (omble de fontaine)"
+    ],
+    "hebergement": [
+      {
+        "camping": null,
+        "distanceCampingAcceuil": 0
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Hausseau (lac)",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Portneuf"
+    },
+    "regionAdministrativeQuebec": "Capitale-Nationale",
+    "coordonnees": {
+      "latitude": 47.17273061976158,
+      "longitude": -72.00955222606034
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Bureau Administratif via Rivière-À-Pierre",
+      "distanceAcceuilLac": 28,
+      "accessible": "auto"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "electrique"
+      }
+    },
+    "superficie": null,
+    "espece": [
+      "Truite mouchetée (omble de fontaine)"
+    ],
+    "hebergement": [
+      {
+        "camping": null,
+        "distanceCampingAcceuil": 0
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Cristal (lac)",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Portneuf"
+    },
+    "regionAdministrativeQuebec": "Capitale-Nationale",
+    "coordonnees": {
+      "latitude": 47.20152673720127,
+      "longitude": -71.98812246806581
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Bureau Administratif via Rivière-À-Pierre",
+      "distanceAcceuilLac": 36,
+      "accessible": "auto"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "essence",
+        "puissanceMin": 2
+      }
+    },
+    "superficie": null,
+    "espece": [
+      "Truite mouchetée (omble de fontaine)",
+      "Truite rouge (omble chevalier)"
+    ],
+    "hebergement": [
+      {
+        "camping": null,
+        "distanceCampingAcceuil": 0
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Lapeyrère (lac)",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Portneuf"
+    },
+    "regionAdministrativeQuebec": "Capitale-Nationale",
+    "coordonnees": {
+      "latitude": 47.223413175112434,
+      "longitude": -72.35158200938568
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Bureau Administratif , entrer via Talbot",
+      "distanceAcceuilLac": 38,
+      "accessible": "auto"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "essence",
+        "puissanceMin": 2
+      }
+    },
+    "superficie": null,
+    "espece": [
+      "Truite grise (touladi)",
+      "Truite mouchetée (omble de fontaine)"
+    ],
+    "hebergement": [
+      {
+        "camping": null,
+        "distanceCampingAcceuil": 0
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Lac Dummy",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Papineau-Labelle"
+    },
+    "regionAdministrativeQuebec": "Outaouais",
+    "coordonnees": {
+      "latitude": 46.053609386439206,
+      "longitude": -75.39905721899528
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Val-des-Bois",
+      "distanceAcceuilLac": 36,
+      "accessible": "auto"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "electrique"
+      }
+    },
+    "superficie": null,
+    "espece": [
+      "Truite mouchetée (omble de fontaine)"
+    ],
+    "hebergement": [
+      {
+        "camping": null,
+        "distanceCampingAcceuil": 0
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Lac des Ibis",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Papineau-Labelle"
+    },
+    "regionAdministrativeQuebec": "Outaouais",
+    "coordonnees": {
+      "latitude": 45.9107102580007,
+      "longitude": -75.26954086444039
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Val-des-Bois",
+      "distanceAcceuilLac": 41,
+      "accessible": "véhicule utilitaire sport (VUS)"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "electrique"
+      }
+    },
+    "superficie": [
+      {
+        "valeur": 8.5,
+        "unite": "ha"
+      },
+      {
+        "valeur": 0.085,
+        "unite": "km2"
+      }
+    ],
+    "espece": [
+      "Truite mouchetée (omble de fontaine)",
+      "Truite rouge (omble chevalier)"
+    ],
+    "hebergement": [
+      {
+        "camping": null,
+        "distanceCampingAcceuil": 0
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Lac de l'Écluse",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Papineau-Labelle"
+    },
+    "regionAdministrativeQuebec": "Outaouais",
+    "coordonnees": {
+      "latitude": 45.86436848049379,
+      "longitude": -75.40825756835989
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Val-des-Bois",
+      "distanceAcceuilLac": 45,
+      "accessible": "véhicule utilitaire sport (VUS)"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "essence",
+        "puissanceMin": 2
+      }
+    },
+    "superficie": [
+      {
+        "valeur": 301.7,
+        "unite": "ha"
+      },
+      {
+        "valeur": 3.017,
+        "unite": "km2"
+      }
+    ],
+    "espece": [
+      "Truite mouchetée (omble de fontaine)",
+      "Truite grise (touladi)"
+    ],
+    "hebergement": [
+      {
+        "camping": null,
+        "distanceCampingAcceuil": 0
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Lac Croche",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Papineau-Labelle"
+    },
+    "regionAdministrativeQuebec": "Outaouais",
+    "coordonnees": {
+      "latitude": 45.983423358916,
+      "longitude": -75.39969687146846
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Val-des-Bois",
+      "distanceAcceuilLac": 26,
+      "accessible": "véhicule utilitaire sport (VUS)"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "electrique"
+      }
+    },
+    "superficie": null,
+    "espece": [
+      "Truite mouchetée (omble de fontaine)"
+    ],
+    "hebergement": [
+      {
+        "camping": null,
+        "distanceCampingAcceuil": 0
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Lac Clark",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Papineau-Labelle"
+    },
+    "regionAdministrativeQuebec": "Outaouais",
+    "coordonnees": {
+      "latitude": 45.89861000566856,
+      "longitude": -75.24060375525998
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Val-des-Bois",
+      "distanceAcceuilLac": {
+        "temps": 67,
+        "kilometrage": 48.6
+      },
+      "accessible": "véhicule utilitaire sport (VUS)"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "essence",
+        "puissanceMin": 2
+      }
+    },
+    "superficie": [
+      {
+        "valeur": 63.1,
+        "unite": "ha"
+      },
+      {
+        "valeur": 0.631,
+        "unite": "km2"
+      }
+    ],
+    "espece": [
+      "Truite mouchetée (omble de fontaine)",
+      "Truite rouge (omble chevalier)"
+    ],
+    "hebergement": [
+      {
+        "camping": "Camping au Lac Schryer",
+        "organisme": "Camping",
+        "distanceCampingAcceuil": {
+          "temps": null,
+          "kilometrage": null
+        },
+        "distanceCampingLac": {
+          "temps": 15,
+          "kilometrage": 8.4
+        },
+        "eau": true,
+        "electricite": true,
+        "coordonnees": {
+          "latitude": 45.85086927174026,
+          "longitude": -75.20381431292004
+        }
+      },
+      {
+        "camping": "Camping Montpellier",
+        "organisme": "Camping",
+        "distanceCampingAcceuil": {
+          "temps": null,
+          "kilometrage": null
+        },
+        "distanceCampingLac": {
+          "temps": 18,
+          "kilometrage": 11.9
+        },
+        "eau": true,
+        "electricite": true,
+        "coordonnees": {
+          "latitude": 45.853138935743296,
+          "longitude": -75.16324412797427
+        }
+      },
+      {
+        "camping": "Camping De La Paix",
+        "organisme": "Camping",
+        "distanceCampingAcceuil": {
+          "temps": null,
+          "kilometrage": null
+        },
+        "distanceCampingLac": {
+          "temps": 21,
+          "kilometrage": 14.3
+        },
+        "eau": true,
+        "electricite": true,
+        "coordonnees": {
+          "latitude": 45.84149944679231,
+          "longitude": -75.15385406432303
+        }
+      },
+      {
+        "camping": "Camping du lac de la cédrière",
+        "organisme": "Camping",
+        "distanceCampingAcceuil": {
+          "temps": null,
+          "kilometrage": null
+        },
+        "distanceCampingLac": {
+          "temps": 21,
+          "kilometrage": 14.8
+        },
+        "eau": true,
+        "electricite": true,
+        "coordonnees": {
+          "latitude": 45.833569850504325,
+          "longitude": -75.15525515985304
+        }
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Lac du Quai",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Papineau-Labelle"
+    },
+    "regionAdministrativeQuebec": "Outaouais",
+    "coordonnees": {
+      "latitude": 46.240815449142346,
+      "longitude": -75.23410554014873
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Gagnon",
+      "distanceAcceuilLac": 18,
+      "accessible": "auto"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "electrique"
+      }
+    },
+    "superficie": [
+      {
+        "valeur": 16.1,
+        "unite": "ha"
+      },
+      {
+        "valeur": 0.161,
+        "unite": "km2"
+      }
+    ],
+    "espece": [
+      "Truite mouchetée (omble de fontaine)"
+    ],
+    "hebergement": [
+      {
+        "camping": null,
+        "distanceCampingAcceuil": 0
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Lac de la Cruche",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Papineau-Labelle"
+    },
+    "regionAdministrativeQuebec": "Outaouais",
+    "coordonnees": {
+      "latitude": 46.14218785479888,
+      "longitude": -75.20773446714071
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Gagnon",
+      "distanceAcceuilLac": 6,
+      "accessible": "auto"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "electrique"
+      }
+    },
+    "superficie": [
+      {
+        "valeur": 5.5,
+        "unite": "ha"
+      },
+      {
+        "valeur": 0.055,
+        "unite": "km2"
+      }
+    ],
+    "espece": [
+      "Truite mouchetée (omble de fontaine)"
+    ],
+    "hebergement": [
+      {
+        "camping": null,
+        "distanceCampingAcceuil": 0
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Lac Caryer",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Papineau-Labelle"
+    },
+    "regionAdministrativeQuebec": "Outaouais",
+    "coordonnees": {
+      "latitude": 46.24799065830105,
+      "longitude": -75.17309375839727
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Gagnon",
+      "distanceAcceuilLac": 20,
+      "accessible": "camion 4x4"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "electrique"
+      }
+    },
+    "superficie": [
+      {
+        "valeur": 13.7,
+        "unite": "ha"
+      },
+      {
+        "valeur": 0.137,
+        "unite": "km2"
+      }
+    ],
+    "espece": [
+      "Truite mouchetée (omble de fontaine)"
+    ],
+    "hebergement": [
+      {
+        "camping": null,
+        "distanceCampingAcceuil": 0
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Lac Binet",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Papineau-Labelle"
+    },
+    "regionAdministrativeQuebec": "Outaouais",
+    "coordonnees": {
+      "latitude": 46.19704272219281,
+      "longitude": -75.32328581392608
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Gagnon",
+      "distanceAcceuilLac": 35,
+      "accessible": "auto"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "essence",
+        "puissanceMin": 2
+      }
+    },
+    "superficie": [
+      {
+        "valeur": 38.9,
+        "unite": "ha"
+      },
+      {
+        "valeur": 0.389,
+        "unite": "km2"
+      }
+    ],
+    "espece": [
+      "Truite mouchetée (omble de fontaine)",
+      "Truite grise (touladi)"
+    ],
+    "hebergement": [
+      {
+        "camping": null,
+        "distanceCampingAcceuil": 0
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Lac Armstrong",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Papineau-Labelle"
+    },
+    "regionAdministrativeQuebec": "Outaouais",
+    "coordonnees": {
+      "latitude": 46.199706234219875,
+      "longitude": -75.21353909009245
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Gagnon",
+      "distanceAcceuilLac": 10,
+      "accessible": "auto Accès par la route 35 au Sud du lac Ernest (pas par le Nord)"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "essence",
+        "puissanceMin": 2
+      }
+    },
+    "superficie": [
+      {
+        "valeur": 157,
+        "unite": "ha"
+      },
+      {
+        "valeur": 1.57,
+        "unite": "km2"
+      }
+    ],
+    "espece": [
+      "Truite mouchetée (omble de fontaine)",
+      "Truite (omble moulac)"
+    ],
+    "hebergement": [
+      {
+        "camping": null,
+        "distanceCampingAcceuil": 0
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Vertnez (lac)",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Mastigouche"
+    },
+    "regionAdministrativeQuebec": "Mauricie",
+    "coordonnees": {
+      "latitude": 46.57689153627062,
+      "longitude": -73.26062922493905
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Pins Rouges",
+      "distanceAcceuilLac": 11,
+      "accessible": "auto"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "electrique"
+      }
+    },
+    "superficie": [
+      {
+        "valeur": 41.2,
+        "unite": "ha"
+      },
+      {
+        "valeur": 0.412,
+        "unite": "km2"
+      }
+    ],
+    "espece": [
+      "Truite mouchetée (omble de fontaine)"
+    ],
+    "hebergement": [
+      {
+        "camping": "Camping Manoir Lac Caché",
+        "distanceCampingAcceuil": 30
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Soufflet (lac du)",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Mastigouche"
+    },
+    "regionAdministrativeQuebec": "Mauricie",
+    "coordonnees": {
+      "latitude": 46.738193994111725,
+      "longitude": -73.40147764395701
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Pins Rouges",
+      "distanceAcceuilLac": 34,
+      "accessible": "auto"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "electrique"
+      }
+    },
+    "superficie": [
+      {
+        "valeur": 52.1,
+        "unite": "ha"
+      },
+      {
+        "valeur": 0.521,
+        "unite": "km2"
+      }
+    ],
+    "espece": [
+      "Truite mouchetée (omble de fontaine)"
+    ],
+    "hebergement": [
+      {
+        "camping": "Camping Manoir Lac Caché",
+        "distanceCampingAcceuil": 30
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Head (lac)",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Mastigouche"
+    },
+    "regionAdministrativeQuebec": "Mauricie",
+    "coordonnees": {
+      "latitude": 46.797084465589556,
+      "longitude": -73.30299429864921
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Pins Rouges",
+      "distanceAcceuilLac": 47,
+      "accessible": "auto"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "electrique"
+      }
+    },
+    "superficie": [
+      {
+        "valeur": 9.7,
+        "unite": "ha"
+      },
+      {
+        "valeur": 0.097,
+        "unite": "km2"
+      }
+    ],
+    "espece": [
+      "Truite mouchetée (omble de fontaine)"
+    ],
+    "hebergement": [
+      {
+        "camping": "Camping Manoir Lac Caché",
+        "distanceCampingAcceuil": 30
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Grives (lac des)",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Mastigouche"
+    },
+    "regionAdministrativeQuebec": "Mauricie",
+    "coordonnees": {
+      "latitude": 46.73539251150728,
+      "longitude": -73.26597684848343
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Pins Rouges",
+      "distanceAcceuilLac": 25,
+      "accessible": "auto"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "electrique"
+      }
+    },
+    "superficie": [
+      {
+        "valeur": 4.8,
+        "unite": "ha"
+      },
+      {
+        "valeur": 0.048,
+        "unite": "km2"
+      }
+    ],
+    "espece": [
+      "Truite mouchetée (omble de fontaine)"
+    ],
+    "hebergement": [
+      {
+        "camping": "Camping Manoir Lac Caché",
+        "distanceCampingAcceuil": 30
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Dionne (lac)",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Mastigouche"
+    },
+    "regionAdministrativeQuebec": "Mauricie",
+    "coordonnees": {
+      "latitude": 46.83012554126423,
+      "longitude": -73.33689544433767
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Pins Rouges",
+      "distanceAcceuilLac": 54,
+      "accessible": "auto"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "electrique"
+      }
+    },
+    "superficie": [
+      {
+        "valeur": 5.3,
+        "unite": "ha"
+      },
+      {
+        "valeur": 0.053,
+        "unite": "km2"
+      }
+    ],
+    "espece": [
+      "Truite mouchetée (omble de fontaine)"
+    ],
+    "hebergement": [
+      {
+        "camping": "Camping Manoir Lac Caché",
+        "distanceCampingAcceuil": 30
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Agonik (lac)",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Mastigouche"
+    },
+    "regionAdministrativeQuebec": "Mauricie",
+    "coordonnees": {
+      "latitude": 46.81442492444677,
+      "longitude": -73.43638539032236
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Pins Rouges",
+      "distanceAcceuilLac": 50,
+      "accessible": "véhicule utilitaire sport (VUS)"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "electrique"
+      }
+    },
+    "superficie": [
+      {
+        "valeur": 8,
+        "unite": "ha"
+      },
+      {
+        "valeur": 0.08,
+        "unite": "km2"
+      }
+    ],
+    "espece": [
+      "Truite mouchetée (omble de fontaine)"
+    ],
+    "hebergement": [
+      {
+        "camping": "Camping Manoir Lac Caché",
+        "distanceCampingAcceuil": 30
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Pimbina (lac du)",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Mastigouche"
+    },
+    "regionAdministrativeQuebec": "Mauricie",
+    "coordonnees": {
+      "latitude": 46.692458443656996,
+      "longitude": -73.21337470789506
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Pins Rouges",
+      "distanceAcceuilLac": 11,
+      "accessible": "auto"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "electrique"
+      }
+    },
+    "superficie": [
+      {
+        "valeur": 56.7,
+        "unite": "ha"
+      },
+      {
+        "valeur": 0.567,
+        "unite": "km2"
+      }
+    ],
+    "espece": [
+      "Truite mouchetée (omble de fontaine)"
+    ],
+    "hebergement": [
+      {
+        "camping": "Camping Manoir Lac Caché",
+        "distanceCampingAcceuil": 30
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Vison (lac au)",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Mastigouche"
+    },
+    "regionAdministrativeQuebec": "Lanaudiere",
+    "coordonnees": {
+      "latitude": 46.551700690273655,
+      "longitude": -73.45554305867005
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Catherine",
+      "distanceAcceuilLac": 12,
+      "accessible": "véhicule utilitaire sport (VUS)"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "essence",
+        "puissanceMin": 2
+      }
+    },
+    "superficie": [
+      {
+        "valeur": 74.7,
+        "unite": "ha"
+      },
+      {
+        "valeur": 0.747,
+        "unite": "km2"
+      }
+    ],
+    "espece": [
+      "Truite mouchetée (omble de fontaine)"
+    ],
+    "hebergement": [
+      {
+        "camping": "Camping Mastigouche",
+        "distanceCampingAcceuil": 14
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Tonnerre (lac au)",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Mastigouche"
+    },
+    "regionAdministrativeQuebec": "Lanaudiere",
+    "coordonnees": {
+      "latitude": 46.54756565064678,
+      "longitude": -73.329363770439
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Catherine",
+      "distanceAcceuilLac": 23,
+      "accessible": "auto"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "essence",
+        "puissanceMin": 2
+      }
+    },
+    "superficie": null,
+    "espece": [
+      "Truite mouchetée (omble de fontaine)"
+    ],
+    "hebergement": [
+      {
+        "camping": "Camping Mastigouche",
+        "distanceCampingAcceuil": 14
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Sanglier (lac)",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Mastigouche"
+    },
+    "regionAdministrativeQuebec": "Lanaudiere",
+    "coordonnees": {
+      "latitude": 46.514331228559854,
+      "longitude": -73.4462018942626
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Catherine",
+      "distanceAcceuilLac": 9,
+      "accessible": "véhicule utilitaire sport (VUS)"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "electrique"
+      }
+    },
+    "superficie": [
+      {
+        "valeur": 20,
+        "unite": "ha"
+      },
+      {
+        "valeur": 0.2,
+        "unite": "km2"
+      }
+    ],
+    "espece": [
+      "Truite mouchetée (omble de fontaine)"
+    ],
+    "hebergement": [
+      {
+        "camping": "Camping Mastigouche",
+        "distanceCampingAcceuil": 14
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Sables (lac aux)",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Mastigouche"
+    },
+    "regionAdministrativeQuebec": "Lanaudiere",
+    "coordonnees": {
+      "latitude": 46.49334894400633,
+      "longitude": -73.38761623334159
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Catherine",
+      "distanceAcceuilLac": 5,
+      "accessible": "auto"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "electrique"
+      }
+    },
+    "superficie": [
+      {
+        "valeur": 49.7,
+        "unite": "ha"
+      },
+      {
+        "valeur": 0.497,
+        "unite": "km2"
+      }
+    ],
+    "espece": [
+      "Truite mouchetée (omble de fontaine)",
+      "Truite grise (touladi)"
+    ],
+    "hebergement": [
+      {
+        "camping": "Camping Mastigouche",
+        "distanceCampingAcceuil": 14
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Panse (lac de la)",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Mastigouche"
+    },
+    "regionAdministrativeQuebec": "Lanaudiere",
+    "coordonnees": {
+      "latitude": 46.519541410661674,
+      "longitude": -73.50177736128946
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Catherine",
+      "distanceAcceuilLac": 12,
+      "accessible": "camion 4x4"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "electrique"
+      }
+    },
+    "superficie": [
+      {
+        "valeur": 34.8,
+        "unite": "ha"
+      },
+      {
+        "valeur": 0.348,
+        "unite": "km2"
+      }
+    ],
+    "espece": [
+      "Truite mouchetée (omble de fontaine)"
+    ],
+    "hebergement": [
+      {
+        "camping": "Camping Mastigouche",
+        "distanceCampingAcceuil": 14
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Chamberlain (lac)",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Mastigouche"
+    },
+    "regionAdministrativeQuebec": "Lanaudiere",
+    "coordonnees": {
+      "latitude": 46.520761921332664,
+      "longitude": -73.33000155826711
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Catherine",
+      "distanceAcceuilLac": 15,
+      "accessible": "véhicule utilitaire sport (VUS)"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "electrique"
+      }
+    },
+    "superficie": [
+      {
+        "valeur": 18.4,
+        "unite": "ha"
+      },
+      {
+        "valeur": 0.184,
+        "unite": "km2"
+      }
+    ],
+    "espece": [
+      "Truite mouchetée (omble de fontaine)"
+    ],
+    "hebergement": [
+      {
+        "camping": "Camping Mastigouche",
+        "distanceCampingAcceuil": 14
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Tremblay (lac)",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Mastigouche"
+    },
+    "regionAdministrativeQuebec": "Lanaudiere",
+    "coordonnees": {
+      "latitude": 46.71975500425298,
+      "longitude": -73.65347268783796
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Bouteille",
+      "distanceAcceuilLac": 5,
+      "accessible": "auto"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "essence",
+        "puissanceMin": 2
+      }
+    },
+    "superficie": [
+      {
+        "valeur": 156.4,
+        "unite": "ha"
+      },
+      {
+        "valeur": 1.564,
+        "unite": "km2"
+      }
+    ],
+    "espece": [
+      "Truite (omble moulac)"
+    ],
+    "hebergement": [
+      {
+        "camping": "Camping Dynastie",
+        "distanceCampingAcceuil": 11
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Sans Nom (lac)",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Mastigouche"
+    },
+    "regionAdministrativeQuebec": "Lanaudiere",
+    "coordonnees": {
+      "latitude": null,
+      "longitude": null
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Bouteille",
+      "distanceAcceuilLac": 33,
+      "accessible": "véhicule utilitaire sport (VUS)"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "electrique"
+      }
+    },
+    "superficie": [
+      {
+        "valeur": 17.3,
+        "unite": "ha"
+      },
+      {
+        "valeur": 0.173,
+        "unite": "km2"
+      }
+    ],
+    "espece": [
+      "Truite mouchetée (omble de fontaine)"
+    ],
+    "hebergement": [
+      {
+        "camping": "Camping Dynastie",
+        "distanceCampingAcceuil": 11
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Crapaud (lac du)",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Mastigouche"
+    },
+    "regionAdministrativeQuebec": "Lanaudiere",
+    "coordonnees": {
+      "latitude": 46.659279195641844,
+      "longitude": -73.5144468169375
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Bouteille",
+      "distanceAcceuilLac": 25,
+      "accessible": "auto"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "electrique"
+      }
+    },
+    "superficie": null,
+    "espece": [
+      "Truite mouchetée (omble de fontaine)"
+    ],
+    "hebergement": [
+      {
+        "camping": "Camping Dynastie",
+        "distanceCampingAcceuil": 11
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Brisé (lac)",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Mastigouche"
+    },
+    "regionAdministrativeQuebec": "Lanaudiere",
+    "coordonnees": {
+      "latitude": 46.662083935307415,
+      "longitude": -73.60682782200313
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Bouteille",
+      "distanceAcceuilLac": {
+        "temps": 24,
+        "kilometrage": 13.6
+      },
+      "accessible": "véhicule utilitaire sport (VUS)"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "electrique"
+      }
+    },
+    "superficie": [
+      {
+        "valeur": 37.8,
+        "unite": "ha"
+      },
+      {
+        "valeur": 0.378,
+        "unite": "km2"
+      }
+    ],
+    "espece": [
+      "Truite mouchetée (omble de fontaine)"
+    ],
+    "hebergement": [
+      {
+        "camping": "Camping du Lac de la bouteille",
+        "organisme": "SEPAQ",
+        "distanceCampingAcceuil": {
+          "temps": 5,
+          "kilometrage": 2.8
+        },
+        "distanceCampingLac": {
+          "temps": 29,
+          "kilometrage": 16.3
+        },
+        "eau": false,
+        "electricite": false,
+        "coordonnees": {
+          "latitude": 46.72188704515101,
+          "longitude": -73.68811234402764
+        }
+      },
+      {
+        "camping": "Roulotte",
+        "organisme": "Camping",
+        "distanceCampingAcceuil": {
+          "temps": 24,
+          "kilometrage": 14.5
+        },
+        "distanceCampingLac": {
+          "temps": 37,
+          "kilometrage": 21.9
+        },
+        "eau": true,
+        "electricite": true,
+        "coordonnees": {
+          "latitude": 46.650496701431514,
+          "longitude": -73.77242088914241
+        }
+      },
+      {
+        "camping": "Camping Dynastie",
+        "organisme": "Camping",
+        "distanceCampingAcceuil": {
+          "temps": 16,
+          "kilometrage": 11.3
+        },
+        "distanceCampingLac": {
+          "temps": 30,
+          "kilometrage": 17.8
+        },
+        "eau": true,
+        "electricite": true,
+        "coordonnees": {
+          "latitude": 46.706858750252586,
+          "longitude": -73.77632979147468
+        }
+      },
+      {
+        "camping": "Camping lac Tremblay",
+        "organisme": "SEPAQ",
+        "distanceCampingAcceuil": {
+          "temps": 8,
+          "kilometrage": 4.9
+        },
+        "distanceCampingLac": {
+          "temps": 30,
+          "kilometrage": 16.2
+        },
+        "eau": false,
+        "electricite": false,
+        "coordonnees": {
+          "latitude": 46.73194740693692,
+          "longitude": -73.66630107647711
+        }
+      },
+      {
+        "camping": "Camping St-Ignace",
+        "organisme": "Camping",
+        "distanceCampingAcceuil": {
+          "temps": 20,
+          "kilometrage": 14.9
+        },
+        "distanceCampingLac": {
+          "temps": 34,
+          "kilometrage": 21.4
+        },
+        "eau": true,
+        "electricite": true,
+        "coordonnees": {
+          "latitude": 46.730270704918134,
+          "longitude": -73.79815113645132
+        }
+      },
+      {
+        "camping": "Camping Des Roses",
+        "organisme": "Camping",
+        "distanceCampingAcceuil": {
+          "temps": 21,
+          "kilometrage": 16.4
+        },
+        "distanceCampingLac": {
+          "temps": 35,
+          "kilometrage": 22.9
+        },
+        "eau": true,
+        "electricite": true,
+        "coordonnees": {
+          "latitude": 46.73853921089921,
+          "longitude": -73.81628015295661
+        }
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Bouteille (lac de la)",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "SEPAQ",
+      "site": "Mastigouche"
+    },
+    "regionAdministrativeQuebec": "Lanaudiere",
+    "coordonnees": {
+      "latitude": 46.710433139797395,
+      "longitude": -73.69855585175675
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Bouteille",
+      "distanceAcceuilLac": {
+        "temps": 1,
+        "kilometrage": 0.65
+      },
+      "accessible": "auto"
+    },
+    "embarcation": {
+      "type": "Embarcation Sépaq fournie",
+      "motorisation": {
+        "type": "essence",
+        "puissanceMin": 2
+      }
+    },
+    "superficie": [
+      {
+        "valeur": 256.5,
+        "unite": "ha"
+      },
+      {
+        "valeur": 2.565,
+        "unite": "km2"
+      }
+    ],
+    "espece": [
+      "Truite mouchetée (omble de fontaine)"
+    ],
+    "hebergement": [
+      {
+        "camping": "Camping du Lac de la bouteille",
+        "organisme": "SEPAQ",
+        "distanceCampingAcceuil": {
+          "temps": 5,
+          "kilometrage": 2.8
+        },
+        "distanceCampingLac": {
+          "temps": 3,
+          "kilometrage": 2.1
+        },
+        "eau": false,
+        "electricite": false,
+        "coordonnees": {
+          "latitude": 46.72188704515101,
+          "longitude": -73.68811234402764
+        }
+      },
+      {
+        "camping": "Camping lac Tremblay",
+        "organisme": "SEPAQ",
+        "distanceCampingAcceuil": {
+          "temps": 8,
+          "kilometrage": 4.9
+        },
+        "distanceCampingLac": {
+          "temps": 7,
+          "kilometrage": 4.3
+        },
+        "eau": false,
+        "electricite": false,
+        "coordonnees": {
+          "latitude": 46.73194740693692,
+          "longitude": -73.66630107647711
+        }
+      },
+      {
+        "camping": "Camping Dynastie",
+        "organisme": "Camping",
+        "distanceCampingAcceuil": {
+          "temps": 16,
+          "kilometrage": 11.3
+        },
+        "distanceCampingLac": {
+          "temps": 17,
+          "kilometrage": 12
+        },
+        "eau": true,
+        "electricite": true,
+        "coordonnees": {
+          "latitude": 46.706858750252586,
+          "longitude": -73.77632979147468
+        }
+      },
+      {
+        "camping": "Camping St-Ignace",
+        "organisme": "Camping",
+        "distanceCampingAcceuil": {
+          "temps": 20,
+          "kilometrage": 14.9
+        },
+        "distanceCampingLac": {
+          "temps": 22,
+          "kilometrage": 15.5
+        },
+        "eau": true,
+        "electricite": true,
+        "coordonnees": {
+          "latitude": 46.730270704918134,
+          "longitude": -73.79815113645132
+        }
+      },
+      {
+        "camping": "Camping Des Roses",
+        "organisme": "Camping",
+        "distanceCampingAcceuil": {
+          "temps": 21,
+          "kilometrage": 16.4
+        },
+        "distanceCampingLac": {
+          "temps": 23,
+          "kilometrage": 17
+        },
+        "eau": true,
+        "electricite": true,
+        "coordonnees": {
+          "latitude": 46.73853921089921,
+          "longitude": -73.81628015295661
+        }
+      },
+      {
+        "camping": "Roulotte",
+        "organisme": "Camping",
+        "distanceCampingAcceuil": {
+          "temps": null,
+          "kilometrage": null
+        },
+        "distanceCampingLac": {
+          "temps": 24,
+          "kilometrage": 15.1
+        },
+        "eau": true,
+        "electricite": true,
+        "coordonnees": {
+          "latitude": 46.64600813858284,
+          "longitude": -73.7718329170261
+        }
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Lac Barriere",
+    "juridiction": {
+      "type": "privé",
+      "organisme": "Pourvoirie",
+      "site": null
+    },
+    "regionAdministrativeQuebec": "Laurentides",
+    "coordonnees": {
+      "latitude": 46.090842147439325,
+      "longitude": -74.75685819750987
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Pourvoirie Baroux Inc",
+      "distanceAcceuilLac": {
+        "temps": 1,
+        "kilometrage": 0.7
+      },
+      "accessible": "véhicule utilitaire sport (VUS)"
+    },
+    "embarcation": {
+      "type": "location embarcation",
+      "motorisation": {
+        "type": "electrique"
+      }
+    },
+    "superficie": null,
+    "espece": [
+      "Truite"
+    ],
+    "hebergement": [
+      {
+        "camping": "Pourvoirie Baroux Inc",
+        "organisme": "Pourvoirie",
+        "distanceCampingAcceuil": {
+          "temps": 1,
+          "kilometrage": 0.7
+        },
+        "distanceCampingLac": {
+          "temps": 1,
+          "kilometrage": 0.7
+        },
+        "eau": true,
+        "electricite": true,
+        "coordonnees": {
+          "latitude": 46.088468312227064,
+          "longitude": -74.75245087307893
+        }
+      },
+      {
+        "camping": "Camping de la Montagne D'Argent",
+        "organisme": "Camping",
+        "distanceCampingAcceuil": {
+          "temps": 26,
+          "kilometrage": 17.7
+        },
+        "distanceCampingLac": {
+          "temps": 26,
+          "kilometrage": 17.7
+        },
+        "eau": true,
+        "electricite": true,
+        "coordonnees": {
+          "latitude": 46.13388815124264,
+          "longitude": -74.69203798099068
+        }
+      },
+      {
+        "camping": "Camping la Conception",
+        "organisme": "Camping",
+        "distanceCampingAcceuil": {
+          "temps": 21,
+          "kilometrage": 15
+        },
+        "distanceCampingLac": {
+          "temps": 21,
+          "kilometrage": 15
+        },
+        "eau": true,
+        "electricite": true,
+        "coordonnees": {
+          "latitude": 46.13070776903985,
+          "longitude": -74.69163481976913
+        }
+      },
+      {
+        "camping": "Camping Domaine des Cèdres",
+        "organisme": "Camping",
+        "distanceCampingAcceuil": {
+          "temps": 16,
+          "kilometrage": 8.8
+        },
+        "distanceCampingLac": {
+          "temps": 16,
+          "kilometrage": 8.8
+        },
+        "eau": true,
+        "electricite": true,
+        "coordonnees": {
+          "latitude": 46.08625296158923,
+          "longitude": -74.66894353979481
+        }
+      },
+      {
+        "camping": "Camping De La Diable",
+        "organisme": "Camping",
+        "distanceCampingAcceuil": {
+          "temps": 23,
+          "kilometrage": 18.1
+        },
+        "eau": true,
+        "electricite": true,
+        "coordonnees": {
+          "latitude": 46.12974220242199,
+          "longitude": -74.60496082286495
+        }
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Lac Cordon",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "territoire naturel",
+      "site": null
+    },
+    "regionAdministrativeQuebec": "Laurentides",
+    "coordonnees": {
+      "latitude": 46.04964561290038,
+      "longitude": -74.47700025105037
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Parc Eco Laurentides",
+      "distanceAcceuilLac": {
+        "temps": 0,
+        "kilometrage": 0
+      },
+      "accessible": "véhicule utilitaire sport (VUS)"
+    },
+    "embarcation": {
+      "type": "location embarcation",
+      "motorisation": {
+        "type": "electrique"
+      }
+    },
+    "superficie": null,
+    "espece": [
+      "Omble de fontaine indigène (truite mouchetée)",
+      "Achigan à petite bouche"
+    ],
+    "hebergement": [
+      {
+        "camping": "Huttopia Les Deux Lacs",
+        "organisme": "Camping",
+        "distanceCampingAcceuil": {
+          "temps": 2,
+          "kilometrage": 1
+        },
+        "distanceCampingLac": {
+          "temps": 2,
+          "kilometrage": 1
+        },
+        "eau": true,
+        "electricite": true,
+        "coordonnees": {
+          "latitude": 46.037996273075656,
+          "longitude": -74.47511707230258
+        }
+      },
+      {
+        "camping": "Camping Boréal",
+        "organisme": "Camping",
+        "distanceCampingAcceuil": {
+          "temps": 26,
+          "kilometrage": 21.6
+        },
+        "distanceCampingLac": {
+          "temps": 26,
+          "kilometrage": 21.6
+        },
+        "eau": true,
+        "electricite": true,
+        "coordonnees": {
+          "latitude": 46.11500935596225,
+          "longitude": -74.53995381494434
+        }
+      },
+      {
+        "camping": "Camping du Domaine Lausanne | Centre de plein air",
+        "organisme": "Camping",
+        "distanceCampingAcceuil": {
+          "temps": 29,
+          "kilometrage": 26.6
+        },
+        "distanceCampingLac": {
+          "temps": 29,
+          "kilometrage": 26.6
+        },
+        "eau": true,
+        "electricite": true,
+        "coordonnees": {
+          "latitude": 46.10495794197176,
+          "longitude": -74.3817711029434
+        }
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Lac Renversi",
+    "juridiction": {
+      "type": "gouvernemental",
+      "organisme": "territoire naturel",
+      "site": null
+    },
+    "regionAdministrativeQuebec": "Laurentides",
+    "coordonnees": {
+      "latitude": 46.05631699227326,
+      "longitude": -74.48648454175515
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Parc Eco Laurentides",
+      "distanceAcceuilLac": {
+        "temps": 0,
+        "kilometrage": 0
+      },
+      "accessible": "véhicule utilitaire sport (VUS)"
+    },
+    "embarcation": {
+      "type": "location embarcation",
+      "motorisation": {
+        "type": "electrique"
+      }
+    },
+    "superficie": null,
+    "espece": [
+      "Omble de fontaine indigène (truite mouchetée)"
+    ],
+    "hebergement": [
+      {
+        "camping": "Huttopia Les Deux Lacs",
+        "organisme": "Camping",
+        "distanceCampingAcceuil": {
+          "temps": 2,
+          "kilometrage": 1
+        },
+        "distanceCampingLac": {
+          "temps": 2,
+          "kilometrage": 1
+        },
+        "eau": true,
+        "electricite": true,
+        "coordonnees": {
+          "latitude": 46.037996273075656,
+          "longitude": -74.47511707230258
+        }
+      },
+      {
+        "camping": "Camping Boréal",
+        "organisme": "Camping",
+        "distanceCampingAcceuil": {
+          "temps": 26,
+          "kilometrage": 21.6
+        },
+        "distanceCampingLac": {
+          "temps": 26,
+          "kilometrage": 21.6
+        },
+        "eau": true,
+        "electricite": true,
+        "coordonnees": {
+          "latitude": 46.11500935596225,
+          "longitude": -74.53995381494434
+        }
+      },
+      {
+        "camping": "Camping du Domaine Lausanne | Centre de plein air",
+        "organisme": "Camping",
+        "distanceCampingAcceuil": {
+          "temps": 29,
+          "kilometrage": 26.6
+        },
+        "distanceCampingLac": {
+          "temps": 29,
+          "kilometrage": 26.6
+        },
+        "eau": true,
+        "electricite": true,
+        "coordonnees": {
+          "latitude": 46.10495794197176,
+          "longitude": -74.3817711029434
+        }
+      }
+    ]
+  },
+  {
+    "nomDuLac": "Lac Caché",
+    "juridiction": {
+      "type": "privé",
+      "organisme": "Camping",
+      "site": null
+    },
+    "regionAdministrativeQuebec": "Lanaudiere",
+    "coordonnees": {
+      "latitude": 46.522124447492395,
+      "longitude": -73.09372024439412
+    },
+    "acces": {
+      "portage": "Aucune marche d'approche nécessaire",
+      "acceuil": "Auberge & Éco-camping du Lac Caché",
+      "distanceAcceuilLac": {
+        "temps": 1,
+        "kilometrage": 0.19
+      },
+      "accessible": "véhicule utilitaire sport (VUS)"
+    },
+    "embarcation": {
+      "type": "location embarcation",
+      "motorisation": {
+        "type": "electrique"
+      }
+    },
+    "superficie": null,
+    "espece": [],
+    "hebergement": [
+      {
+        "camping": "Camping Manoir Lac Caché",
+        "organisme": "privé",
+        "distanceCampingAcceuil": {
+          "temps": 6,
+          "kilometrage": 0.19
+        },
+        "distanceCampingLac": {
+          "temps": 1,
+          "kilometrage": 0.19
+        },
+        "eau": true,
+        "electricite": true,
+        "coordonnees": {
+          "latitude": 46.51976041007759,
+          "longitude": -73.09682390208201
+        }
+      }
+    ]
+  }
+]

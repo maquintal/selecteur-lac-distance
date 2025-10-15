@@ -14,6 +14,7 @@ import type {
   FunctionReference,
 } from "convex/server";
 import type * as lacs from "../lacs.js";
+import type * as migrations_populateTables from "../migrations/populateTables.js";
 import type * as mutations_removeCampingFromLac from "../mutations/removeCampingFromLac.js";
 import type * as types from "../types.js";
 
@@ -27,6 +28,7 @@ import type * as types from "../types.js";
  */
 declare const fullApi: ApiFromModules<{
   lacs: typeof lacs;
+  "migrations/populateTables": typeof migrations_populateTables;
   "mutations/removeCampingFromLac": typeof mutations_removeCampingFromLac;
   types: typeof types;
 }>;
