@@ -25,6 +25,7 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
   const createCamping = useMutation(api.lacs.createCamping);
   const updateCamping = useMutation(api.lacs.updateCamping);
 
+  // @ts-ignore en attente de ia
   const handleInputChange = (field: keyof NewCampingInput, value: any) => {
     if (field === 'coordonnees') {
       setFormData(prev => ({

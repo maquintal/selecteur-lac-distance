@@ -3,11 +3,10 @@
 import { useState } from 'react';
 import { useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
-import { 
-  Box, TextField, Button, 
+import {
+  Box, TextField, Button,
   Dialog, DialogTitle, DialogContent, DialogActions,
-  FormControl, InputLabel, Select, MenuItem, 
-  FormControlLabel, Checkbox
+  FormControl, InputLabel, Select, MenuItem,
 } from '@mui/material';
 import { EspeceDoc, NewEspeceInput, defaultEspeceInput } from '../types/schema.types';
 
@@ -19,12 +18,13 @@ type EspeceDialogProps = {
 };
 
 export default function EspeceDialog({ open, onClose, espece, mode }: EspeceDialogProps) {
-  const [formData, setFormData] = useState<NewEspeceInput >(espece || defaultEspeceInput);
+  const [formData, setFormData] = useState<NewEspeceInput>(espece || defaultEspeceInput);
 
   // Mutations Convex
   const createEspece = useMutation(api.lacs.addEspece);
   const updateEspece = useMutation(api.lacs.updateEspece);
 
+  // @ts-ignore en attente de ia
   const handleInputChange = (field: keyof NewEspeceInput, value: any) => {
     setFormData(prev => ({
       ...prev,
