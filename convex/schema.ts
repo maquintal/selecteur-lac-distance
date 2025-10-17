@@ -72,25 +72,46 @@ export default defineSchema({
     acces: v.object({
       portage: v.string(),
       acceuil: v.string(),
-      // Supporte à la fois les nombres simples (32) et les objets complexes
       distanceAcceuilLac: v.union(
-        v.number(),
         v.object({
           temps: v.number(), // en minutes
           kilometrage: v.number(),
         })
       ),
-      accessible: v.string(), // Plus flexible pour supporter toutes les variantes
+      accessible: v.union(
+        v.literal("auto"),
+        v.literal("véhicule utilitaire sport (VUS)"),
+        v.literal("camion 4x4"),
+      ),
     }),
 
     embarcation: v.object({
-      type: v.string(), // Plus flexible pour tous les types
+      type: v.union(
+        v.literal("Embarcation personnelle"),
+        v.literal("Embarcation Sépaq fournie"),
+        v.literal("Embarcation Pourvoirie fournie"),
+        v.literal("Location"),
+      ),
       motorisation: v.object({
-        type: v.union(
-          v.literal("electrique"),
-          v.literal("essence"),
+        // type: v.optional(v.union(
+        //   v.literal("electrique"),
+        //   v.literal("essence"),
+        // )),
+        // puissanceMin: v.optional(v.number()),
+        // ajout pour version 2 du schema
+        puissance: v.optional(
+          v.object({
+            minimum: v.optional(v.union(v.number(), v.null())),
+            maximum: v.optional(v.union(v.number(), v.null())),
+          })
         ),
-        puissanceMin: v.optional(v.number()),
+        necessaire: v.optional(
+          v.union(
+            v.literal("electrique"),
+            v.literal("essence"),
+            v.literal("a determiner"),
+          )
+        )
       }),
     }),
 
@@ -110,7 +131,6 @@ export default defineSchema({
         campingId: v.id("campings"),
         distanceDepuisAcceuil: v.optional(
           v.union(
-            v.number(),
             v.object({
               temps: v.number(),
               kilometrage: v.number(),
@@ -119,7 +139,6 @@ export default defineSchema({
         ),
         distanceDepuisLac: v.optional(
           v.union(
-            v.number(),
             v.object({
               temps: v.number(),
               kilometrage: v.number(),
@@ -151,7 +170,6 @@ export default defineSchema({
     campingId: v.id("campings"),
     distanceDepuisAcceuil: v.optional(
       v.union(
-        v.number(),
         v.object({
           temps: v.number(),
           kilometrage: v.number(),
@@ -160,7 +178,6 @@ export default defineSchema({
     ),
     distanceDepuisLac: v.optional(
       v.union(
-        v.number(),
         v.object({
           temps: v.number(),
           kilometrage: v.number(),

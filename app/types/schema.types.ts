@@ -64,7 +64,12 @@ export const defaultLacInput: NewLacInput = {
   embarcation: {
     type: "Location",
     motorisation: {
-      type: "electrique",
+      // type: "electrique",
+      puissance: {
+        minimum: null,
+        maximum: null,
+      },
+      necessaire: "a determiner",
     },
   },
   especeIds: [],

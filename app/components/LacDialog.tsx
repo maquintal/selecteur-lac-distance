@@ -331,20 +331,22 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
                 <MenuItem value="Embarcation Sépaq fournie">Embarcation Sépaq fournie</MenuItem>
                 <MenuItem value="Embarcation Pourvoirie fournie">Embarcation Pourvoirie fournie</MenuItem>
                 <MenuItem value="Location">Location</MenuItem>
+                <MenuItem value="Embarcation personnelle">Embarcation personnelle</MenuItem>
               </Select>
             </FormControl>
 
             <FormControl fullWidth>
               <InputLabel>Type de motorisation</InputLabel>
               <Select
-                value={formData.embarcation.motorisation.type}
+                value={formData.embarcation.motorisation.necessaire}
                 label="Type de motorisation"
                 onChange={(e) => handleInputChange('embarcation', {
-                  motorisation: { type: e.target.value }
+                  motorisation: { necessaire: e.target.value }
                 })}
               >
                 <MenuItem value="electrique">Électrique</MenuItem>
                 <MenuItem value="essence">Essence</MenuItem>
+                <MenuItem value="a determiner">À déterminer</MenuItem>
               </Select>
             </FormControl>
           </Box>

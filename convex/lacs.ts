@@ -404,14 +404,29 @@ export const addLac = mutation({
       type: v.union(
         v.literal("Embarcation Sépaq fournie"),
         v.literal("Embarcation Pourvoirie fournie"),
-        v.literal("Location")
+        v.literal("Location"),
+        v.literal("Embarcation personnelle")
       ),
       motorisation: v.object({
-        type: v.union(
-          v.literal("electrique"),
-          v.literal("essence"),
+        // type: v.optional(v.union(
+        //   v.literal("electrique"),
+        //   v.literal("essence"),
+        // )),
+        // puissanceMin: v.optional(v.number()),
+        // ajout pour version 2 du schema
+        puissance: v.optional(
+          v.object({
+            minimum: v.optional(v.union(v.number(), v.null())),
+            maximum: v.optional(v.union(v.number(), v.null())),
+          })
         ),
-        puissanceMin: v.optional(v.number()),
+        necessaire: v.optional(
+          v.union(
+            v.literal("electrique"),
+            v.literal("essence"),
+            v.literal("a determiner"),
+          )
+        )
       }),
     }),
 
@@ -454,14 +469,29 @@ export const updateLac = mutation({
       type: v.union(
         v.literal("Embarcation Sépaq fournie"),
         v.literal("Embarcation Pourvoirie fournie"),
-        v.literal("Location")
+        v.literal("Location"),
+        v.literal("Embarcation personnelle")
       ),
       motorisation: v.object({
-        type: v.union(
-          v.literal("electrique"),
-          v.literal("essence"),
+        // type: v.optional(v.union(
+        //   v.literal("electrique"),
+        //   v.literal("essence"),
+        // )),
+        // puissanceMin: v.optional(v.number()),
+        // ajout pour version 2 du schema
+        puissance: v.optional(
+          v.object({
+            minimum: v.optional(v.union(v.number(), v.null())),
+            maximum: v.optional(v.union(v.number(), v.null())),
+          })
         ),
-        puissanceMin: v.optional(v.number()),
+        necessaire: v.optional(
+          v.union(
+            v.literal("electrique"),
+            v.literal("essence"),
+            v.literal("a determiner"),
+          )
+        )
       }),
     }),
     zone: v.optional(v.number()),
