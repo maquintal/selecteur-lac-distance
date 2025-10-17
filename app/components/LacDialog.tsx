@@ -31,7 +31,7 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
   useEffect(() => {
     if (open) {
       if (lac) {
-        
+
         setFormData({
           nomDuLac: lac.nomDuLac,
           regionAdministrativeQuebec: lac.regionAdministrativeQuebec,
@@ -218,6 +218,7 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
             <FormControl fullWidth>
               <InputLabel>Région Adiministrative du Québec</InputLabel>
               <Select
+                label="Région Adiministrative du Québec"
                 value={formData.regionAdministrativeQuebec}
                 onChange={(e) => handleInputChange('regionAdministrativeQuebec', e.target.value)}
               >
@@ -233,6 +234,7 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
             <FormControl fullWidth>
               <InputLabel>Site</InputLabel>
               <Select
+                label="Site"
                 value={formData.site}
                 onChange={(e) => handleInputChange('site', e.target.value)}
               >
@@ -309,6 +311,7 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
             <FormControl fullWidth>
               <InputLabel>Accessible</InputLabel>
               <Select
+                label="Accessible"
                 value={formData.acces.accessible}
                 onChange={(e) => handleInputChange('acces', { accessible: e.target.value })}
               >
@@ -326,6 +329,7 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
               <InputLabel>{`Type d'embarcation`}</InputLabel>
               <Select
                 value={formData.embarcation.type}
+                label="Type d'embarcation"
                 onChange={(e) => handleInputChange('embarcation', { type: e.target.value })}
               >
                 <MenuItem value="Embarcation Sépaq fournie">Embarcation Sépaq fournie</MenuItem>
@@ -336,7 +340,7 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
             </FormControl>
 
             <FormControl fullWidth>
-              <InputLabel>Type de motorisation</InputLabel>
+              <InputLabel>{`Type de motorisation`}</InputLabel>
               <Select
                 value={formData.embarcation.motorisation.necessaire}
                 label="Type de motorisation"
@@ -349,6 +353,18 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
                 <MenuItem value="a determiner">À déterminer</MenuItem>
               </Select>
             </FormControl>
+
+            {/* Puissance minimale */}
+            {formData.embarcation.motorisation.necessaire === "essence" && (
+              <TextField
+                fullWidth
+                label="Puissance minimale (CV)"
+                type="number"
+                value={formData.embarcation.motorisation.puissance?.minimum || 0}
+                onChange={(e) => handleInputChange('embarcation', {
+                  motorisation: { puissance: { minimum: e.target.value ? parseInt(e.target.value) : 0 } }
+                })}
+              />)}
           </Box>
 
           <Typography variant="h6" sx={{ mt: 2 }}>Espèces</Typography>
