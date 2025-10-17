@@ -64,7 +64,6 @@ export const defaultLacInput: NewLacInput = {
   embarcation: {
     type: "Location",
     motorisation: {
-      // type: "electrique",
       puissance: {
         minimum: null,
         maximum: null,

@@ -408,12 +408,6 @@ export const addLac = mutation({
         v.literal("Embarcation personnelle")
       ),
       motorisation: v.object({
-        // type: v.optional(v.union(
-        //   v.literal("electrique"),
-        //   v.literal("essence"),
-        // )),
-        // puissanceMin: v.optional(v.number()),
-        // ajout pour version 2 du schema
         puissance: v.optional(
           v.object({
             minimum: v.optional(v.union(v.number(), v.null())),
@@ -473,12 +467,6 @@ export const updateLac = mutation({
         v.literal("Embarcation personnelle")
       ),
       motorisation: v.object({
-        // type: v.optional(v.union(
-        //   v.literal("electrique"),
-        //   v.literal("essence"),
-        // )),
-        // puissanceMin: v.optional(v.number()),
-        // ajout pour version 2 du schema
         puissance: v.optional(
           v.object({
             minimum: v.optional(v.union(v.number(), v.null())),

@@ -323,7 +323,7 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
           <Box sx={{ display: 'flex', gap: 2 }}>
 
             <FormControl fullWidth>
-              <InputLabel>Type d'embarcation</InputLabel>
+              <InputLabel>{`Type d'embarcation`}</InputLabel>
               <Select
                 value={formData.embarcation.type}
                 onChange={(e) => handleInputChange('embarcation', { type: e.target.value })}

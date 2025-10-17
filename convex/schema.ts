@@ -93,12 +93,6 @@ export default defineSchema({
         v.literal("Location"),
       ),
       motorisation: v.object({
-        // type: v.optional(v.union(
-        //   v.literal("electrique"),
-        //   v.literal("essence"),
-        // )),
-        // puissanceMin: v.optional(v.number()),
-        // ajout pour version 2 du schema
         puissance: v.optional(
           v.object({
             minimum: v.optional(v.union(v.number(), v.null())),
