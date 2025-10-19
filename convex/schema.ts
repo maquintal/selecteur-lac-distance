@@ -145,11 +145,17 @@ export default defineSchema({
     // Métadonnées
     createdAt: v.number(),
     updatedAt: v.optional(v.number()),
+
+    // Champs calculés pour optimiser les requêtes
+    nbHebergements: v.optional(v.number()), // calculé lors de l'insertion/update
+    isMoteurisationElectrique: v.optional(v.boolean()),
+
   })
     .index("by_region", ["regionAdministrativeQuebec"])
     .index("by_site", ["site"])
     .index("by_zone", ["zone"])
     .index("by_coordonnees", ["coordonnees.latitude", "coordonnees.longitude"])
+    .index("by_hebergements_electrique", ["nbHebergements", "isMoteurisationElectrique"])
     .searchIndex("search_nom", {
       searchField: "nomDuLac",
       filterFields: ["regionAdministrativeQuebec", "site"],

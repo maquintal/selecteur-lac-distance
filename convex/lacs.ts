@@ -117,6 +117,24 @@ export const getAllLacs = query({
   },
 });
 
+export const getAllLacsSorted = query({
+  handler: async (ctx) => {
+    const lacs = await ctx.db
+      .query("lacs")
+      .withIndex("by_hebergements_electrique")
+      .order("desc")
+      .collect();
+
+    // Tri secondaire en JS seulement pour les lacs avec même nb d'hébergements
+    return lacs.sort((a, b) => {
+      if (a.nbHebergements === b.nbHebergements) {
+        return (b.isMoteurisationElectrique ? 1 : 0) - (a.isMoteurisationElectrique ? 1 : 0);
+      }
+      return 0; // Déjà trié par l'index
+    });
+  },
+});
+
 // ✅ CORRECT - Avec .first()
 export const getFirstLac = query({
   handler: async (ctx) => {
@@ -573,6 +591,63 @@ export const addEspeceToLac = mutation({
     return await ctx.db.patch(args.lacId, {
       especeIds: [...lac.especeIds, args.especeId],
       updatedAt: Date.now(),
+    });
+  },
+});
+
+
+// ============================================
+// PARTIE 1: Query Convex optimisée
+// Fichier: convex/lacs.ts
+// ============================================
+
+export const getLacsSortedOptimized = query({
+  handler: async (ctx) => {
+    // Récupérer tous les lacs
+    const allLacs = await ctx.db.query("lacs").collect();
+
+    // Enrichir avec les données liées
+    const enrichedLacs = await Promise.all(
+      allLacs.map(async (lac) => {
+        // Récupérer les espèces
+        const especes = await Promise.all(
+          lac.especeIds.map((id) => ctx.db.get(id))
+        );
+
+        // Récupérer les campings avec leurs infos
+        const hebergements = await Promise.all(
+          lac.hebergements.map(async (h) => {
+            const camping = await ctx.db.get(h.campingId);
+            return {
+              ...camping,
+              distanceDepuisAcceuil: h.distanceDepuisAcceuil,
+              distanceDepuisLac: h.distanceDepuisLac,
+            };
+          })
+        );
+
+        return {
+          ...lac,
+          especes: especes.filter((e) => e !== null),
+          hebergements,
+        };
+      })
+    );
+
+    // 🎯 Tri identique à votre logique MongoDB aggregate
+    return enrichedLacs.sort((a, b) => {
+      // Priorité 1: Nombre d'hébergements (décroissant)
+      const countA = a.hebergements?.length || 0;
+      const countB = b.hebergements?.length || 0;
+      if (countA !== countB) return countB - countA;
+
+      // Priorité 2: Motorisation (électrique > essence > autre)
+      const motorA = a.embarcation?.motorisation?.necessaire;
+      const motorB = b.embarcation?.motorisation?.necessaire;
+      const priorityA = motorA === 'electrique' ? 1 : motorA === 'essence' ? 2 : 3;
+      const priorityB = motorB === 'electrique' ? 1 : motorB === 'essence' ? 2 : 3;
+
+      return priorityA - priorityB;
     });
   },
 });

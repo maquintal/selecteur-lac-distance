@@ -12,9 +12,9 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { LacDoc } from '../types/dynamicLake.type.';
 import LacDialog from '../components/LacDialog';
 import GestionNavBar from '../components/GestionNavBar';
+import { LacDoc } from '../types/schema.types';
 
 export default function GestionLacs() {
   const [openDialog, setOpenDialog] = useState(false);
@@ -23,7 +23,8 @@ export default function GestionLacs() {
   const [dialogMode, setDialogMode] = useState<'create' | 'edit'>('create');
 
   // Queries Convex
-  const lacs = useQuery(api.lacs.getAllLacs) || [];
+  // const lacs = useQuery(api.lacs.getAllLacs) || [];
+  const lacs = useQuery(api.lacs.getAllLacsSorted) || [];
 
   const handleOpenDialog = (mode: 'create' | 'edit', lac?: LacDoc) => {
     setDialogMode(mode);
