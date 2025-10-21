@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { 
@@ -19,11 +19,24 @@ type CampingDialogProps = {
 };
 
 export default function CampingDialog({ open, onClose, camping, mode }: CampingDialogProps) {
-  const [formData, setFormData] = useState<NewCampingInput>(camping || defaultCampingInput);
+  const [formData, setFormData] = useState<NewCampingInput>(defaultCampingInput);
 
   // Mutations Convex
   const createCamping = useMutation(api.lacs.createCamping);
   const updateCamping = useMutation(api.lacs.updateCamping);
+
+  // Synchroniser formData avec la prop camping
+  useEffect(() => {
+    if (open) {
+      if (mode === 'edit' && camping) {
+        // Extraire seulement les champs modifiables (sans _id et _creationTime)
+        const { _id, _creationTime, ...editableData } = camping;
+        setFormData(editableData);
+      } else {
+        setFormData(defaultCampingInput);
+      }
+    }
+  }, [open, mode, camping]);
 
   const handleInputChange = (field: keyof NewCampingInput, value: any) => {
     if (field === 'coordonnees') {

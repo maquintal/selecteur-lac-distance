@@ -1,6 +1,7 @@
 'use client';
 
-import LakesSearchCards from './components/LakesSearchCards';
+// import LakesSearchCards from './components/LakesSearchCards';
+import LakesSearchCards from './fe-convex/page';
 import { ThemeToggleButton } from './ThemeToggleButton';
 
 export default function Home() {

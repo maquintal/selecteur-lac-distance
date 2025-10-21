@@ -634,20 +634,20 @@ export const getLacsSortedOptimized = query({
       })
     );
 
-    // 🎯 Tri identique à votre logique MongoDB aggregate
+    // 🎯 Tri modifié: Motorisation EN PREMIER, puis nombre d'hébergements
     return enrichedLacs.sort((a, b) => {
-      // Priorité 1: Nombre d'hébergements (décroissant)
-      const countA = a.hebergements?.length || 0;
-      const countB = b.hebergements?.length || 0;
-      if (countA !== countB) return countB - countA;
-
-      // Priorité 2: Motorisation (électrique > essence > autre)
+      // Priorité 1: Motorisation (électrique > essence > autre)
       const motorA = a.embarcation?.motorisation?.necessaire;
       const motorB = b.embarcation?.motorisation?.necessaire;
       const priorityA = motorA === 'electrique' ? 1 : motorA === 'essence' ? 2 : 3;
       const priorityB = motorB === 'electrique' ? 1 : motorB === 'essence' ? 2 : 3;
 
-      return priorityA - priorityB;
+      if (priorityA !== priorityB) return priorityA - priorityB;
+
+      // Priorité 2: Nombre d'hébergements (décroissant)
+      const countA = a.hebergements?.length || 0;
+      const countB = b.hebergements?.length || 0;
+      return countB - countA;
     });
   },
 });

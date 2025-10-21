@@ -13,8 +13,7 @@ import {
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
-import { NewLacInput, defaultLacInput, LacDoc } from '../../app/types/schema.types';
-import { HebergementLac } from '../types/dynamicLake.type.';
+import { NewLacInput, defaultLacInput, LacDoc, HebergementLac } from '../../app/types/schema.types';
 import { Id } from "../../convex/_generated/dataModel";
 
 type LacDialogProps = {
@@ -25,31 +24,42 @@ type LacDialogProps = {
 };
 
 export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) {
-  const [formData, setFormData] = useState<NewLacInput>(lac || defaultLacInput);
+  const [formData, setFormData] = useState<NewLacInput>(defaultLacInput);
 
   // ✅ Synchroniser formData avec le lac sélectionné
   useEffect(() => {
     if (open) {
-      if (lac) {
-
+      if (mode === 'edit' && lac) {
+        const lacData = lac as any;
+        
+        // Convertir les espèces enrichies en IDs si nécessaire
+        const especeIds = lacData.especeIds || (lacData.especes?.map((e: any) => e._id) || []);
+        
+        // Convertir les hébergements enrichis en format simple pour formData
+        const hebergementsSimples = (lacData.hebergements || []).map((h: any) => ({
+          campingId: h.campingId || h._id,
+          distanceDepuisLac: h.distanceDepuisLac,
+          distanceDepuisAcceuil: h.distanceDepuisAcceuil,
+        }));
+        
         setFormData({
-          nomDuLac: lac.nomDuLac,
-          regionAdministrativeQuebec: lac.regionAdministrativeQuebec,
-          coordonnees: lac.coordonnees,
-          acces: lac.acces,
-          embarcation: lac.embarcation,
-          especeIds: lac.especeIds,
-          hebergements: lac.hebergements,
-          zone: lac.zone,
-          site: lac.site,
-          superficie: lac.superficie,
+          nomDuLac: lacData.nomDuLac,
+          regionAdministrativeQuebec: lacData.regionAdministrativeQuebec,
+          coordonnees: lacData.coordonnees,
+          acces: lacData.acces,
+          embarcation: lacData.embarcation,
+          especeIds,
+          hebergements: hebergementsSimples,
+          zone: lacData.zone,
+          site: lacData.site,
+          superficie: lacData.superficie,
         });
       } else {
         // Réinitialiser pour le mode création
         setFormData(defaultLacInput);
       }
     }
-  }, [open, lac]);
+  }, [open, mode, lac]);
 
   const [hebergement, setHebergement] = useState<Omit<HebergementLac, 'campingId'> & { campingId: Id<"campings"> | null }>({
     campingId: null,
@@ -145,8 +155,7 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
           acces: formData.acces,
           embarcation: formData.embarcation
         });
-      }
-      else if (mode === 'edit' && lac) { // ✅ Ajoutez cette condition
+      } else if (mode === 'edit' && lac) {
         await updateLac({
           lacId: lac._id,
           nomDuLac: formData.nomDuLac,
@@ -324,7 +333,6 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
 
           <Typography variant="h6" sx={{ mt: 1 }}>Embarcation</Typography>
           <Box sx={{ display: 'flex', gap: 2 }}>
-
             <FormControl fullWidth>
               <InputLabel>{`Type d'embarcation`}</InputLabel>
               <Select
@@ -354,7 +362,6 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
               </Select>
             </FormControl>
 
-            {/* Puissance minimale */}
             {formData.embarcation.motorisation.necessaire === "essence" && (
               <TextField
                 fullWidth
@@ -364,7 +371,8 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
                 onChange={(e) => handleInputChange('embarcation', {
                   motorisation: { puissance: { minimum: e.target.value ? parseInt(e.target.value) : 0 } }
                 })}
-              />)}
+              />
+            )}
           </Box>
 
           <Typography variant="h6" sx={{ mt: 2 }}>Espèces</Typography>
@@ -410,23 +418,22 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {lac.hebergements.map((h) => {
-                      const camping = campings?.find(c => c._id === h.campingId);
+                    {lac.hebergements.map((h: any, index) => {
+                      // h contient déjà les données enrichies du camping (nom, organisme, etc.)
+                      const campingNom = h.nom || 'N/A';
+                      const campingId = h.campingId || h._id;
+                      
                       return (
-                        <TableRow key={h.campingId}>
-                          <TableCell>{camping?.nom || 'N/A'}</TableCell>
-                          <TableCell>{
-                            h.distanceDepuisLac?.kilometrage || 'N/A'
-                          }</TableCell>
-                          <TableCell>{
-                            h.distanceDepuisLac?.temps || 'N/A'
-                          }</TableCell>
+                        <TableRow key={`${campingId}-${index}`}>
+                          <TableCell>{campingNom}</TableCell>
+                          <TableCell>{h.distanceDepuisLac?.kilometrage || 'N/A'}</TableCell>
+                          <TableCell>{h.distanceDepuisLac?.temps || 'N/A'}</TableCell>
                           <TableCell>
                             <Tooltip title="Supprimer">
                               <IconButton
                                 size="small"
                                 color="error"
-                                onClick={() => handleRemoveHebergement(h.campingId)}
+                                onClick={() => handleRemoveHebergement(campingId)}
                               >
                                 <DeleteIcon />
                               </IconButton>
@@ -491,32 +498,6 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
                   </span>
                 </Tooltip>
               </Box>
-              <Typography variant="h6" sx={{ mt: 2 }}>Espèces</Typography>
-              <FormControl fullWidth>
-                <InputLabel>Espèces présentes</InputLabel>
-                <Select
-                  multiple
-                  value={formData.especeIds}
-                  label="Espèces présentes"
-                  onChange={(e) => handleInputChange('especeIds', e.target.value)}
-                  renderValue={(selected) => (
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                      {(selected as Id<"especes">[]).map((id) => {
-                        const espece = especes?.find(e => e._id === id);
-                        return (
-                          <Chip key={id} label={espece?.nomCommun || id} size="small" />
-                        );
-                      })}
-                    </Box>
-                  )}
-                >
-                  {especes?.map((espece) => (
-                    <MenuItem key={espece._id} value={espece._id}>
-                      {espece.nomCommun}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
             </>
           )}
         </Box>
