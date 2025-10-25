@@ -595,6 +595,25 @@ export const addEspeceToLac = mutation({
   },
 });
 
+// 🆕 NOUVELLE MUTATION À AJOUTER
+export const toggleChoixInteressant = mutation({
+  args: {
+    lacId: v.id("lacs"),
+  },
+  handler: async (ctx, args) => {
+    const lac = await ctx.db.get(args.lacId);
+    if (!lac) throw new Error("Lac non trouvé");
+
+    const newValue = !lac.isChoixInteressant;
+
+    await ctx.db.patch(args.lacId, {
+      isChoixInteressant: newValue,
+      updatedAt: Date.now(),
+    });
+
+    return { lacId: args.lacId, isChoixInteressant: newValue };
+  },
+});
 
 // ============================================
 // PARTIE 1: Query Convex optimisée

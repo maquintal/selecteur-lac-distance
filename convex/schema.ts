@@ -145,6 +145,7 @@ export default defineSchema({
     // Métadonnées
     createdAt: v.number(),
     updatedAt: v.optional(v.number()),
+    isChoixInteressant: v.optional(v.boolean()),
 
     // Champs calculés pour optimiser les requêtes
     nbHebergements: v.optional(v.number()), // calculé lors de l'insertion/update
@@ -156,6 +157,7 @@ export default defineSchema({
     .index("by_zone", ["zone"])
     .index("by_coordonnees", ["coordonnees.latitude", "coordonnees.longitude"])
     .index("by_hebergements_electrique", ["nbHebergements", "isMoteurisationElectrique"])
+    .index("by_choix_interessant", ["isChoixInteressant"])
     .searchIndex("search_nom", {
       searchField: "nomDuLac",
       filterFields: ["regionAdministrativeQuebec", "site"],

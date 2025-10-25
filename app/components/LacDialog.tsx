@@ -6,15 +6,16 @@ import { api } from '../../convex/_generated/api';
 import {
   Box, TextField, Button,
   Dialog, DialogTitle, DialogContent, DialogActions,
-  Select, MenuItem, FormControl, InputLabel,
   Typography, Table, TableBody, TableCell, TableContainer,
   TableHead, TableRow, Paper, IconButton, Tooltip,
-  Chip
+  Chip,
+  Autocomplete
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import { NewLacInput, defaultLacInput, LacDoc, HebergementLac } from '../../app/types/schema.types';
 import { Id } from "../../convex/_generated/dataModel";
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
 type LacDialogProps = {
   open: boolean;
@@ -22,6 +23,45 @@ type LacDialogProps = {
   lac?: LacDoc;
   mode: 'create' | 'edit';
 };
+
+// Options pour les autocomplete
+const regionsOptions = [
+  "Capitale-Nationale",
+  "Chaudière-Appalaches",
+  "Lanaudière",
+  "Laurentides",
+  "Mauricie",
+  "Outaouais",
+  "Portneuf"
+];
+
+const siteOptions = [
+  "Mastigouche",
+  "Rouge-Matawin",
+  "Papineau-Labelle",
+  "Saint-Maurice",
+  "Portneuf",
+  "Jacques-Cartier"
+];
+
+const accessibleOptions = [
+  "véhicule utilitaire sport (VUS)",
+  "auto",
+  "camion 4x4"
+];
+
+const typeEmbarcationOptions = [
+  "Embarcation Sépaq fournie",
+  "Embarcation Pourvoirie fournie",
+  "Location",
+  "Embarcation personnelle"
+];
+
+const motorisationOptions = [
+  { value: "electrique", label: "Électrique" },
+  { value: "essence", label: "Essence" },
+  { value: "a determiner", label: "À déterminer" }
+];
 
 export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) {
   const [formData, setFormData] = useState<NewLacInput>(defaultLacInput);
@@ -31,17 +71,17 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
     if (open) {
       if (mode === 'edit' && lac) {
         const lacData = lac as any;
-        
+
         // Convertir les espèces enrichies en IDs si nécessaire
         const especeIds = lacData.especeIds || (lacData.especes?.map((e: any) => e._id) || []);
-        
+
         // Convertir les hébergements enrichis en format simple pour formData
         const hebergementsSimples = (lacData.hebergements || []).map((h: any) => ({
           campingId: h.campingId || h._id,
           distanceDepuisLac: h.distanceDepuisLac,
           distanceDepuisAcceuil: h.distanceDepuisAcceuil,
         }));
-        
+
         setFormData({
           nomDuLac: lacData.nomDuLac,
           regionAdministrativeQuebec: lacData.regionAdministrativeQuebec,
@@ -223,53 +263,60 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
             value={formData.nomDuLac}
             onChange={(e) => handleInputChange('nomDuLac', e.target.value)}
           />
-          <Box sx={{ display: 'flex', gap: 2 }}>
-            <FormControl fullWidth>
-              <InputLabel>Région Adiministrative du Québec</InputLabel>
-              <Select
-                label="Région Adiministrative du Québec"
-                value={formData.regionAdministrativeQuebec}
-                onChange={(e) => handleInputChange('regionAdministrativeQuebec', e.target.value)}
-              >
-                <MenuItem value="Capitale-Nationale">Capitale-Nationale</MenuItem>
-                <MenuItem value="Chaudière-Appalaches">Chaudière-Appalaches</MenuItem>
-                <MenuItem value="Lanaudière">Lanaudière</MenuItem>
-                <MenuItem value="Laurentides">Laurentides</MenuItem>
-                <MenuItem value="Mauricie">Mauricie</MenuItem>
-                <MenuItem value="Outaouais">Outaouais</MenuItem>
-              </Select>
-            </FormControl>
 
-            <FormControl fullWidth>
-              <InputLabel>Site</InputLabel>
-              <Select
-                label="Site"
-                value={formData.site}
-                onChange={(e) => handleInputChange('site', e.target.value)}
-              >
-                <MenuItem value="Mastigouche">Mastigouche</MenuItem>
-                <MenuItem value="Rouge-Matawin">Rouge-Matawin</MenuItem>
-                <MenuItem value="Papineau-Labelle">Papineau-Labelle</MenuItem>
-                <MenuItem value="Saint-Maurice">Saint-Maurice</MenuItem>
-              </Select>
-            </FormControl>
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <Autocomplete
+              fullWidth
+              options={regionsOptions}
+              value={formData.regionAdministrativeQuebec}
+              onChange={(_, newValue) => handleInputChange('regionAdministrativeQuebec', newValue || '')}
+              renderInput={(params) => (
+                <TextField {...params} label="Région Administrative du Québec" />
+              )}
+              freeSolo={false}
+            />
+
+            <Autocomplete
+              fullWidth
+              options={siteOptions}
+              value={formData.site}
+              onChange={(_, newValue) => handleInputChange('site', newValue || '')}
+              renderInput={(params) => (
+                <TextField {...params} label="Site" />
+              )}
+              freeSolo={false}
+            />
           </Box>
 
-          <Box sx={{ display: 'flex', gap: 2 }}>
-            <TextField
-              fullWidth
-              type="number"
-              label="Latitude"
-              value={formData.coordonnees.latitude || ''}
-              onChange={(e) => handleCoordChange('latitude', e.target.value)}
-            />
-            <TextField
-              fullWidth
-              type="number"
-              label="Longitude"
-              value={formData.coordonnees.longitude || ''}
-              onChange={(e) => handleCoordChange('longitude', e.target.value)}
-            />
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {/* Champs individuels avec bouton de copie */}
+            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: 2, alignItems: 'center' }}>
+              <TextField
+                type="number"
+                label="Latitude"
+                value={formData.coordonnees.latitude || ''}
+                onChange={(e) => handleCoordChange('latitude', e.target.value)}
+              />
+              <TextField
+                type="number"
+                label="Longitude"
+                value={formData.coordonnees.longitude || ''}
+                onChange={(e) => handleCoordChange('longitude', e.target.value)}
+              />
+              <Tooltip title="Copier les coordonnées">
+                <IconButton
+                  onClick={() => {
+                    const lat = formData.coordonnees.latitude.toString().replace(',', '.');
+                    const lng = formData.coordonnees.longitude.toString().replace(',', '.');
+                    const coords = `${lat}, ${lng}`;
+                    navigator.clipboard.writeText(coords);
+                  }}
+                  color="primary"
+                >
+                  <ContentCopyIcon />
+                </IconButton>
+              </Tooltip>
+            </Box>
           </Box>
 
           <Box sx={{ display: 'flex', gap: 2 }}>
@@ -317,50 +364,45 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
               value={formData.acces.distanceAcceuilLac.temps || 0}
               onChange={(e) => handleInputChange('acces', { distanceAcceuilLac: { kilometrage: formData.acces.distanceAcceuilLac.kilometrage, temps: e.target.value ? parseInt(e.target.value) : 0 } })}
             />
-            <FormControl fullWidth>
-              <InputLabel>Accessible</InputLabel>
-              <Select
-                label="Accessible"
-                value={formData.acces.accessible}
-                onChange={(e) => handleInputChange('acces', { accessible: e.target.value })}
-              >
-                <MenuItem value="véhicule utilitaire sport (VUS)">Véhicule utilitaire sport (VUS)</MenuItem>
-                <MenuItem value="auto">Auto</MenuItem>
-                <MenuItem value="camion 4x4">Camion 4x4</MenuItem>
-              </Select>
-            </FormControl>
+            <Autocomplete
+              fullWidth
+              options={accessibleOptions}
+              value={formData.acces.accessible}
+              onChange={(_, newValue) => handleInputChange('acces', { accessible: newValue || '' })}
+              renderInput={(params) => (
+                <TextField {...params} label="Accessible" />
+              )}
+              freeSolo={false}
+            />
           </Box>
 
-          <Typography variant="h6" sx={{ mt: 1 }}>Embarcation</Typography>
+          {/* <Typography variant="h6" sx={{ mt: 1 }}>Embarcation</Typography>
           <Box sx={{ display: 'flex', gap: 2 }}>
-            <FormControl fullWidth>
-              <InputLabel>{`Type d'embarcation`}</InputLabel>
-              <Select
-                value={formData.embarcation.type}
-                label="Type d'embarcation"
-                onChange={(e) => handleInputChange('embarcation', { type: e.target.value })}
-              >
-                <MenuItem value="Embarcation Sépaq fournie">Embarcation Sépaq fournie</MenuItem>
-                <MenuItem value="Embarcation Pourvoirie fournie">Embarcation Pourvoirie fournie</MenuItem>
-                <MenuItem value="Location">Location</MenuItem>
-                <MenuItem value="Embarcation personnelle">Embarcation personnelle</MenuItem>
-              </Select>
-            </FormControl>
+            <Autocomplete
+              fullWidth
+              options={typeEmbarcationOptions}
+              value={formData.embarcation.type}
+              onChange={(_, newValue) => handleInputChange('embarcation', { type: newValue || '' })}
+              renderInput={(params) => (
+                <TextField {...params} label="Type d'embarcation" />
+              )}
+              freeSolo={false}
+            />
 
-            <FormControl fullWidth>
-              <InputLabel>{`Type de motorisation`}</InputLabel>
-              <Select
-                value={formData.embarcation.motorisation.necessaire}
-                label="Type de motorisation"
-                onChange={(e) => handleInputChange('embarcation', {
-                  motorisation: { necessaire: e.target.value }
-                })}
-              >
-                <MenuItem value="electrique">Électrique</MenuItem>
-                <MenuItem value="essence">Essence</MenuItem>
-                <MenuItem value="a determiner">À déterminer</MenuItem>
-              </Select>
-            </FormControl>
+            <Autocomplete
+              fullWidth
+              options={motorisationOptions}
+              value={motorisationOptions.find(opt => opt.value === formData.embarcation.motorisation.necessaire) || null}
+              onChange={(_, newValue) => handleInputChange('embarcation', {
+                motorisation: { necessaire: newValue?.value || '' }
+              })}
+              getOptionLabel={(option) => option.label}
+              renderInput={(params) => (
+                <TextField {...params} label="Type de motorisation" />
+              )}
+              isOptionEqualToValue={(option, value) => option.value === value.value}
+              freeSolo={false}
+            />
 
             {formData.embarcation.motorisation.necessaire === "essence" && (
               <TextField
@@ -373,34 +415,86 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
                 })}
               />
             )}
+          </Box> */}
+
+          <Typography variant="h6" sx={{ mt: 1 }}>Embarcation</Typography>
+          <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+            <Box sx={{ flex: '1 1 300px' }}>
+              <Autocomplete
+                fullWidth
+                options={typeEmbarcationOptions}
+                value={formData.embarcation.type}
+                onChange={(_, newValue) => handleInputChange('embarcation', { type: newValue || '' })}
+                renderInput={(params) => (
+                  <TextField {...params} label="Type d'embarcation" />
+                )}
+                freeSolo={false}
+              />
+            </Box>
+
+            <Box sx={{ flex: '1 1 300px' }}>
+              <Autocomplete
+                fullWidth
+                options={motorisationOptions}
+                value={motorisationOptions.find(opt => opt.value === formData.embarcation.motorisation.necessaire) || null}
+                onChange={(_, newValue) => handleInputChange('embarcation', {
+                  motorisation: {
+                    necessaire: newValue?.value || '',
+                    puissance: formData.embarcation.motorisation.puissance // Conserver la puissance existante
+                  }
+                })}
+                getOptionLabel={(option) => option.label}
+                renderInput={(params) => (
+                  <TextField {...params} label="Type de motorisation" />
+                )}
+                isOptionEqualToValue={(option, value) => option.value === value.value}
+                freeSolo={false}
+              />
+            </Box>
+
+            {formData.embarcation.motorisation.necessaire === "essence" && (
+              <Box sx={{ flex: '1 1 200px' }}>
+                <TextField
+                  fullWidth
+                  label="Puissance minimale (CV)"
+                  type="number"
+                  value={formData.embarcation.motorisation.puissance?.minimum || ''}
+                  onChange={(e) => handleInputChange('embarcation', {
+                    motorisation: {
+                      necessaire: formData.embarcation.motorisation.necessaire, // Conserver le type de motorisation
+                      puissance: { minimum: e.target.value ? parseInt(e.target.value) : 0 }
+                    }
+                  })}
+                />
+              </Box>
+            )}
           </Box>
 
           <Typography variant="h6" sx={{ mt: 2 }}>Espèces</Typography>
-          <FormControl fullWidth>
-            <InputLabel>Espèces présentes</InputLabel>
-            <Select
-              multiple
-              value={formData.especeIds}
-              label="Espèces présentes"
-              onChange={(e) => handleInputChange('especeIds', e.target.value)}
-              renderValue={(selected) => (
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                  {(selected as Id<"especes">[]).map((id) => {
-                    const espece = especes?.find(e => e._id === id);
-                    return (
-                      <Chip key={id} label={espece?.nomCommun || id} size="small" />
-                    );
-                  })}
-                </Box>
-              )}
-            >
-              {especes?.map((espece) => (
-                <MenuItem key={espece._id} value={espece._id}>
-                  {espece.nomCommun}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+          <Autocomplete
+            multiple
+            fullWidth
+            options={especes || []}
+            value={especes?.filter(e => formData.especeIds.includes(e._id)) || []}
+            onChange={(_, newValue) => {
+              handleInputChange('especeIds', newValue.map(e => e._id));
+            }}
+            getOptionLabel={(option) => option.nomCommun}
+            renderInput={(params) => (
+              <TextField {...params} label="Espèces présentes" placeholder="Sélectionner les espèces..." />
+            )}
+            renderTags={(value, getTagProps) =>
+              value.map((option, index) => (
+                <Chip
+                  {...getTagProps({ index })}
+                  key={option._id}
+                  label={option.nomCommun}
+                  size="small"
+                />
+              ))
+            }
+            isOptionEqualToValue={(option, value) => option._id === value._id}
+          />
 
           {mode === 'edit' && lac && (
             <>
@@ -422,7 +516,7 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
                       // h contient déjà les données enrichies du camping (nom, organisme, etc.)
                       const campingNom = h.nom || 'N/A';
                       const campingId = h.campingId || h._id;
-                      
+
                       return (
                         <TableRow key={`${campingId}-${index}`}>
                           <TableCell>{campingNom}</TableCell>
@@ -449,22 +543,36 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
               {/* Formulaire d'ajout d'hébergement */}
               <Typography variant="subtitle1" sx={{ mt: 2 }}>Ajouter un hébergement</Typography>
               <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                <FormControl fullWidth>
-                  <InputLabel>Camping</InputLabel>
-                  <Select
-                    value={hebergement.campingId || ''}
-                    label="Camping"
-                    onChange={(e) => handleHebergementChange('campingId', e.target.value)}
-                  >
-                    {campings?.filter(camping =>
-                      !lac.hebergements.some(h => h.campingId === camping._id)
-                    ).map((camping) => (
-                      <MenuItem key={camping._id} value={camping._id}>
-                        {camping.nom}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
+                <Autocomplete
+                  fullWidth
+                  options={campings?.filter(camping =>
+                    !lac.hebergements.some((h: any) => (h.campingId || h._id) === camping._id)
+                  ) || []}
+                  value={campings?.find(c => c._id === hebergement.campingId) || null}
+                  onChange={(_, newValue) => {
+                    handleHebergementChange('campingId', newValue?._id || null);
+                  }}
+                  getOptionLabel={(option) => option.nom}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Camping"
+                      placeholder="Rechercher un camping..."
+                    />
+                  )}
+                  renderOption={(props, option) => (
+                    <li {...props} key={option._id}>
+                      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                        <Typography variant="body1">{option.nom}</Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {option.organisme} • {option.regionAdministrative || 'N/A'}
+                        </Typography>
+                      </Box>
+                    </li>
+                  )}
+                  noOptionsText="Aucun camping disponible"
+                  isOptionEqualToValue={(option, value) => option._id === value._id}
+                />
                 <TextField
                   type="number"
                   label="Distance (km)"

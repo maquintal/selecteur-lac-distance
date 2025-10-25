@@ -14,37 +14,49 @@ import {
     Tooltip,
     CardActions,
     IconButton,
+    Button,
 } from '@mui/material';
 import Image from 'next/image';
 import ReactCardFlip from 'react-card-flip';
 import BoltOutlinedIcon from '@mui/icons-material/BoltOutlined';
 import Icon from '@mdi/react';
 import { mdiFuel, mdiMapSearchOutline } from '@mdi/js';
-import WaterDropOutlinedIcon from '@mui/icons-material/WaterDropOutlined';
 import { ButtonBase } from '@mui/material';
 import ReplyOutlinedIcon from '@mui/icons-material/ReplyOutlined';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import EditIcon from '@mui/icons-material/Edit';
-import { useQuery } from 'convex/react';
+import { useMutation, useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import LacDialog from '../components/LacDialog';
 import { LacDoc } from '../types/schema.types';
+import StarIcon from '@mui/icons-material/Star';
+import StarBorderIcon from '@mui/icons-material/StarBorder';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import WaterDropOutlinedIcon from '@mui/icons-material/WaterDropOutlined';
+import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
+import DoNotDisturbAltOutlinedIcon from '@mui/icons-material/DoNotDisturbAltOutlined';
+import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
+import ShuffleIcon from '@mui/icons-material/Shuffle';
 
 type Filters = {
     region: string;
     reserve: string;
     organisme: string;
     nom: string;
+    motorisation: string;
 };
 
 export default function LakesSearchCards() {
     // Utilisation de la query Convex triée
     const data = useQuery(api.lacs.getLacsSortedOptimized) || [];
     const loading = data === undefined;
-    
-    const [filters, setFilters] = useState<Filters>({ region: '', reserve: '', organisme: '', nom: '' });
+
+    const toggleChoixInteressant = useMutation(api.lacs.toggleChoixInteressant);
+
+    const [filters, setFilters] = useState<Filters>({ region: '', reserve: '', organisme: '', nom: '', motorisation: '' });
     const [flippedCards, setFlippedCards] = useState<{ [key: string]: boolean }>({});
-    
+    const [highlightedLacId, setHighlightedLacId] = useState<string | null>(null);
+
     // État pour le dialog d'édition
     const [openDialog, setOpenDialog] = useState(false);
     const [selectedLac, setSelectedLac] = useState<LacDoc | undefined>(undefined);
@@ -60,9 +72,22 @@ export default function LakesSearchCards() {
             const organismeActuel = l.site ? 'SEPAQ' : 'privé';
             const organismeMatch = filters.organisme ? organismeActuel.toLowerCase().includes(filters.organisme.toLowerCase()) : true;
             const nomMatch = filters.nom ? (l.nomDuLac || '').toLowerCase().includes(filters.nom.toLowerCase()) : true;
-            return regionMatch && organismeMatch && reserveMatch && nomMatch;
+            const motorisationType = l.embarcation?.motorisation?.necessaire || '';
+            const motorisationMatch = filters.motorisation
+                ? motorisationType.toLowerCase().includes(filters.motorisation.toLowerCase())
+                : true;
+            return regionMatch && organismeMatch && reserveMatch && nomMatch && motorisationMatch;
         });
     }, [data, filters]);
+
+    const handleToggleInteressant = async (lacId: string, e: React.MouseEvent) => {
+        e.stopPropagation();
+        try {
+            await toggleChoixInteressant({ lacId: lacId as any });
+        } catch (error) {
+            console.error("Erreur lors du toggle:", error);
+        }
+    };
 
     // Fonction pour ouvrir le dialog d'édition
     const handleOpenEditDialog = (lac: any) => {
@@ -104,7 +129,7 @@ export default function LakesSearchCards() {
     };
 
     const getLakeSizeCategory = (superficie: any) => {
-        if (!superficie) {
+        if (!superficie || !superficie.hectares) {
             return {
                 label: 'Superficie inconnue',
                 level: 0,
@@ -114,63 +139,65 @@ export default function LakesSearchCards() {
 
         const superficieHa = superficie.hectares;
 
-        if (!superficieHa) {
-            return {
-                label: 'Superficie inconnue',
-                level: 0,
-                icon: null
-            };
-        }
-
-        if (superficieHa < 10) return {
+        if (superficieHa < 5) return {
             label: 'Très petit lac',
             level: 1,
             icon: (
                 <>
-                    <WaterDropOutlinedIcon sx={{ fontSize: 14, color: 'primary.main' }} />
-                    <WaterDropOutlinedIcon sx={{ fontSize: 16, color: 'action.disabled' }} />
-                    <WaterDropOutlinedIcon sx={{ fontSize: 20, color: 'action.disabled' }} />
-                    <WaterDropOutlinedIcon sx={{ fontSize: 24, color: 'action.disabled' }} />
+                    <WaterDropOutlinedIcon sx={{ fontSize: 18, color: 'success.main' }} />
+                    <WaterDropOutlinedIcon sx={{ fontSize: 22, color: 'success.main' }} />
                 </>
-            )
+            ),
+            recommendation: 'Idéal pour moteur électrique'
         };
-        if (superficieHa < 100) return {
+
+        if (superficieHa < 30) return {
             label: 'Petit lac',
             level: 2,
             icon: (
                 <>
-                    <WaterDropOutlinedIcon sx={{ fontSize: 14, color: 'primary.main' }} />
-                    <WaterDropOutlinedIcon sx={{ fontSize: 16, color: 'primary.main' }} />
-                    <WaterDropOutlinedIcon sx={{ fontSize: 20, color: 'action.disabled' }} />
-                    <WaterDropOutlinedIcon sx={{ fontSize: 24, color: 'action.disabled' }} />
+                    <WaterDropOutlinedIcon sx={{ fontSize: 18, color: 'success.main' }} />
+                    <WaterDropOutlinedIcon sx={{ fontSize: 22, color: 'success.main' }} />
+                    <WaterDropOutlinedIcon sx={{ fontSize: 26, color: 'success.main' }} />
                 </>
-            )
+            ),
+            recommendation: 'Bon choix pour la pêche en électrique'
         };
-        if (superficieHa < 1000) return {
+
+        if (superficieHa < 150) return {
             label: 'Lac moyen',
             level: 3,
             icon: (
                 <>
-                    <WaterDropOutlinedIcon sx={{ fontSize: 14, color: 'primary.main' }} />
-                    <WaterDropOutlinedIcon sx={{ fontSize: 16, color: 'primary.main' }} />
-                    <WaterDropOutlinedIcon sx={{ fontSize: 20, color: 'primary.main' }} />
-                    <WaterDropOutlinedIcon sx={{ fontSize: 24, color: 'action.disabled' }} />
+                    <WarningAmberOutlinedIcon sx={{ fontSize: 22, color: 'warning.main' }} />
                 </>
-            )
+            ),
+            recommendation: 'Faisable avec prudence (vent, autonomie limitée)'
         };
-        return {
+
+        if (superficieHa < 1000) return {
             label: 'Grand lac',
             level: 4,
             icon: (
                 <>
-                    <WaterDropOutlinedIcon sx={{ fontSize: 14, color: 'primary.main' }} />
-                    <WaterDropOutlinedIcon sx={{ fontSize: 16, color: 'primary.main' }} />
-                    <WaterDropOutlinedIcon sx={{ fontSize: 20, color: 'primary.main' }} />
-                    <WaterDropOutlinedIcon sx={{ fontSize: 24, color: 'primary.main' }} />
+                    <DoNotDisturbAltOutlinedIcon sx={{ fontSize: 24, color: 'error.main' }} />
                 </>
-            )
+            ),
+            recommendation: 'À éviter — trop vaste pour moteur électrique'
+        };
+
+        return {
+            label: 'Très grand lac / réservoir',
+            level: 5,
+            icon: (
+                <>
+                    <ReportProblemOutlinedIcon sx={{ fontSize: 26, color: 'error.main' }} />
+                </>
+            ),
+            recommendation: 'Dangereux — ne pas naviguer avec moteur électrique'
         };
     };
+
 
     const getHebergement = (acces: Acces | undefined, hebergement: any[] | null) => {
         if (!hebergement || hebergement.length === 0) {
@@ -183,7 +210,7 @@ export default function LakesSearchCards() {
                     // h contient déjà les données du camping enrichies par getLacsSortedOptimized
                     const campingNom = h.nom || h.camping || 'N/A';
                     const organisme = h.organisme || 'privé';
-                    
+
                     return (
                         <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                             <Box sx={{ flex: 1 }}>
@@ -236,34 +263,71 @@ export default function LakesSearchCards() {
         setFlippedCards(prev => ({ ...prev, [id]: !prev[id] }));
     };
 
+    const handleRandomInteressant = () => {
+        const interessants = filtered.filter((l: any) => l.isChoixInteressant);
+        if (interessants.length === 0) {
+            alert('Aucun lac marqué comme intéressant trouvé!');
+            return;
+        }
+        const randomLac = interessants[Math.floor(Math.random() * interessants.length)];
+        setHighlightedLacId(randomLac._id);
+        
+        // Scroll vers la carte
+        setTimeout(() => {
+            const element = document.getElementById(`lac-card-${randomLac._id}`);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }, 100);
+        
+        // Retirer le highlight après 3 secondes
+        setTimeout(() => setHighlightedLacId(null), 3000);
+    };
+
     return (
         <>
             <Box className="p-4 bg-white rounded-lg shadow">
-                <Box display="flex" gap={8} mb={3}>
-                    <TextField
-                        label="Région"
-                        size="small"
-                        value={filters.region}
-                        onChange={e => setFilters(f => ({ ...f, region: e.target.value }))}
-                    />
-                    <TextField
-                        label="Réserve / Site (SEPAQ)"
-                        size="small"
-                        value={filters.reserve}
-                        onChange={e => setFilters(f => ({ ...f, reserve: e.target.value }))}
-                    />
-                    <TextField
-                        label="Organisme"
-                        size="small"
-                        value={filters.organisme}
-                        onChange={e => setFilters(f => ({ ...f, organisme: e.target.value }))}
-                    />
-                    <TextField
-                        label="Nom du lac"
-                        size="small"
-                        value={filters.nom}
-                        onChange={e => setFilters(f => ({ ...f, nom: e.target.value }))}
-                    />
+                <Box display="flex" gap={2} mb={3} alignItems="center">
+                    <Button
+                        variant="contained"
+                        startIcon={<ShuffleIcon />}
+                        onClick={handleRandomInteressant}
+                        sx={{ minWidth: 200 }}
+                    >
+                        Lac au hasard
+                    </Button>
+                    <Box display="flex" gap={8} flex={1}>
+                        <TextField
+                            label="Région"
+                            size="small"
+                            value={filters.region}
+                            onChange={e => setFilters(f => ({ ...f, region: e.target.value }))}
+                        />
+                        <TextField
+                            label="Réserve / Site (SEPAQ)"
+                            size="small"
+                            value={filters.reserve}
+                            onChange={e => setFilters(f => ({ ...f, reserve: e.target.value }))}
+                        />
+                        <TextField
+                            label="Organisme"
+                            size="small"
+                            value={filters.organisme}
+                            onChange={e => setFilters(f => ({ ...f, organisme: e.target.value }))}
+                        />
+                        <TextField
+                            label="Nom du lac"
+                            size="small"
+                            value={filters.nom}
+                            onChange={e => setFilters(f => ({ ...f, nom: e.target.value }))}
+                        />
+                        <TextField
+                            label="Motorisation"
+                            size="small"
+                            value={filters.motorisation}
+                            onChange={e => setFilters(f => ({ ...f, motorisation: e.target.value }))}
+                        />
+                    </Box>
                 </Box>
 
                 <Box
@@ -305,20 +369,63 @@ export default function LakesSearchCards() {
                                     </Box>
                                 }
                                 action={
-                                    <Tooltip title="Modifier le lac">
-                                        <IconButton
-                                            size="small"
-                                            onClick={() => handleOpenEditDialog(l)}
-                                        >
-                                            <EditIcon />
-                                        </IconButton>
-                                    </Tooltip>
+                                    <Box sx={{ display: 'flex', gap: 0.5 }}>
+                                        <Tooltip title={l.isChoixInteressant ? "Retirer des favoris" : "Marquer comme intéressant"}>
+                                            <IconButton
+                                                size="small"
+                                                onClick={(e) => handleToggleInteressant(l._id, e)}
+                                                sx={{
+                                                    color: l.isChoixInteressant ? 'warning.main' : 'action.active',
+                                                    '&:hover': {
+                                                        color: 'warning.main',
+                                                    }
+                                                }}
+                                            >
+                                                {l.isChoixInteressant ? <StarIcon /> : <StarBorderIcon />}
+                                            </IconButton>
+                                        </Tooltip>
+                                        <Tooltip title="Copier les coordonnées">
+                                            <IconButton
+                                                onClick={() => {
+                                                    const lat = l.coordonnees.latitude.toString().replace(',', '.');
+                                                    const lng = l.coordonnees.longitude.toString().replace(',', '.');
+                                                    const coords = `${lat}, ${lng}`;
+                                                    navigator.clipboard.writeText(coords);
+                                                }}
+                                                color="primary"
+                                            >
+                                                <ContentCopyIcon />
+                                            </IconButton>
+                                        </Tooltip>
+
+                                        <Tooltip title="Modifier le lac">
+                                            <IconButton
+                                                size="small"
+                                                onClick={() => handleOpenEditDialog(l)}
+                                            >
+                                                <EditIcon />
+                                            </IconButton>
+                                        </Tooltip>
+                                    </Box>
                                 }
                             />
                         );
 
                         return (
-                            <Box key={l._id} sx={{ display: 'flex', flexDirection: 'column' }}>
+                            <Box 
+                                key={l._id} 
+                                id={`lac-card-${l._id}`}
+                                sx={{ 
+                                    display: 'flex', 
+                                    flexDirection: 'column',
+                                    transition: 'all 0.3s ease',
+                                    ...(highlightedLacId === l._id && {
+                                        transform: 'scale(1.02)',
+                                        boxShadow: '0 0 20px rgba(25, 118, 210, 0.5)',
+                                        borderRadius: 1
+                                    })
+                                }}
+                            >
                                 <ReactCardFlip isFlipped={!!flippedCards[l._id]} flipDirection="horizontal">
                                     <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                                         {cardHeader}
@@ -384,6 +491,7 @@ export default function LakesSearchCards() {
                                         <Box sx={{ p: 1 }}>
                                             <Typography variant="caption" color="textSecondary">Lat: {getLatitude(l) ?? '—'} • Lon: {getLongitude(l) ?? '—'}</Typography>
                                         </Box>
+
                                     </Card>
 
                                     {/* BACK */}
