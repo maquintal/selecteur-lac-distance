@@ -128,67 +128,94 @@ export default function LakesSearchCards() {
         );
     };
 
-    const getLakeSizeCategory = (superficie: any) => {
+    interface Superficie {
+        hectares: number;
+    }
+
+    const getLakeSizeCategory = (superficie: Superficie | null) => {
         if (!superficie || !superficie.hectares) {
             return {
                 label: 'Superficie inconnue',
                 level: 0,
-                icon: null
+                icon: null,
+                recommendation: 'Données manquantes'
             };
         }
 
         const superficieHa = superficie.hectares;
 
-        if (superficieHa < 5) return {
-            label: 'Très petit lac',
+        if (superficieHa < 3) return {
+            label: 'Micro-lac',
             level: 1,
             icon: (
                 <>
                     <WaterDropOutlinedIcon sx={{ fontSize: 18, color: 'success.main' }} />
-                    <WaterDropOutlinedIcon sx={{ fontSize: 22, color: 'success.main' }} />
                 </>
             ),
-            recommendation: 'Idéal pour moteur électrique'
+            recommendation: 'Parfait pour exploration tranquille'
         };
 
-        if (superficieHa < 30) return {
+        if (superficieHa < 15) return {
             label: 'Petit lac',
             level: 2,
             icon: (
                 <>
                     <WaterDropOutlinedIcon sx={{ fontSize: 18, color: 'success.main' }} />
                     <WaterDropOutlinedIcon sx={{ fontSize: 22, color: 'success.main' }} />
+                </>
+            ),
+            recommendation: 'Très bon pour pêche et navigation'
+        };
+
+        if (superficieHa < 30) return {
+            label: 'Lac modeste',
+            level: 3,
+            icon: (
+                <>
+                    <WaterDropOutlinedIcon sx={{ fontSize: 22, color: 'success.main' }} />
                     <WaterDropOutlinedIcon sx={{ fontSize: 26, color: 'success.main' }} />
                 </>
             ),
-            recommendation: 'Bon choix pour la pêche en électrique'
+            recommendation: 'Navigable avec autonomie raisonnable'
         };
 
-        if (superficieHa < 150) return {
-            label: 'Lac moyen',
-            level: 3,
+        if (superficieHa < 45) return {
+            label: 'Lac étendu',
+            level: 4,
             icon: (
                 <>
                     <WarningAmberOutlinedIcon sx={{ fontSize: 22, color: 'warning.main' }} />
                 </>
             ),
-            recommendation: 'Faisable avec prudence (vent, autonomie limitée)'
+            recommendation: 'Faisable avec prudence (vent, retour anticipé)'
         };
 
-        if (superficieHa < 1000) return {
+        if (superficieHa < 80) return {
+            label: 'Lac large',
+            level: 5,
+            icon: (
+                <>
+                    <WarningAmberOutlinedIcon sx={{ fontSize: 24, color: 'warning.main' }} />
+                    <WarningAmberOutlinedIcon sx={{ fontSize: 20, color: 'warning.main' }} />
+                </>
+            ),
+            recommendation: 'Limite atteinte — attention à l’autonomie'
+        };
+
+        if (superficieHa < 300) return {
             label: 'Grand lac',
-            level: 4,
+            level: 6,
             icon: (
                 <>
                     <DoNotDisturbAltOutlinedIcon sx={{ fontSize: 24, color: 'error.main' }} />
                 </>
             ),
-            recommendation: 'À éviter — trop vaste pour moteur électrique'
+            recommendation: 'À éviter — trop vaste pour ton moteur'
         };
 
         return {
             label: 'Très grand lac / réservoir',
-            level: 5,
+            level: 7,
             icon: (
                 <>
                     <ReportProblemOutlinedIcon sx={{ fontSize: 26, color: 'error.main' }} />
@@ -271,7 +298,7 @@ export default function LakesSearchCards() {
         }
         const randomLac = interessants[Math.floor(Math.random() * interessants.length)];
         setHighlightedLacId(randomLac._id);
-        
+
         // Scroll vers la carte
         setTimeout(() => {
             const element = document.getElementById(`lac-card-${randomLac._id}`);
@@ -279,7 +306,7 @@ export default function LakesSearchCards() {
                 element.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         }, 100);
-        
+
         // Retirer le highlight après 3 secondes
         setTimeout(() => setHighlightedLacId(null), 3000);
     };
@@ -412,11 +439,11 @@ export default function LakesSearchCards() {
                         );
 
                         return (
-                            <Box 
-                                key={l._id} 
+                            <Box
+                                key={l._id}
                                 id={`lac-card-${l._id}`}
-                                sx={{ 
-                                    display: 'flex', 
+                                sx={{
+                                    display: 'flex',
                                     flexDirection: 'column',
                                     transition: 'all 0.3s ease',
                                     ...(highlightedLacId === l._id && {
