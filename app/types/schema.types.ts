@@ -30,10 +30,10 @@ export type HebergementLac = {
 
 // Type enrichi pour un lac avec ses relations
 export type LacWithDetails = LacDoc & {
-  // site: SiteDoc | null;
   especes: EspeceDoc[];
-  hebergements: (CampingDoc & {
-    distanceDepuisAcceuil?: number | {
+  hebergements: {
+    campingId: Id<"campings">;
+    distanceDepuisAcceuil?: {
       temps: number;
       kilometrage: number;
     };
@@ -41,7 +41,8 @@ export type LacWithDetails = LacDoc & {
       temps: number;
       kilometrage: number;
     };
-  })[];
+  }[];
+  isChoixInteressant?: boolean;
 };
 
 // Valeurs par défaut pour les nouveaux documents

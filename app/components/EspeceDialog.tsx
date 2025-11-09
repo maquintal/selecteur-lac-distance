@@ -24,7 +24,7 @@ export default function EspeceDialog({ open, onClose, espece, mode }: EspeceDial
   const createEspece = useMutation(api.lacs.addEspece);
   const updateEspece = useMutation(api.lacs.updateEspece);
 
-  const handleInputChange = (field: keyof NewEspeceInput, value: any) => {
+  const handleInputChange = (field: keyof NewEspeceInput, value: string) => {
     setFormData(prev => ({
       ...prev,
       [field]: value

@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
-import { Acces, Hebergement, Lake, Superficie } from '../types/lake';
+import { Acces } from '../types/lake';
+import { LacWithDetails, EspeceDoc } from '../types/schema.types';
+import { Id } from "../../convex/_generated/dataModel";
 import {
     Box,
     TextField,
@@ -48,8 +50,14 @@ type Filters = {
 
 export default function LakesSearchCards() {
     // Utilisation de la query Convex triée
-    const data = useQuery(api.lacs.getLacsSortedOptimized) || [];
-    const loading = data === undefined;
+    const queryResult = useQuery(api.lacs.getLacsSortedOptimized);
+    const loading = queryResult === undefined;
+    
+    // Mémoiser les données de la requête
+    const data = useMemo(() => {
+        if (queryResult === undefined) return [];
+        return queryResult;
+    }, [queryResult]);
 
     const toggleChoixInteressant = useMutation(api.lacs.toggleChoixInteressant);
 
@@ -80,17 +88,17 @@ export default function LakesSearchCards() {
         });
     }, [data, filters]);
 
-    const handleToggleInteressant = async (lacId: string, e: React.MouseEvent) => {
+    const handleToggleInteressant = async (lacId: Id<"lacs">, e: React.MouseEvent) => {
         e.stopPropagation();
         try {
-            await toggleChoixInteressant({ lacId: lacId as any });
+            await toggleChoixInteressant({ lacId });
         } catch (error) {
             console.error("Erreur lors du toggle:", error);
         }
     };
 
     // Fonction pour ouvrir le dialog d'édition
-    const handleOpenEditDialog = (lac: any) => {
+    const handleOpenEditDialog = (lac: LacWithDetails) => {
         setSelectedLac(lac);
         setOpenDialog(true);
     };
@@ -101,16 +109,16 @@ export default function LakesSearchCards() {
     };
 
     // Helper getters
-    const getLatitude = (l: any) => l.coordonnees.latitude ?? null;
-    const getLongitude = (l: any) => l.coordonnees.longitude ?? null;
-    const getEspeces = (l: any) => l.especes ?? [];
-    const getSuperficieText = (l: any) => {
+    const getLatitude = (l: LacWithDetails) => l.coordonnees.latitude ?? null;
+    const getLongitude = (l: LacWithDetails) => l.coordonnees.longitude ?? null;
+    const getEspeces = (l: LacWithDetails) => l.especes ?? [];
+    const getSuperficieText = (l: LacWithDetails) => {
         const s = l.superficie;
         if (!s) return null;
         return `${s.hectares} ha`;
     };
 
-    const getMotorisationChip = (l: any) => {
+    const getMotorisationChip = (l: LacDoc) => {
         const m = l.embarcation?.motorisation ?? null;
         if (!m) return <Chip label="—" size="small" />;
 
@@ -226,7 +234,19 @@ export default function LakesSearchCards() {
     };
 
 
-    const getHebergement = (acces: Acces | undefined, hebergement: any[] | null) => {
+    const getHebergement = (acces: Acces | undefined, hebergement: Array<{
+        nom?: string;
+        camping?: string;
+        organisme?: string;
+        commodites?: {
+            eau?: boolean;
+            electricite?: boolean;
+        };
+        distanceDepuisLac?: {
+            kilometrage: number;
+            temps: number;
+        };
+    }> | null) => {
         if (!hebergement || hebergement.length === 0) {
             return <Typography variant="body2" color="text.secondary">—</Typography>;
         }
@@ -291,7 +311,7 @@ export default function LakesSearchCards() {
     };
 
     const handleRandomInteressant = () => {
-        const interessants = filtered.filter((l: any) => l.isChoixInteressant);
+        const interessants = filtered.filter((l) => l.isChoixInteressant);
         if (interessants.length === 0) {
             alert('Aucun lac marqué comme intéressant trouvé!');
             return;
@@ -374,8 +394,8 @@ export default function LakesSearchCards() {
                         </Box>
                     )}
 
-                    {filtered.map((l: any) => {
-                        const { icon } = getLakeSizeCategory(l.superficie);
+                    {filtered.map((l) => {
+                        const { icon } = getLakeSizeCategory(l.superficie || null);
 
                         const cardHeader = (
                             <CardHeader
@@ -460,7 +480,7 @@ export default function LakesSearchCards() {
                                             <Box display="flex" justifyContent="space-between" gap={2}>
                                                 <Box flex={1}>
                                                     <Box mt={0.5} display="flex" gap={1} flexWrap="wrap">
-                                                        {getEspeces(l).slice(0, 6).map((sp: any) => (
+                                                        {getEspeces(l).slice(0, 6).map((sp: EspeceDoc) => (
                                                             <Chip key={sp.nomCommun} label={sp.nomCommun} size="small" />
                                                         ))}
                                                     </Box>

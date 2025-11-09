@@ -29,8 +29,8 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
   useEffect(() => {
     if (open) {
       if (mode === 'edit' && camping) {
-        // Extraire seulement les champs modifiables (sans _id et _creationTime)
-        const { _id, _creationTime, ...editableData } = camping;
+        // Extraire seulement les champs modifiables
+        const { ...editableData } = camping;
         setFormData(editableData);
       } else {
         setFormData(defaultCampingInput);
@@ -38,13 +38,23 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
     }
   }, [open, mode, camping]);
 
-  const handleInputChange = (field: keyof NewCampingInput, value: any) => {
+  type Coordonnees = {
+    latitude: number;
+    longitude: number;
+  };
+
+  type Commodites = {
+    eau: boolean;
+    electricite: boolean;
+  };
+
+  const handleInputChange = (field: keyof NewCampingInput, value: string | number | boolean | Partial<Coordonnees> | Partial<Commodites>) => {
     if (field === 'coordonnees') {
       setFormData(prev => ({
         ...prev,
         coordonnees: {
           ...prev.coordonnees,
-          ...value,
+          ...(value as Partial<Coordonnees>),
         }
       }));
     } else if (field === 'commodites') {
@@ -52,7 +62,7 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
         ...prev,
         commodites: {
           ...prev.commodites,
-          ...value,
+          ...(value as Partial<Commodites>),
         }
       }));
     } else {

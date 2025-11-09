@@ -15,6 +15,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import { NewLacInput, defaultLacInput, LacDoc, HebergementLac } from '../../app/types/schema.types';
 import { Id } from "../../convex/_generated/dataModel";
+import { Embarcation, Acces } from "../types/lake";
+import { EMBARCATION_TYPES, MOTORISATION_TYPES, VEHICLE_TYPES } from "../constants/options";
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
 type LacDialogProps = {
@@ -50,18 +52,7 @@ const accessibleOptions = [
   "camion 4x4"
 ];
 
-const typeEmbarcationOptions = [
-  "Embarcation Sépaq fournie",
-  "Embarcation Pourvoirie fournie",
-  "Location",
-  "Embarcation personnelle"
-];
-
-const motorisationOptions = [
-  { value: "electrique", label: "Électrique" },
-  { value: "essence", label: "Essence" },
-  { value: "a determiner", label: "À déterminer" }
-];
+// Les options sont maintenant dans le fichier constants/options.ts
 
 export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) {
   const [formData, setFormData] = useState<NewLacInput>(defaultLacInput);
@@ -70,29 +61,27 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
   useEffect(() => {
     if (open) {
       if (mode === 'edit' && lac) {
-        const lacData = lac as any;
-
         // Convertir les espèces enrichies en IDs si nécessaire
-        const especeIds = lacData.especeIds || (lacData.especes?.map((e: any) => e._id) || []);
+        const especeIds = lac.especeIds || [];
 
         // Convertir les hébergements enrichis en format simple pour formData
-        const hebergementsSimples = (lacData.hebergements || []).map((h: any) => ({
-          campingId: h.campingId || h._id,
+        const hebergementsSimples = (lac.hebergements || []).map(h => ({
+          campingId: h.campingId,
           distanceDepuisLac: h.distanceDepuisLac,
           distanceDepuisAcceuil: h.distanceDepuisAcceuil,
         }));
 
         setFormData({
-          nomDuLac: lacData.nomDuLac,
-          regionAdministrativeQuebec: lacData.regionAdministrativeQuebec,
-          coordonnees: lacData.coordonnees,
-          acces: lacData.acces,
-          embarcation: lacData.embarcation,
+          nomDuLac: lac.nomDuLac,
+          regionAdministrativeQuebec: lac.regionAdministrativeQuebec,
+          coordonnees: lac.coordonnees,
+          acces: lac.acces,
+          embarcation: lac.embarcation,
           especeIds,
           hebergements: hebergementsSimples,
-          zone: lacData.zone,
-          site: lacData.site,
-          superficie: lacData.superficie,
+          zone: lac.zone,
+          site: lac.site,
+          superficie: lac.superficie,
         });
       } else {
         // Réinitialiser pour le mode création
@@ -116,55 +105,86 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
   const removeCampingFromLac = useMutation(api.lacs.removeCampingFromLac);
   const especes = useQuery(api.lacs.getAllEspeces);
 
-  const handleInputChange = (field: keyof NewLacInput, value: any) => {
-    if (field === 'superficie') {
-      setFormData(prev => ({
-        ...prev,
-        superficie: value ? {
-          hectares: parseFloat(value),
-          km2: parseFloat(value) / 100
-        } : undefined
-      }));
-    } else if (field === 'acces') {
-      setFormData(prev => ({
-        ...prev,
-        acces: {
-          ...prev.acces,
-          ...value
+  const handleInputChange = (
+    field: keyof NewLacInput, 
+    value: string | number | Id<"especes">[] | 
+    Partial<Embarcation> | 
+    Partial<Acces>
+  ) => {
+    setFormData((prev: NewLacInput) => {
+      if (field === 'superficie') {
+        const superficieValue = typeof value === 'string' ? parseFloat(value) : (typeof value === 'number' ? value : 0);
+        return {
+          ...prev,
+          superficie: {
+            hectares: superficieValue,
+            km2: superficieValue / 100
+          }
+        };
+      }
+      
+      if (field === 'acces' && typeof value === 'object' && value !== null) {
+        return {
+          ...prev,
+          acces: {
+            ...prev.acces,
+            ...value
+          }
+        };
+      }
+      
+      if (field === 'embarcation' && typeof value === 'object' && value !== null) {
+        return {
+          ...prev,
+          embarcation: {
+            ...prev.embarcation,
+            ...value
+          }
+        };
+      }
+      
+      if (field === 'especeIds') {
+        if (Array.isArray(value)) {
+          return {
+            ...prev,
+            especeIds: value as Id<"especes">[]
+          };
         }
-      }));
-    } else if (field === 'embarcation') {
-      setFormData(prev => ({
-        ...prev,
-        embarcation: {
-          ...prev.embarcation,
-          ...value
+        if (typeof value === 'string') {
+          return {
+            ...prev,
+            especeIds: [value] as Id<"especes">[]
+          };
         }
-      }));
-    } else if (field === 'especeIds') {
-      setFormData(prev => ({
-        ...prev,
-        especeIds: typeof value === 'string' ? [value] : value
-      }));
-    } else {
-      setFormData(prev => ({
+        return prev;
+      }
+      
+      if (field === 'zone') {
+        const zoneValue = typeof value === 'string' ? parseInt(value) : (typeof value === 'number' ? value : 0);
+        return {
+          ...prev,
+          zone: zoneValue || 0
+        };
+      }
+
+      return {
         ...prev,
         [field]: value
-      }));
-    }
+      };
+    });
   };
 
-  const handleHebergementChange = (field: keyof HebergementLac, value: any) => {
-    if (field === 'distanceDepuisLac') {
-      setHebergement(prev => ({
+  const handleHebergementChange = (field: keyof HebergementLac, value: Id<"campings"> | null | { temps?: number; kilometrage?: number }) => {
+    if (field === 'distanceDepuisLac' && typeof value === 'object' && value !== null) {
+      setHebergement((prev: Omit<HebergementLac, 'campingId'> & { campingId: Id<"campings"> | null }) => ({
         ...prev,
         distanceDepuisLac: {
-          ...prev.distanceDepuisLac,
-          ...value
+          temps: typeof value.temps === 'number' ? value.temps : (prev.distanceDepuisLac?.temps ?? 0),
+          kilometrage: typeof value.kilometrage === 'number' ? value.kilometrage : (prev.distanceDepuisLac?.kilometrage ?? 0)
         }
       }));
     } else {
-      setHebergement(prev => ({
+      setHebergement((prev: Omit<HebergementLac, 'campingId'> & { campingId: Id<"campings"> | null }) => ({
         ...prev,
         [field]: value
       }));
@@ -172,7 +192,7 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
   };
 
   const handleCoordChange = (field: 'latitude' | 'longitude', value: string) => {
-    setFormData(prev => ({
+    setFormData((prev: NewLacInput) => ({
       ...prev,
       coordonnees: {
         ...prev.coordonnees,
@@ -325,7 +345,7 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
               type="number"
               label="Zone"
               value={formData.zone || ''}
-              onChange={(e) => handleInputChange('zone', e.target.value ? parseInt(e.target.value) : undefined)}
+              onChange={(e) => handleInputChange('zone', e.target.value ? parseInt(e.target.value) : 0)}
             />
             <TextField
               fullWidth
@@ -368,7 +388,11 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
               fullWidth
               options={accessibleOptions}
               value={formData.acces.accessible}
-              onChange={(_, newValue) => handleInputChange('acces', { accessible: newValue || '' })}
+              onChange={(_, newValue) => {
+                if (newValue && VEHICLE_TYPES.includes(newValue as typeof VEHICLE_TYPES[number])) {
+                  handleInputChange('acces', { accessible: newValue as typeof VEHICLE_TYPES[number] })
+                }
+              }}
               renderInput={(params) => (
                 <TextField {...params} label="Accessible" />
               )}
@@ -422,9 +446,13 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
             <Box sx={{ flex: '1 1 300px' }}>
               <Autocomplete
                 fullWidth
-                options={typeEmbarcationOptions}
+                options={EMBARCATION_TYPES}
                 value={formData.embarcation.type}
-                onChange={(_, newValue) => handleInputChange('embarcation', { type: newValue || '' })}
+                onChange={(_, newValue) => {
+                  if (newValue && EMBARCATION_TYPES.includes(newValue as typeof EMBARCATION_TYPES[number])) {
+                    handleInputChange('embarcation', { type: newValue as typeof EMBARCATION_TYPES[number] })
+                  }
+                }}
                 renderInput={(params) => (
                   <TextField {...params} label="Type d'embarcation" />
                 )}
@@ -435,19 +463,25 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
             <Box sx={{ flex: '1 1 300px' }}>
               <Autocomplete
                 fullWidth
-                options={motorisationOptions}
-                value={motorisationOptions.find(opt => opt.value === formData.embarcation.motorisation.necessaire) || null}
-                onChange={(_, newValue) => handleInputChange('embarcation', {
-                  motorisation: {
-                    necessaire: newValue?.value || '',
-                    puissance: formData.embarcation.motorisation.puissance // Conserver la puissance existante
+                options={MOTORISATION_TYPES}
+                value={formData.embarcation.motorisation.necessaire}
+                onChange={(_, newValue) => {
+                  if (newValue && MOTORISATION_TYPES.includes(newValue as typeof MOTORISATION_TYPES[number])) {
+                    const existingPuissance = formData.embarcation.motorisation.puissance;
+                    handleInputChange('embarcation', {
+                      motorisation: {
+                        necessaire: newValue as typeof MOTORISATION_TYPES[number],
+                        puissance: existingPuissance ? {
+                          minimum: existingPuissance.minimum === null ? undefined : existingPuissance.minimum,
+                          maximum: existingPuissance.maximum === null ? undefined : existingPuissance.maximum
+                        } : undefined
+                      }
+                    })
                   }
-                })}
-                getOptionLabel={(option) => option.label}
+                }}
                 renderInput={(params) => (
                   <TextField {...params} label="Type de motorisation" />
                 )}
-                isOptionEqualToValue={(option, value) => option.value === value.value}
                 freeSolo={false}
               />
             </Box>
@@ -459,12 +493,18 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
                   label="Puissance minimale (CV)"
                   type="number"
                   value={formData.embarcation.motorisation.puissance?.minimum || ''}
-                  onChange={(e) => handleInputChange('embarcation', {
-                    motorisation: {
-                      necessaire: formData.embarcation.motorisation.necessaire, // Conserver le type de motorisation
-                      puissance: { minimum: e.target.value ? parseInt(e.target.value) : 0 }
+                  onChange={(e) => {
+                    const value = e.target.value ? parseInt(e.target.value) : undefined;
+                    const necessaire = formData.embarcation.motorisation.necessaire;
+                    if (necessaire && MOTORISATION_TYPES.includes(necessaire as typeof MOTORISATION_TYPES[number])) {
+                      handleInputChange('embarcation', {
+                        motorisation: {
+                          necessaire: necessaire as typeof MOTORISATION_TYPES[number],
+                          puissance: value !== undefined ? { minimum: value } : undefined
+                        }
+                      });
                     }
-                  })}
+                  }}
                 />
               </Box>
             )}
@@ -512,7 +552,7 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {lac.hebergements.map((h: any, index) => {
+                    {lac.hebergements.map((h: { nom?: string; campingId?: Id<"campings">; _id?: Id<"campings">; distanceDepuisLac?: { temps: number; kilometrage: number } }, index) => {
                       // h contient déjà les données enrichies du camping (nom, organisme, etc.)
                       const campingNom = h.nom || 'N/A';
                       const campingId = h.campingId || h._id;
@@ -527,7 +567,7 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
                               <IconButton
                                 size="small"
                                 color="error"
-                                onClick={() => handleRemoveHebergement(campingId)}
+                                onClick={() => campingId && handleRemoveHebergement(campingId)}
                               >
                                 <DeleteIcon />
                               </IconButton>
@@ -546,7 +586,7 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
                 <Autocomplete
                   fullWidth
                   options={campings?.filter(camping =>
-                    !lac.hebergements.some((h: any) => (h.campingId || h._id) === camping._id)
+                    !lac.hebergements.some(h => h.campingId === camping._id)
                   ) || []}
                   value={campings?.find(c => c._id === hebergement.campingId) || null}
                   onChange={(_, newValue) => {

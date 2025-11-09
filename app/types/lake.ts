@@ -1,18 +1,21 @@
 export interface Acces {
-    portage: "Aucune marche d'approche nécessaire",
+    portage: string,
     acceuil: string,
     distanceAcceuilLac: {
-        temps?: number, // en minutes
-        kilometrage?: number // en km
+        temps: number, // en minutes
+        kilometrage: number // en km
     },
     accessible: "auto" | "véhicule utilitaire sport (VUS)" | "camion 4x4"
 }
 
 export interface Embarcation {
-    type: string;
+    type: "Embarcation personnelle" | "Embarcation Sépaq fournie" | "Embarcation Pourvoirie fournie" | "Location";
     motorisation: {
-        type: "electrique" | "essence";
-        puissanceMin: number; // en HP
+        necessaire: "electrique" | "essence" | "a determiner";
+        puissance?: {
+            minimum?: number;
+            maximum?: number;
+        };
     };
 }
 
