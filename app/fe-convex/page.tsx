@@ -51,6 +51,7 @@ type Filters = {
 export default function LakesSearchCards() {
     // Utilisation de la query Convex triée
     const queryResult = useQuery(api.lacs.getLacsSortedOptimized);
+    console.log('queryResult structure:', JSON.stringify(queryResult?.[0], null, 2));
     const loading = queryResult === undefined;
     
     // Mémoiser les données de la requête
@@ -67,7 +68,7 @@ export default function LakesSearchCards() {
 
     // État pour le dialog d'édition
     const [openDialog, setOpenDialog] = useState(false);
-    const [selectedLac, setSelectedLac] = useState<LacDoc | undefined>(undefined);
+    const [selectedLac, setSelectedLac] = useState<LacWithDetails | undefined>(undefined);
 
     const filtered = useMemo(() => {
         if (!data) return [];
@@ -118,7 +119,7 @@ export default function LakesSearchCards() {
         return `${s.hectares} ha`;
     };
 
-    const getMotorisationChip = (l: LacDoc) => {
+    const getMotorisationChip = (l: LacWithDetails) => {
         const m = l.embarcation?.motorisation ?? null;
         if (!m) return <Chip label="—" size="small" />;
 

@@ -14,11 +14,11 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import LacDialog from '../components/LacDialog';
 import GestionNavBar from '../components/GestionNavBar';
-import { LacDoc } from '../types/schema.types';
+import { LacDoc, LacWithDetails } from '../types/schema.types';
 
 export default function GestionLacs() {
   const [openDialog, setOpenDialog] = useState(false);
-  const [selectedLac, setSelectedLac] = useState<LacDoc | undefined>(undefined);
+  const [selectedLac, setSelectedLac] = useState<LacWithDetails | undefined>(undefined);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
   const [dialogMode, setDialogMode] = useState<'create' | 'edit'>('create');
 
@@ -26,7 +26,7 @@ export default function GestionLacs() {
   // const lacs = useQuery(api.lacs.getAllLacs) || [];
   const lacs = useQuery(api.lacs.getAllLacsSorted) || [];
 
-  const handleOpenDialog = (mode: 'create' | 'edit', lac?: LacDoc) => {
+  const handleOpenDialog = (mode: 'create' | 'edit', lac?: LacWithDetails) => {
     setDialogMode(mode);
     setSelectedLac(lac);
     setOpenDialog(true);

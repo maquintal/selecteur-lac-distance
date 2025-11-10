@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
-import { NewLacInput, defaultLacInput, LacDoc, HebergementLac } from '../../app/types/schema.types';
+import { NewLacInput, defaultLacInput, HebergementLac, LacWithDetails } from '../../app/types/schema.types';
 import { Id } from "../../convex/_generated/dataModel";
 import { Embarcation, Acces } from "../types/lake";
 import { EMBARCATION_TYPES, MOTORISATION_TYPES, VEHICLE_TYPES } from "../constants/options";
@@ -22,7 +22,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 type LacDialogProps = {
   open: boolean;
   onClose: () => void;
-  lac?: LacDoc;
+  lac?: LacWithDetails;
   mode: 'create' | 'edit';
 };
 
@@ -65,24 +65,45 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
         const especeIds = lac.especeIds || [];
 
         // Convertir les hébergements enrichis en format simple pour formData
-        const hebergementsSimples = (lac.hebergements || []).map(h => ({
-          campingId: h.campingId,
-          distanceDepuisLac: h.distanceDepuisLac,
-          distanceDepuisAcceuil: h.distanceDepuisAcceuil,
-        }));
+        type HebergementWithRequired = {
+          campingId: Id<"campings">;
+          distanceDepuisLac: { temps: number; kilometrage: number; } | undefined;
+          distanceDepuisAcceuil: { temps: number; kilometrage: number; } | undefined;
+        };
 
-        setFormData({
+        const hebergementsSimples = (lac.hebergements || []).map(h => {
+          if (!h._id) return null;
+          return {
+            campingId: h._id,
+            distanceDepuisLac: h.distanceDepuisLac,
+            distanceDepuisAcceuil: h.distanceDepuisAcceuil,
+          };
+        }).filter((h): h is HebergementWithRequired => h !== null);
+
+        const newFormData: NewLacInput = {
           nomDuLac: lac.nomDuLac,
           regionAdministrativeQuebec: lac.regionAdministrativeQuebec,
           coordonnees: lac.coordonnees,
-          acces: lac.acces,
-          embarcation: lac.embarcation,
+          acces: {
+            portage: lac.acces?.portage ?? "",
+            acceuil: lac.acces?.acceuil ?? "",
+            distanceAcceuilLac: lac.acces?.distanceAcceuilLac ?? { temps: 0, kilometrage: 0 },
+            accessible: (lac.acces?.accessible ?? "auto") as "auto" | "véhicule utilitaire sport (VUS)" | "camion 4x4"
+          },
+          embarcation: {
+            type: (lac.embarcation?.type ?? "Embarcation personnelle") as "Embarcation personnelle" | "Embarcation Sépaq fournie" | "Embarcation Pourvoirie fournie" | "Location",
+            motorisation: {
+              necessaire: (lac.embarcation?.motorisation?.necessaire ?? "a determiner") as "electrique" | "essence" | "a determiner"
+            }
+          },
           especeIds,
           hebergements: hebergementsSimples,
           zone: lac.zone,
           site: lac.site,
-          superficie: lac.superficie,
-        });
+          superficie: lac.superficie || { hectares: 0, km2: 0 }
+        };
+        
+        setFormData(newFormData);
       } else {
         // Réinitialiser pour le mode création
         setFormData(defaultLacInput);
@@ -586,11 +607,13 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
                 <Autocomplete
                   fullWidth
                   options={campings?.filter(camping =>
-                    !lac.hebergements.some(h => h.campingId === camping._id)
+                    !lac.hebergements.some(h => h._id === camping._id)
                   ) || []}
                   value={campings?.find(c => c._id === hebergement.campingId) || null}
                   onChange={(_, newValue) => {
-                    handleHebergementChange('campingId', newValue?._id || null);
+                    if (newValue) {
+                      handleHebergementChange('campingId', newValue._id);
+                    }
                   }}
                   getOptionLabel={(option) => option.nom}
                   renderInput={(params) => (
