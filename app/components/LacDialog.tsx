@@ -8,7 +8,7 @@ import {
   Dialog, DialogTitle, DialogContent, DialogActions,
   Typography, Table, TableBody, TableCell, TableContainer,
   TableHead, TableRow, Paper, IconButton, Tooltip,
-  Chip,
+  Chip, Alert,
   Autocomplete
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -18,6 +18,7 @@ import { Id } from "../../convex/_generated/dataModel";
 import { Embarcation, Acces } from "../types/lake";
 import { EMBARCATION_TYPES, MOTORISATION_TYPES, VEHICLE_TYPES } from "../constants/options";
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import { useReadOnlyMode } from '../hooks/useReadOnlyMode';
 
 type LacDialogProps = {
   open: boolean;
@@ -56,6 +57,7 @@ const accessibleOptions = [
 
 export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) {
   const [formData, setFormData] = useState<NewLacInput>(defaultLacInput);
+  const isReadOnly = useReadOnlyMode();
 
   // ✅ Synchroniser formData avec le lac sélectionné
   useEffect(() => {
@@ -233,6 +235,12 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
 
   const handleSubmit = async () => {
     try {
+      // ❌ Bloquer les modifications en mode read-only
+      if (isReadOnly) {
+        console.error('Mode read-only: Les modifications ne sont pas autorisées');
+        return;
+      }
+
       if (mode === 'create') {
         await addLac({
           nomDuLac: formData.nomDuLac,
@@ -267,6 +275,11 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
 
   const handleRemoveHebergement = async (campingId: Id<"campings">) => {
     if (!lac) return;
+    // ❌ Bloquer les modifications en mode read-only
+    if (isReadOnly) {
+      console.error('Mode read-only: Les modifications ne sont pas autorisées');
+      return;
+    }
     try {
       await removeCampingFromLac({
         lacId: lac._id,
@@ -279,6 +292,12 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
 
   const handleAddHebergement = async () => {
     if (!lac || !hebergement.campingId) return;
+    
+    // ❌ Bloquer les modifications en mode read-only
+    if (isReadOnly) {
+      console.error('Mode read-only: Les modifications ne sont pas autorisées');
+      return;
+    }
 
     try {
       await addHebergement({
@@ -307,11 +326,17 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
       </DialogTitle>
       <DialogContent>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+          {isReadOnly && (
+            <Alert severity="warning">
+              Mode Read-Only activé. Les modifications ne sont pas autorisées en production.
+            </Alert>
+          )}
           <TextField
             fullWidth
             label="Nom du lac"
             value={formData.nomDuLac}
             onChange={(e) => handleInputChange('nomDuLac', e.target.value)}
+            disabled={isReadOnly}
           />
 
           <Box sx={{ display: 'flex', gap: 2 }}>
@@ -320,6 +345,7 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
               options={regionsOptions}
               value={formData.regionAdministrativeQuebec}
               onChange={(_, newValue) => handleInputChange('regionAdministrativeQuebec', newValue || '')}
+              disabled={isReadOnly}
               renderInput={(params) => (
                 <TextField {...params} label="Région Administrative du Québec" />
               )}
@@ -331,6 +357,7 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
               options={siteOptions}
               value={formData.site}
               onChange={(_, newValue) => handleInputChange('site', newValue || '')}
+              disabled={isReadOnly}
               renderInput={(params) => (
                 <TextField {...params} label="Site" />
               )}
@@ -346,12 +373,14 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
                 label="Latitude"
                 value={formData.coordonnees.latitude || ''}
                 onChange={(e) => handleCoordChange('latitude', e.target.value)}
+                disabled={isReadOnly}
               />
               <TextField
                 type="number"
                 label="Longitude"
                 value={formData.coordonnees.longitude || ''}
                 onChange={(e) => handleCoordChange('longitude', e.target.value)}
+                disabled={isReadOnly}
               />
               <Tooltip title="Copier les coordonnées">
                 <IconButton
@@ -593,14 +622,17 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
                           <TableCell>{h.distanceDepuisLac?.kilometrage || 'N/A'}</TableCell>
                           <TableCell>{h.distanceDepuisLac?.temps || 'N/A'}</TableCell>
                           <TableCell>
-                            <Tooltip title="Supprimer">
-                              <IconButton
-                                size="small"
-                                color="error"
-                                onClick={() => campingId && handleRemoveHebergement(campingId)}
-                              >
-                                <DeleteIcon />
-                              </IconButton>
+                            <Tooltip title={isReadOnly ? "Mode read-only: Suppression impossible" : "Supprimer"}>
+                              <span>
+                                <IconButton
+                                  size="small"
+                                  color="error"
+                                  onClick={() => campingId && handleRemoveHebergement(campingId)}
+                                  disabled={isReadOnly}
+                                >
+                                  <DeleteIcon />
+                                </IconButton>
+                              </span>
                             </Tooltip>
                           </TableCell>
                         </TableRow>
@@ -666,12 +698,12 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
                   })}
                   sx={{ width: '150px' }}
                 />
-                <Tooltip title="Ajouter l'hébergement">
+                <Tooltip title={isReadOnly ? "Mode read-only: Ajout impossible" : "Ajouter l'hébergement"}>
                   <span>
                     <Button
                       variant="contained"
                       onClick={handleAddHebergement}
-                      disabled={!hebergement.campingId || hebergement.campingId === null}
+                      disabled={!hebergement.campingId || hebergement.campingId === null || isReadOnly}
                       startIcon={<AddIcon />}
                     >
                       Ajouter
@@ -685,8 +717,19 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
 
       </DialogContent>
       <DialogActions>
+        {isReadOnly && (
+          <Box sx={{ width: '100%', mb: 2 }}>
+            <Alert severity="error">
+              Mode Read-Only activé. Les modifications ne sont pas autorisées en production.
+            </Alert>
+          </Box>
+        )}
         <Button onClick={onClose}>Annuler</Button>
-        <Button onClick={handleSubmit} variant="contained">
+        <Button 
+          onClick={handleSubmit} 
+          variant="contained"
+          disabled={isReadOnly}
+        >
           {mode === 'create' ? 'Créer' : 'Enregistrer'}
         </Button>
       </DialogActions>

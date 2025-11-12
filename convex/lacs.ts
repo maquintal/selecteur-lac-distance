@@ -6,6 +6,7 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 import { paginationOptsValidator } from "convex/server";
+import { checkReadOnlyModeConvex } from "./readOnlyMode";
 
 // ============================================
 // MUTATIONS
@@ -31,6 +32,7 @@ export const createCamping = mutation({
     regionAdministrative: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    checkReadOnlyModeConvex();
     return await ctx.db.insert("campings", args);
   },
 });
@@ -56,6 +58,7 @@ export const updateCamping = mutation({
     regionAdministrative: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    checkReadOnlyModeConvex();
     const { id, ...data } = args;
     return await ctx.db.patch(id, data);
   },
@@ -75,6 +78,7 @@ export const updateEspece = mutation({
     ),
   },
   handler: async (ctx, args) => {
+    checkReadOnlyModeConvex();
     const { id, ...data } = args;
     return await ctx.db.patch(id, data);
   },
@@ -86,6 +90,7 @@ export const removeCampingFromLac = mutation({
     campingId: v.id("campings"),
   },
   handler: async (ctx, args) => {
+    checkReadOnlyModeConvex();
     const lac = await ctx.db.get(args.lacId);
     if (!lac) throw new Error("Lac non trouvé");
 
@@ -444,6 +449,7 @@ export const addLac = mutation({
 
   },
   handler: async (ctx, args) => {
+    checkReadOnlyModeConvex();
     return await ctx.db.insert("lacs", {
       ...args,
       especeIds: args.especeIds || [],
@@ -511,6 +517,7 @@ export const updateLac = mutation({
     especeIds: v.optional(v.array(v.id("especes"))),
   },
   handler: async (ctx, args) => {
+    checkReadOnlyModeConvex();
     const { lacId, ...updateData } = args;
 
     await ctx.db.patch(lacId, {
@@ -535,6 +542,7 @@ export const addCampingToLac = mutation({
     ),
   },
   handler: async (ctx, args) => {
+    checkReadOnlyModeConvex();
     const lac = await ctx.db.get(args.lacId);
     if (!lac) throw new Error("Lac non trouvé");
 
@@ -570,6 +578,7 @@ export const addEspece = mutation({
     ),
   },
   handler: async (ctx, args) => {
+    checkReadOnlyModeConvex();
     return await ctx.db.insert("especes", args);
   },
 });
@@ -580,6 +589,7 @@ export const addEspeceToLac = mutation({
     especeId: v.id("especes"),
   },
   handler: async (ctx, args) => {
+    checkReadOnlyModeConvex();
     const lac = await ctx.db.get(args.lacId);
     if (!lac) throw new Error("Lac non trouvé");
 
@@ -601,6 +611,7 @@ export const toggleChoixInteressant = mutation({
     lacId: v.id("lacs"),
   },
   handler: async (ctx, args) => {
+    checkReadOnlyModeConvex();
     const lac = await ctx.db.get(args.lacId);
     if (!lac) throw new Error("Lac non trouvé");
 
