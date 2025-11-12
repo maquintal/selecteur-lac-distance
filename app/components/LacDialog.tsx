@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
-import { NewLacInput, defaultLacInput, HebergementLac, LacWithDetails } from '../../app/types/schema.types';
+import { NewLacInput, defaultLacInput, HebergementLac, LacWithDetails, LacDoc } from '../../app/types/schema.types';
 import { Id } from "../../convex/_generated/dataModel";
 import { Embarcation, Acces } from "../types/lake";
 import { EMBARCATION_TYPES, MOTORISATION_TYPES, VEHICLE_TYPES } from "../constants/options";
@@ -22,7 +22,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 type LacDialogProps = {
   open: boolean;
   onClose: () => void;
-  lac?: LacWithDetails;
+  lac?: LacDoc | LacWithDetails;
   mode: 'create' | 'edit';
 };
 
@@ -71,10 +71,19 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
           distanceDepuisAcceuil: { temps: number; kilometrage: number; } | undefined;
         };
 
-        const hebergementsSimples = (lac.hebergements || []).map(h => {
-          if (!h._id) return null;
+        type HebergementUnion = {
+          _id?: Id<"campings">;
+          campingId?: Id<"campings">;
+          distanceDepuisLac?: { temps: number; kilometrage: number };
+          distanceDepuisAcceuil?: { temps: number; kilometrage: number };
+        };
+
+        const hebergementsSimples = (lac.hebergements || []).map((h: HebergementUnion) => {
+          // Support both enriched hebergement objects (with _id) and simple ones (with campingId)
+          const campingId = h._id ?? h.campingId ?? null;
+          if (!campingId) return null;
           return {
-            campingId: h._id,
+            campingId,
             distanceDepuisLac: h.distanceDepuisLac,
             distanceDepuisAcceuil: h.distanceDepuisAcceuil,
           };
@@ -607,7 +616,8 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
                 <Autocomplete
                   fullWidth
                   options={campings?.filter(camping =>
-                    !lac.hebergements.some(h => h._id === camping._id)
+                    // Compare either enriched _id or simple campingId
+                    !lac.hebergements.some(h => ((h as { _id?: Id<"campings"> })._id ?? (h as { campingId?: Id<"campings"> }).campingId) === camping._id)
                   ) || []}
                   value={campings?.find(c => c._id === hebergement.campingId) || null}
                   onChange={(_, newValue) => {

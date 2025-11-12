@@ -18,7 +18,7 @@ import { LacDoc, LacWithDetails } from '../types/schema.types';
 
 export default function GestionLacs() {
   const [openDialog, setOpenDialog] = useState(false);
-  const [selectedLac, setSelectedLac] = useState<LacWithDetails | undefined>(undefined);
+  const [selectedLac, setSelectedLac] = useState<LacDoc | LacWithDetails | undefined>(undefined);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
   const [dialogMode, setDialogMode] = useState<'create' | 'edit'>('create');
 
@@ -26,7 +26,7 @@ export default function GestionLacs() {
   // const lacs = useQuery(api.lacs.getAllLacs) || [];
   const lacs = useQuery(api.lacs.getAllLacsSorted) || [];
 
-  const handleOpenDialog = (mode: 'create' | 'edit', lac?: LacWithDetails) => {
+  const handleOpenDialog = (mode: 'create' | 'edit', lac?: LacDoc | LacWithDetails) => {
     setDialogMode(mode);
     setSelectedLac(lac);
     setOpenDialog(true);
