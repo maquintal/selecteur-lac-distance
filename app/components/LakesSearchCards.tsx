@@ -85,11 +85,11 @@ export default function LakesSearchCards() {
     };
 
     const getMotorisationChip = (l: Lake) => {
-        const m = l.embarcation?.motorisation ?? null;
-        if (!m) return <Chip label="—" size="small" />;
+        const m = l.embarcation?.motorisation;
+        if (!m?.necessaire) return <Chip label="—" size="small" />;
 
-        const type = m.type?.toLowerCase() ?? '';
-        const puissance = m.puissanceMin ?? null;
+        const type = m.necessaire;
+        const puissance = m.puissance?.minimum;
 
         return (
             type === "electrique" ?

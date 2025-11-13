@@ -29,7 +29,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     const root = window?.document?.documentElement;
     root?.style?.setProperty('--initial-color-mode', mode);
     setMounted(true);
-  }, []);
+  }, [mode]);
 
   const theme = useMemo(
     () =>

@@ -7,25 +7,29 @@ import {
   Box, Container, Typography, Paper, Button,
   IconButton, Table, TableBody, TableCell,
   TableContainer, TableHead, TableRow,
-  Snackbar, Alert
+  Snackbar, Alert, Chip
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { LacDoc } from '../types/dynamicLake.type.';
+import LockIcon from '@mui/icons-material/Lock';
 import LacDialog from '../components/LacDialog';
 import GestionNavBar from '../components/GestionNavBar';
+import { LacDoc, LacWithDetails } from '../types/schema.types';
+import { useReadOnlyMode } from '../hooks/useReadOnlyMode';
 
 export default function GestionLacs() {
   const [openDialog, setOpenDialog] = useState(false);
-  const [selectedLac, setSelectedLac] = useState<LacDoc | undefined>(undefined);
+  const [selectedLac, setSelectedLac] = useState<LacDoc | LacWithDetails | undefined>(undefined);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
   const [dialogMode, setDialogMode] = useState<'create' | 'edit'>('create');
+  const isReadOnly = useReadOnlyMode();
 
   // Queries Convex
-  const lacs = useQuery(api.lacs.getAllLacs) || [];
+  // const lacs = useQuery(api.lacs.getAllLacs) || [];
+  const lacs = useQuery(api.lacs.getAllLacsSorted) || [];
 
-  const handleOpenDialog = (mode: 'create' | 'edit', lac?: LacDoc) => {
+  const handleOpenDialog = (mode: 'create' | 'edit', lac?: LacDoc | LacWithDetails) => {
     setDialogMode(mode);
     setSelectedLac(lac);
     setOpenDialog(true);
@@ -49,17 +53,28 @@ export default function GestionLacs() {
     <>
       <GestionNavBar />
       <Container maxWidth="xl">
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 4 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
           <Typography variant="h4" component="h1">
             Gestion des Lacs
           </Typography>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={() => handleOpenDialog('create')}
-          >
-            Ajouter un lac
-          </Button>
+          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+            {isReadOnly && (
+              <Chip
+                icon={<LockIcon />}
+                label="Mode Read-Only (Production)"
+                color="error"
+                variant="outlined"
+              />
+            )}
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={() => handleOpenDialog('create')}
+              disabled={isReadOnly}
+            >
+              Ajouter un lac
+            </Button>
+          </Box>
         </Box>
 
         <TableContainer component={Paper}>
@@ -86,10 +101,15 @@ export default function GestionLacs() {
                     <IconButton
                       size="small"
                       onClick={() => handleOpenDialog('edit', lac)}
+                      disabled={isReadOnly}
                     >
                       <EditIcon />
                     </IconButton>
-                    <IconButton size="small" color="error">
+                    <IconButton 
+                      size="small" 
+                      color="error"
+                      disabled={isReadOnly}
+                    >
                       <DeleteIcon />
                     </IconButton>
                   </TableCell>

@@ -17,8 +17,8 @@ export type NewHebergementLacInput = Omit<HebergementLacDoc, "_id" | "_creationT
 
 // Type pour les relations d'hébergement dans un lac
 export type HebergementLac = {
-  campingId: Id<"campings">;
-  distanceDepuisAcceuil?: number | {
+  campingId?: Id<"campings">;
+  distanceDepuisAcceuil?: {
     temps: number;
     kilometrage: number;
   };
@@ -29,11 +29,10 @@ export type HebergementLac = {
 };
 
 // Type enrichi pour un lac avec ses relations
-export type LacWithDetails = LacDoc & {
-  // site: SiteDoc | null;
+export interface LacWithDetails extends Omit<LacDoc, "hebergements"> {
   especes: EspeceDoc[];
-  hebergements: (CampingDoc & {
-    distanceDepuisAcceuil?: number | {
+  hebergements: {
+    distanceDepuisAcceuil?: {
       temps: number;
       kilometrage: number;
     };
@@ -41,7 +40,19 @@ export type LacWithDetails = LacDoc & {
       temps: number;
       kilometrage: number;
     };
-  })[];
+    _id?: Id<"campings">;
+    nom?: string;
+    organisme?: "privé" | "SEPAQ" | "Camping" | "Pourvoirie";
+    coordonnees?: {
+      latitude: number;
+      longitude: number;
+    };
+    commodites?: {
+      eau: boolean;
+      electricite: boolean;
+    };
+    regionAdministrative?: string;
+  }[];
 };
 
 // Valeurs par défaut pour les nouveaux documents
@@ -64,7 +75,11 @@ export const defaultLacInput: NewLacInput = {
   embarcation: {
     type: "Location",
     motorisation: {
-      type: "electrique",
+      puissance: {
+        minimum: null,
+        maximum: null,
+      },
+      necessaire: "a determiner",
     },
   },
   especeIds: [],

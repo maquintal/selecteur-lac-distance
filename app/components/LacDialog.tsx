@@ -6,49 +6,121 @@ import { api } from '../../convex/_generated/api';
 import {
   Box, TextField, Button,
   Dialog, DialogTitle, DialogContent, DialogActions,
-  Select, MenuItem, FormControl, InputLabel,
   Typography, Table, TableBody, TableCell, TableContainer,
   TableHead, TableRow, Paper, IconButton, Tooltip,
-  Chip
+  Chip, Alert,
+  Autocomplete
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
-import { NewLacInput, defaultLacInput, LacDoc } from '../../app/types/schema.types';
-import { HebergementLac } from '../types/dynamicLake.type.';
+import { NewLacInput, defaultLacInput, HebergementLac, LacWithDetails, LacDoc } from '../../app/types/schema.types';
 import { Id } from "../../convex/_generated/dataModel";
+import { Embarcation, Acces } from "../types/lake";
+import { EMBARCATION_TYPES, MOTORISATION_TYPES, VEHICLE_TYPES } from "../constants/options";
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import { useReadOnlyMode } from '../hooks/useReadOnlyMode';
 
 type LacDialogProps = {
   open: boolean;
   onClose: () => void;
-  lac?: LacDoc;
+  lac?: LacDoc | LacWithDetails;
   mode: 'create' | 'edit';
 };
 
+// Options pour les autocomplete
+const regionsOptions = [
+  "Capitale-Nationale",
+  "Chaudière-Appalaches",
+  "Lanaudière",
+  "Laurentides",
+  "Mauricie",
+  "Outaouais",
+  "Portneuf"
+];
+
+const siteOptions = [
+  "Mastigouche",
+  "Rouge-Matawin",
+  "Papineau-Labelle",
+  "Saint-Maurice",
+  "Portneuf",
+  "Jacques-Cartier"
+];
+
+const accessibleOptions = [
+  "véhicule utilitaire sport (VUS)",
+  "auto",
+  "camion 4x4"
+];
+
+// Les options sont maintenant dans le fichier constants/options.ts
+
 export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) {
-  const [formData, setFormData] = useState<NewLacInput>(lac || defaultLacInput);
+  const [formData, setFormData] = useState<NewLacInput>(defaultLacInput);
+  const isReadOnly = useReadOnlyMode();
 
   // ✅ Synchroniser formData avec le lac sélectionné
   useEffect(() => {
     if (open) {
-      if (lac) {
-        setFormData({
+      if (mode === 'edit' && lac) {
+        // Convertir les espèces enrichies en IDs si nécessaire
+        const especeIds = lac.especeIds || [];
+
+        // Convertir les hébergements enrichis en format simple pour formData
+        type HebergementWithRequired = {
+          campingId: Id<"campings">;
+          distanceDepuisLac: { temps: number; kilometrage: number; } | undefined;
+          distanceDepuisAcceuil: { temps: number; kilometrage: number; } | undefined;
+        };
+
+        type HebergementUnion = {
+          _id?: Id<"campings">;
+          campingId?: Id<"campings">;
+          distanceDepuisLac?: { temps: number; kilometrage: number };
+          distanceDepuisAcceuil?: { temps: number; kilometrage: number };
+        };
+
+        const hebergementsSimples = (lac.hebergements || []).map((h: HebergementUnion) => {
+          // Support both enriched hebergement objects (with _id) and simple ones (with campingId)
+          const campingId = h._id ?? h.campingId ?? null;
+          if (!campingId) return null;
+          return {
+            campingId,
+            distanceDepuisLac: h.distanceDepuisLac,
+            distanceDepuisAcceuil: h.distanceDepuisAcceuil,
+          };
+        }).filter((h): h is HebergementWithRequired => h !== null);
+
+        const newFormData: NewLacInput = {
           nomDuLac: lac.nomDuLac,
           regionAdministrativeQuebec: lac.regionAdministrativeQuebec,
           coordonnees: lac.coordonnees,
-          acces: lac.acces,
-          embarcation: lac.embarcation,
-          especeIds: lac.especeIds,
-          hebergements: lac.hebergements,
+          acces: {
+            portage: lac.acces?.portage ?? "",
+            acceuil: lac.acces?.acceuil ?? "",
+            distanceAcceuilLac: lac.acces?.distanceAcceuilLac ?? { temps: 0, kilometrage: 0 },
+            accessible: (lac.acces?.accessible ?? "auto") as "auto" | "véhicule utilitaire sport (VUS)" | "camion 4x4"
+          },
+          embarcation: {
+            type: (lac.embarcation?.type ?? "Embarcation personnelle") as "Embarcation personnelle" | "Embarcation Sépaq fournie" | "Embarcation Pourvoirie fournie" | "Location",
+            motorisation: {
+              necessaire: (lac.embarcation?.motorisation?.necessaire ?? "a determiner") as "electrique" | "essence" | "a determiner"
+            }
+          },
+          especeIds,
+          hebergements: hebergementsSimples,
           zone: lac.zone,
           site: lac.site,
-          superficie: lac.superficie,
-        });
+          superficie: lac.superficie || { hectares: 0, km2: 0 }
+        };
+        
+        setFormData(newFormData);
       } else {
         // Réinitialiser pour le mode création
         setFormData(defaultLacInput);
       }
     }
-  }, [open, lac]);
+  }, [open, mode, lac]);
 
   const [hebergement, setHebergement] = useState<Omit<HebergementLac, 'campingId'> & { campingId: Id<"campings"> | null }>({
     campingId: null,
@@ -65,56 +137,86 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
   const removeCampingFromLac = useMutation(api.lacs.removeCampingFromLac);
   const especes = useQuery(api.lacs.getAllEspeces);
 
-  // @ts-ignore en attente de ia
-  const handleInputChange = (field: keyof NewLacInput, value: any) => {
-    if (field === 'superficie') {
-      setFormData(prev => ({
-        ...prev,
-        superficie: value ? {
-          hectares: parseFloat(value),
-          km2: parseFloat(value) / 100
-        } : undefined
-      }));
-    } else if (field === 'acces') {
-      setFormData(prev => ({
-        ...prev,
-        acces: {
-          ...prev.acces,
-          ...value
+  const handleInputChange = (
+    field: keyof NewLacInput, 
+    value: string | number | Id<"especes">[] | 
+    Partial<Embarcation> | 
+    Partial<Acces>
+  ) => {
+    setFormData((prev: NewLacInput) => {
+      if (field === 'superficie') {
+        const superficieValue = typeof value === 'string' ? parseFloat(value) : (typeof value === 'number' ? value : 0);
+        return {
+          ...prev,
+          superficie: {
+            hectares: superficieValue,
+            km2: superficieValue / 100
+          }
+        };
+      }
+      
+      if (field === 'acces' && typeof value === 'object' && value !== null) {
+        return {
+          ...prev,
+          acces: {
+            ...prev.acces,
+            ...value
+          }
+        };
+      }
+      
+      if (field === 'embarcation' && typeof value === 'object' && value !== null) {
+        return {
+          ...prev,
+          embarcation: {
+            ...prev.embarcation,
+            ...value
+          }
+        };
+      }
+      
+      if (field === 'especeIds') {
+        if (Array.isArray(value)) {
+          return {
+            ...prev,
+            especeIds: value as Id<"especes">[]
+          };
         }
-      }));
-    } else if (field === 'embarcation') {
-      setFormData(prev => ({
-        ...prev,
-        embarcation: {
-          ...prev.embarcation,
-          ...value
+        if (typeof value === 'string') {
+          return {
+            ...prev,
+            especeIds: [value] as Id<"especes">[]
+          };
         }
-      }));
-    } else if (field === 'especeIds') {
-      setFormData(prev => ({
-        ...prev,
-        especeIds: typeof value === 'string' ? [value] : value
-      }));
-    } else {
-      setFormData(prev => ({
+        return prev;
+      }
+      
+      if (field === 'zone') {
+        const zoneValue = typeof value === 'string' ? parseInt(value) : (typeof value === 'number' ? value : 0);
+        return {
+          ...prev,
+          zone: zoneValue || 0
+        };
+      }
+
+      return {
         ...prev,
         [field]: value
-      }));
-    }
+      };
+    });
   };
 
-  const handleHebergementChange = (field: keyof HebergementLac, value: any) => {
-    if (field === 'distanceDepuisLac') {
-      setHebergement(prev => ({
+  const handleHebergementChange = (field: keyof HebergementLac, value: Id<"campings"> | null | { temps?: number; kilometrage?: number }) => {
+    if (field === 'distanceDepuisLac' && typeof value === 'object' && value !== null) {
+      setHebergement((prev: Omit<HebergementLac, 'campingId'> & { campingId: Id<"campings"> | null }) => ({
         ...prev,
         distanceDepuisLac: {
-          ...prev.distanceDepuisLac,
-          ...value
+          temps: typeof value.temps === 'number' ? value.temps : (prev.distanceDepuisLac?.temps ?? 0),
+          kilometrage: typeof value.kilometrage === 'number' ? value.kilometrage : (prev.distanceDepuisLac?.kilometrage ?? 0)
         }
       }));
     } else {
-      setHebergement(prev => ({
+      setHebergement((prev: Omit<HebergementLac, 'campingId'> & { campingId: Id<"campings"> | null }) => ({
         ...prev,
         [field]: value
       }));
@@ -122,7 +224,7 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
   };
 
   const handleCoordChange = (field: 'latitude' | 'longitude', value: string) => {
-    setFormData(prev => ({
+    setFormData((prev: NewLacInput) => ({
       ...prev,
       coordonnees: {
         ...prev.coordonnees,
@@ -133,6 +235,12 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
 
   const handleSubmit = async () => {
     try {
+      // ❌ Bloquer les modifications en mode read-only
+      if (isReadOnly) {
+        console.error('Mode read-only: Les modifications ne sont pas autorisées');
+        return;
+      }
+
       if (mode === 'create') {
         await addLac({
           nomDuLac: formData.nomDuLac,
@@ -142,21 +250,16 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
           site: formData.site,
           superficie: formData.superficie,
           especeIds: formData.especeIds,
-          // @ts-ignore en attendant de ia
           acces: formData.acces,
-          // @ts-ignore en attendant de ia
           embarcation: formData.embarcation
         });
-      }
-      else if (mode === 'edit' && lac) { // ✅ Ajoutez cette condition
+      } else if (mode === 'edit' && lac) {
         await updateLac({
           lacId: lac._id,
           nomDuLac: formData.nomDuLac,
           regionAdministrativeQuebec: formData.regionAdministrativeQuebec,
           coordonnees: formData.coordonnees,
-          // @ts-ignore en attendant de ia
           acces: formData.acces,
-          // @ts-ignore en attendant de ia
           embarcation: formData.embarcation,
           zone: formData.zone,
           site: formData.site,
@@ -172,6 +275,11 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
 
   const handleRemoveHebergement = async (campingId: Id<"campings">) => {
     if (!lac) return;
+    // ❌ Bloquer les modifications en mode read-only
+    if (isReadOnly) {
+      console.error('Mode read-only: Les modifications ne sont pas autorisées');
+      return;
+    }
     try {
       await removeCampingFromLac({
         lacId: lac._id,
@@ -184,6 +292,12 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
 
   const handleAddHebergement = async () => {
     if (!lac || !hebergement.campingId) return;
+    
+    // ❌ Bloquer les modifications en mode read-only
+    if (isReadOnly) {
+      console.error('Mode read-only: Les modifications ne sont pas autorisées');
+      return;
+    }
 
     try {
       await addHebergement({
@@ -212,57 +326,76 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
       </DialogTitle>
       <DialogContent>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+          {isReadOnly && (
+            <Alert severity="warning">
+              Mode Read-Only activé. Les modifications ne sont pas autorisées en production.
+            </Alert>
+          )}
           <TextField
             fullWidth
             label="Nom du lac"
             value={formData.nomDuLac}
             onChange={(e) => handleInputChange('nomDuLac', e.target.value)}
+            disabled={isReadOnly}
           />
-          <Box sx={{ display: 'flex', gap: 2 }}>
-            <FormControl fullWidth>
-              <InputLabel>Région Adiministrative du Québec</InputLabel>
-              <Select
-                value={formData.regionAdministrativeQuebec}
-                onChange={(e) => handleInputChange('regionAdministrativeQuebec', e.target.value)}
-              >
-                <MenuItem value="Capitale-Nationale">Capitale-Nationale</MenuItem>
-                <MenuItem value="Chaudière-Appalaches">Chaudière-Appalaches</MenuItem>
-                <MenuItem value="Lanaudière">Lanaudière</MenuItem>
-                <MenuItem value="Laurentides">Laurentides</MenuItem>
-                <MenuItem value="Mauricie">Mauricie</MenuItem>
-                <MenuItem value="Outaouais">Outaouais</MenuItem>
-              </Select>
-            </FormControl>
 
-            <FormControl fullWidth>
-              <InputLabel>Site</InputLabel>
-              <Select
-                value={formData.site}
-                onChange={(e) => handleInputChange('site', e.target.value)}
-              >
-                <MenuItem value="Mastigouche">Mastigouche</MenuItem>
-                <MenuItem value="Rouge-Matawin">Rouge-Matawin</MenuItem>
-                <MenuItem value="Papineau-Labelle">Papineau-Labelle</MenuItem>
-                <MenuItem value="Saint-Maurice">Saint-Maurice</MenuItem>
-              </Select>
-            </FormControl>
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <Autocomplete
+              fullWidth
+              options={regionsOptions}
+              value={formData.regionAdministrativeQuebec}
+              onChange={(_, newValue) => handleInputChange('regionAdministrativeQuebec', newValue || '')}
+              disabled={isReadOnly}
+              renderInput={(params) => (
+                <TextField {...params} label="Région Administrative du Québec" />
+              )}
+              freeSolo={false}
+            />
+
+            <Autocomplete
+              fullWidth
+              options={siteOptions}
+              value={formData.site}
+              onChange={(_, newValue) => handleInputChange('site', newValue || '')}
+              disabled={isReadOnly}
+              renderInput={(params) => (
+                <TextField {...params} label="Site" />
+              )}
+              freeSolo={false}
+            />
           </Box>
 
-          <Box sx={{ display: 'flex', gap: 2 }}>
-            <TextField
-              fullWidth
-              type="number"
-              label="Latitude"
-              value={formData.coordonnees.latitude || ''}
-              onChange={(e) => handleCoordChange('latitude', e.target.value)}
-            />
-            <TextField
-              fullWidth
-              type="number"
-              label="Longitude"
-              value={formData.coordonnees.longitude || ''}
-              onChange={(e) => handleCoordChange('longitude', e.target.value)}
-            />
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {/* Champs individuels avec bouton de copie */}
+            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: 2, alignItems: 'center' }}>
+              <TextField
+                type="number"
+                label="Latitude"
+                value={formData.coordonnees.latitude || ''}
+                onChange={(e) => handleCoordChange('latitude', e.target.value)}
+                disabled={isReadOnly}
+              />
+              <TextField
+                type="number"
+                label="Longitude"
+                value={formData.coordonnees.longitude || ''}
+                onChange={(e) => handleCoordChange('longitude', e.target.value)}
+                disabled={isReadOnly}
+              />
+              <Tooltip title="Copier les coordonnées">
+                <IconButton
+                  onClick={() => {
+                    const lat = formData.coordonnees.latitude.toString().replace(',', '.');
+                    const lng = formData.coordonnees.longitude.toString().replace(',', '.');
+                    const coords = `${lat}, ${lng}`;
+                    navigator.clipboard.writeText(coords);
+                  }}
+                  color="primary"
+                >
+                  <ContentCopyIcon />
+                </IconButton>
+              </Tooltip>
+            </Box>
           </Box>
 
           <Box sx={{ display: 'flex', gap: 2 }}>
@@ -271,7 +404,7 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
               type="number"
               label="Zone"
               value={formData.zone || ''}
-              onChange={(e) => handleInputChange('zone', e.target.value ? parseInt(e.target.value) : undefined)}
+              onChange={(e) => handleInputChange('zone', e.target.value ? parseInt(e.target.value) : 0)}
             />
             <TextField
               fullWidth
@@ -300,89 +433,167 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
               fullWidth
               label="Distance d'accueil au lac (m)"
               type="number"
-              // @ts-ignore en attendant de ia
               value={formData.acces.distanceAcceuilLac.kilometrage || 0}
-              // @ts-ignore en attendant de ia
               onChange={(e) => handleInputChange('acces', { distanceAcceuilLac: { kilometrage: e.target.value ? parseInt(e.target.value) : 0, temps: formData.acces.distanceAcceuilLac.temps } })}
             />
             <TextField
               fullWidth
               label="Temps d'accueil au lac (min)"
               type="number"
-              // @ts-ignore en attendant de ia
               value={formData.acces.distanceAcceuilLac.temps || 0}
-              // @ts-ignore en attendant de ia
               onChange={(e) => handleInputChange('acces', { distanceAcceuilLac: { kilometrage: formData.acces.distanceAcceuilLac.kilometrage, temps: e.target.value ? parseInt(e.target.value) : 0 } })}
             />
-            <FormControl fullWidth>
-              <InputLabel>Accessible</InputLabel>
-              <Select
-                value={formData.acces.accessible}
-                onChange={(e) => handleInputChange('acces', { accessible: e.target.value })}
-              >
-                <MenuItem value="véhicule utilitaire sport (VUS)">Véhicule utilitaire sport (VUS)</MenuItem>
-                <MenuItem value="auto">Auto</MenuItem>
-                <MenuItem value="camion 4x4">Camion 4x4</MenuItem>
-              </Select>
-            </FormControl>
+            <Autocomplete
+              fullWidth
+              options={accessibleOptions}
+              value={formData.acces.accessible}
+              onChange={(_, newValue) => {
+                if (newValue && VEHICLE_TYPES.includes(newValue as typeof VEHICLE_TYPES[number])) {
+                  handleInputChange('acces', { accessible: newValue as typeof VEHICLE_TYPES[number] })
+                }
+              }}
+              renderInput={(params) => (
+                <TextField {...params} label="Accessible" />
+              )}
+              freeSolo={false}
+            />
           </Box>
 
-          <Typography variant="h6" sx={{ mt: 1 }}>Embarcation</Typography>
+          {/* <Typography variant="h6" sx={{ mt: 1 }}>Embarcation</Typography>
           <Box sx={{ display: 'flex', gap: 2 }}>
+            <Autocomplete
+              fullWidth
+              options={typeEmbarcationOptions}
+              value={formData.embarcation.type}
+              onChange={(_, newValue) => handleInputChange('embarcation', { type: newValue || '' })}
+              renderInput={(params) => (
+                <TextField {...params} label="Type d'embarcation" />
+              )}
+              freeSolo={false}
+            />
 
-            <FormControl fullWidth>
-              <InputLabel>Type d'embarcation</InputLabel>
-              <Select
-                value={formData.embarcation.type}
-                onChange={(e) => handleInputChange('embarcation', { type: e.target.value })}
-              >
-                <MenuItem value="Embarcation Sépaq fournie">Embarcation Sépaq fournie</MenuItem>
-                <MenuItem value="Embarcation Pourvoirie fournie">Embarcation Pourvoirie fournie</MenuItem>
-                <MenuItem value="Location">Location</MenuItem>
-              </Select>
-            </FormControl>
+            <Autocomplete
+              fullWidth
+              options={motorisationOptions}
+              value={motorisationOptions.find(opt => opt.value === formData.embarcation.motorisation.necessaire) || null}
+              onChange={(_, newValue) => handleInputChange('embarcation', {
+                motorisation: { necessaire: newValue?.value || '' }
+              })}
+              getOptionLabel={(option) => option.label}
+              renderInput={(params) => (
+                <TextField {...params} label="Type de motorisation" />
+              )}
+              isOptionEqualToValue={(option, value) => option.value === value.value}
+              freeSolo={false}
+            />
 
-            <FormControl fullWidth>
-              <InputLabel>Type de motorisation</InputLabel>
-              <Select
-                value={formData.embarcation.motorisation.type}
-                label="Type de motorisation"
+            {formData.embarcation.motorisation.necessaire === "essence" && (
+              <TextField
+                fullWidth
+                label="Puissance minimale (CV)"
+                type="number"
+                value={formData.embarcation.motorisation.puissance?.minimum || 0}
                 onChange={(e) => handleInputChange('embarcation', {
-                  motorisation: { type: e.target.value }
+                  motorisation: { puissance: { minimum: e.target.value ? parseInt(e.target.value) : 0 } }
                 })}
-              >
-                <MenuItem value="electrique">Électrique</MenuItem>
-                <MenuItem value="essence">Essence</MenuItem>
-              </Select>
-            </FormControl>
+              />
+            )}
+          </Box> */}
+
+          <Typography variant="h6" sx={{ mt: 1 }}>Embarcation</Typography>
+          <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+            <Box sx={{ flex: '1 1 300px' }}>
+              <Autocomplete
+                fullWidth
+                options={EMBARCATION_TYPES}
+                value={formData.embarcation.type}
+                onChange={(_, newValue) => {
+                  if (newValue && EMBARCATION_TYPES.includes(newValue as typeof EMBARCATION_TYPES[number])) {
+                    handleInputChange('embarcation', { type: newValue as typeof EMBARCATION_TYPES[number] })
+                  }
+                }}
+                renderInput={(params) => (
+                  <TextField {...params} label="Type d'embarcation" />
+                )}
+                freeSolo={false}
+              />
+            </Box>
+
+            <Box sx={{ flex: '1 1 300px' }}>
+              <Autocomplete
+                fullWidth
+                options={MOTORISATION_TYPES}
+                value={formData.embarcation.motorisation.necessaire}
+                onChange={(_, newValue) => {
+                  if (newValue && MOTORISATION_TYPES.includes(newValue as typeof MOTORISATION_TYPES[number])) {
+                    const existingPuissance = formData.embarcation.motorisation.puissance;
+                    handleInputChange('embarcation', {
+                      motorisation: {
+                        necessaire: newValue as typeof MOTORISATION_TYPES[number],
+                        puissance: existingPuissance ? {
+                          minimum: existingPuissance.minimum === null ? undefined : existingPuissance.minimum,
+                          maximum: existingPuissance.maximum === null ? undefined : existingPuissance.maximum
+                        } : undefined
+                      }
+                    })
+                  }
+                }}
+                renderInput={(params) => (
+                  <TextField {...params} label="Type de motorisation" />
+                )}
+                freeSolo={false}
+              />
+            </Box>
+
+            {formData.embarcation.motorisation.necessaire === "essence" && (
+              <Box sx={{ flex: '1 1 200px' }}>
+                <TextField
+                  fullWidth
+                  label="Puissance minimale (CV)"
+                  type="number"
+                  value={formData.embarcation.motorisation.puissance?.minimum || ''}
+                  onChange={(e) => {
+                    const value = e.target.value ? parseInt(e.target.value) : undefined;
+                    const necessaire = formData.embarcation.motorisation.necessaire;
+                    if (necessaire && MOTORISATION_TYPES.includes(necessaire as typeof MOTORISATION_TYPES[number])) {
+                      handleInputChange('embarcation', {
+                        motorisation: {
+                          necessaire: necessaire as typeof MOTORISATION_TYPES[number],
+                          puissance: value !== undefined ? { minimum: value } : undefined
+                        }
+                      });
+                    }
+                  }}
+                />
+              </Box>
+            )}
           </Box>
 
           <Typography variant="h6" sx={{ mt: 2 }}>Espèces</Typography>
-          <FormControl fullWidth>
-            <InputLabel>Espèces présentes</InputLabel>
-            <Select
-              multiple
-              value={formData.especeIds}
-              label="Espèces présentes"
-              onChange={(e) => handleInputChange('especeIds', e.target.value)}
-              renderValue={(selected) => (
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                  {(selected as Id<"especes">[]).map((id) => {
-                    const espece = especes?.find(e => e._id === id);
-                    return (
-                      <Chip key={id} label={espece?.nomCommun || id} size="small" />
-                    );
-                  })}
-                </Box>
-              )}
-            >
-              {especes?.map((espece) => (
-                <MenuItem key={espece._id} value={espece._id}>
-                  {espece.nomCommun}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+          <Autocomplete
+            multiple
+            fullWidth
+            options={especes || []}
+            value={especes?.filter(e => formData.especeIds.includes(e._id)) || []}
+            onChange={(_, newValue) => {
+              handleInputChange('especeIds', newValue.map(e => e._id));
+            }}
+            getOptionLabel={(option) => option.nomCommun}
+            renderInput={(params) => (
+              <TextField {...params} label="Espèces présentes" placeholder="Sélectionner les espèces..." />
+            )}
+            renderTags={(value, getTagProps) =>
+              value.map((option, index) => (
+                <Chip
+                  {...getTagProps({ index })}
+                  key={option._id}
+                  label={option.nomCommun}
+                  size="small"
+                />
+              ))
+            }
+            isOptionEqualToValue={(option, value) => option._id === value._id}
+          />
 
           {mode === 'edit' && lac && (
             <>
@@ -400,28 +611,28 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {lac.hebergements.map((h) => {
-                      const camping = campings?.find(c => c._id === h.campingId);
+                    {lac.hebergements.map((h: { nom?: string; campingId?: Id<"campings">; _id?: Id<"campings">; distanceDepuisLac?: { temps: number; kilometrage: number } }, index) => {
+                      // h contient déjà les données enrichies du camping (nom, organisme, etc.)
+                      const campingNom = h.nom || 'N/A';
+                      const campingId = h.campingId || h._id;
+
                       return (
-                        <TableRow key={h.campingId}>
-                          <TableCell>{camping?.nom || 'N/A'}</TableCell>
-                          <TableCell>{
-                            // @ts-ignore en attendant de ia
-                            h.distanceDepuisLac?.kilometrage || 'N/A'
-                          }</TableCell>
-                          <TableCell>{
-                            // @ts-ignore en attendant de ia
-                            h.distanceDepuisLac?.temps || 'N/A'
-                          }</TableCell>
+                        <TableRow key={`${campingId}-${index}`}>
+                          <TableCell>{campingNom}</TableCell>
+                          <TableCell>{h.distanceDepuisLac?.kilometrage || 'N/A'}</TableCell>
+                          <TableCell>{h.distanceDepuisLac?.temps || 'N/A'}</TableCell>
                           <TableCell>
-                            <Tooltip title="Supprimer">
-                              <IconButton
-                                size="small"
-                                color="error"
-                                onClick={() => handleRemoveHebergement(h.campingId)}
-                              >
-                                <DeleteIcon />
-                              </IconButton>
+                            <Tooltip title={isReadOnly ? "Mode read-only: Suppression impossible" : "Supprimer"}>
+                              <span>
+                                <IconButton
+                                  size="small"
+                                  color="error"
+                                  onClick={() => campingId && handleRemoveHebergement(campingId)}
+                                  disabled={isReadOnly}
+                                >
+                                  <DeleteIcon />
+                                </IconButton>
+                              </span>
                             </Tooltip>
                           </TableCell>
                         </TableRow>
@@ -434,22 +645,39 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
               {/* Formulaire d'ajout d'hébergement */}
               <Typography variant="subtitle1" sx={{ mt: 2 }}>Ajouter un hébergement</Typography>
               <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                <FormControl fullWidth>
-                  <InputLabel>Camping</InputLabel>
-                  <Select
-                    value={hebergement.campingId || ''}
-                    label="Camping"
-                    onChange={(e) => handleHebergementChange('campingId', e.target.value)}
-                  >
-                    {campings?.filter(camping =>
-                      !lac.hebergements.some(h => h.campingId === camping._id)
-                    ).map((camping) => (
-                      <MenuItem key={camping._id} value={camping._id}>
-                        {camping.nom}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
+                <Autocomplete
+                  fullWidth
+                  options={campings?.filter(camping =>
+                    // Compare either enriched _id or simple campingId
+                    !lac.hebergements.some(h => ((h as { _id?: Id<"campings"> })._id ?? (h as { campingId?: Id<"campings"> }).campingId) === camping._id)
+                  ) || []}
+                  value={campings?.find(c => c._id === hebergement.campingId) || null}
+                  onChange={(_, newValue) => {
+                    if (newValue) {
+                      handleHebergementChange('campingId', newValue._id);
+                    }
+                  }}
+                  getOptionLabel={(option) => option.nom}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Camping"
+                      placeholder="Rechercher un camping..."
+                    />
+                  )}
+                  renderOption={(props, option) => (
+                    <li {...props} key={option._id}>
+                      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                        <Typography variant="body1">{option.nom}</Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {option.organisme} • {option.regionAdministrative || 'N/A'}
+                        </Typography>
+                      </Box>
+                    </li>
+                  )}
+                  noOptionsText="Aucun camping disponible"
+                  isOptionEqualToValue={(option, value) => option._id === value._id}
+                />
                 <TextField
                   type="number"
                   label="Distance (km)"
@@ -470,12 +698,12 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
                   })}
                   sx={{ width: '150px' }}
                 />
-                <Tooltip title="Ajouter l'hébergement">
+                <Tooltip title={isReadOnly ? "Mode read-only: Ajout impossible" : "Ajouter l'hébergement"}>
                   <span>
                     <Button
                       variant="contained"
                       onClick={handleAddHebergement}
-                      disabled={!hebergement.campingId || hebergement.campingId === null}
+                      disabled={!hebergement.campingId || hebergement.campingId === null || isReadOnly}
                       startIcon={<AddIcon />}
                     >
                       Ajouter
@@ -483,40 +711,25 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
                   </span>
                 </Tooltip>
               </Box>
-              <Typography variant="h6" sx={{ mt: 2 }}>Espèces</Typography>
-              <FormControl fullWidth>
-                <InputLabel>Espèces présentes</InputLabel>
-                <Select
-                  multiple
-                  value={formData.especeIds}
-                  label="Espèces présentes"
-                  onChange={(e) => handleInputChange('especeIds', e.target.value)}
-                  renderValue={(selected) => (
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                      {(selected as Id<"especes">[]).map((id) => {
-                        const espece = especes?.find(e => e._id === id);
-                        return (
-                          <Chip key={id} label={espece?.nomCommun || id} size="small" />
-                        );
-                      })}
-                    </Box>
-                  )}
-                >
-                  {especes?.map((espece) => (
-                    <MenuItem key={espece._id} value={espece._id}>
-                      {espece.nomCommun}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
             </>
           )}
         </Box>
 
       </DialogContent>
       <DialogActions>
+        {isReadOnly && (
+          <Box sx={{ width: '100%', mb: 2 }}>
+            <Alert severity="error">
+              Mode Read-Only activé. Les modifications ne sont pas autorisées en production.
+            </Alert>
+          </Box>
+        )}
         <Button onClick={onClose}>Annuler</Button>
-        <Button onClick={handleSubmit} variant="contained">
+        <Button 
+          onClick={handleSubmit} 
+          variant="contained"
+          disabled={isReadOnly}
+        >
           {mode === 'create' ? 'Créer' : 'Enregistrer'}
         </Button>
       </DialogActions>

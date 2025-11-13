@@ -6,6 +6,7 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 import { paginationOptsValidator } from "convex/server";
+import { checkReadOnlyModeConvex } from "./readOnlyMode";
 
 // ============================================
 // MUTATIONS
@@ -31,6 +32,7 @@ export const createCamping = mutation({
     regionAdministrative: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    checkReadOnlyModeConvex();
     return await ctx.db.insert("campings", args);
   },
 });
@@ -56,6 +58,7 @@ export const updateCamping = mutation({
     regionAdministrative: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    checkReadOnlyModeConvex();
     const { id, ...data } = args;
     return await ctx.db.patch(id, data);
   },
@@ -75,6 +78,7 @@ export const updateEspece = mutation({
     ),
   },
   handler: async (ctx, args) => {
+    checkReadOnlyModeConvex();
     const { id, ...data } = args;
     return await ctx.db.patch(id, data);
   },
@@ -86,6 +90,7 @@ export const removeCampingFromLac = mutation({
     campingId: v.id("campings"),
   },
   handler: async (ctx, args) => {
+    checkReadOnlyModeConvex();
     const lac = await ctx.db.get(args.lacId);
     if (!lac) throw new Error("Lac non trouvé");
 
@@ -114,6 +119,24 @@ export const removeCampingFromLac = mutation({
 export const getAllLacs = query({
   handler: async (ctx) => {
     return await ctx.db.query("lacs").collect();
+  },
+});
+
+export const getAllLacsSorted = query({
+  handler: async (ctx) => {
+    const lacs = await ctx.db
+      .query("lacs")
+      .withIndex("by_hebergements_electrique")
+      .order("desc")
+      .collect();
+
+    // Tri secondaire en JS seulement pour les lacs avec même nb d'hébergements
+    return lacs.sort((a, b) => {
+      if (a.nbHebergements === b.nbHebergements) {
+        return (b.isMoteurisationElectrique ? 1 : 0) - (a.isMoteurisationElectrique ? 1 : 0);
+      }
+      return 0; // Déjà trié par l'index
+    });
   },
 });
 
@@ -404,19 +427,29 @@ export const addLac = mutation({
       type: v.union(
         v.literal("Embarcation Sépaq fournie"),
         v.literal("Embarcation Pourvoirie fournie"),
-        v.literal("Location")
+        v.literal("Location"),
+        v.literal("Embarcation personnelle")
       ),
       motorisation: v.object({
-        type: v.union(
-          v.literal("electrique"),
-          v.literal("essence"),
+        puissance: v.optional(
+          v.object({
+            minimum: v.optional(v.union(v.number(), v.null())),
+            maximum: v.optional(v.union(v.number(), v.null())),
+          })
         ),
-        puissanceMin: v.optional(v.number()),
+        necessaire: v.optional(
+          v.union(
+            v.literal("electrique"),
+            v.literal("essence"),
+            v.literal("a determiner"),
+          )
+        )
       }),
     }),
 
   },
   handler: async (ctx, args) => {
+    checkReadOnlyModeConvex();
     return await ctx.db.insert("lacs", {
       ...args,
       especeIds: args.especeIds || [],
@@ -454,14 +487,23 @@ export const updateLac = mutation({
       type: v.union(
         v.literal("Embarcation Sépaq fournie"),
         v.literal("Embarcation Pourvoirie fournie"),
-        v.literal("Location")
+        v.literal("Location"),
+        v.literal("Embarcation personnelle")
       ),
       motorisation: v.object({
-        type: v.union(
-          v.literal("electrique"),
-          v.literal("essence"),
+        puissance: v.optional(
+          v.object({
+            minimum: v.optional(v.union(v.number(), v.null())),
+            maximum: v.optional(v.union(v.number(), v.null())),
+          })
         ),
-        puissanceMin: v.optional(v.number()),
+        necessaire: v.optional(
+          v.union(
+            v.literal("electrique"),
+            v.literal("essence"),
+            v.literal("a determiner"),
+          )
+        )
       }),
     }),
     zone: v.optional(v.number()),
@@ -475,6 +517,7 @@ export const updateLac = mutation({
     especeIds: v.optional(v.array(v.id("especes"))),
   },
   handler: async (ctx, args) => {
+    checkReadOnlyModeConvex();
     const { lacId, ...updateData } = args;
 
     await ctx.db.patch(lacId, {
@@ -499,6 +542,7 @@ export const addCampingToLac = mutation({
     ),
   },
   handler: async (ctx, args) => {
+    checkReadOnlyModeConvex();
     const lac = await ctx.db.get(args.lacId);
     if (!lac) throw new Error("Lac non trouvé");
 
@@ -534,6 +578,7 @@ export const addEspece = mutation({
     ),
   },
   handler: async (ctx, args) => {
+    checkReadOnlyModeConvex();
     return await ctx.db.insert("especes", args);
   },
 });
@@ -544,6 +589,7 @@ export const addEspeceToLac = mutation({
     especeId: v.id("especes"),
   },
   handler: async (ctx, args) => {
+    checkReadOnlyModeConvex();
     const lac = await ctx.db.get(args.lacId);
     if (!lac) throw new Error("Lac non trouvé");
 
@@ -555,6 +601,83 @@ export const addEspeceToLac = mutation({
     return await ctx.db.patch(args.lacId, {
       especeIds: [...lac.especeIds, args.especeId],
       updatedAt: Date.now(),
+    });
+  },
+});
+
+// 🆕 NOUVELLE MUTATION À AJOUTER
+export const toggleChoixInteressant = mutation({
+  args: {
+    lacId: v.id("lacs"),
+  },
+  handler: async (ctx, args) => {
+    checkReadOnlyModeConvex();
+    const lac = await ctx.db.get(args.lacId);
+    if (!lac) throw new Error("Lac non trouvé");
+
+    const newValue = !lac.isChoixInteressant;
+
+    await ctx.db.patch(args.lacId, {
+      isChoixInteressant: newValue,
+      updatedAt: Date.now(),
+    });
+
+    return { lacId: args.lacId, isChoixInteressant: newValue };
+  },
+});
+
+// ============================================
+// PARTIE 1: Query Convex optimisée
+// Fichier: convex/lacs.ts
+// ============================================
+
+export const getLacsSortedOptimized = query({
+  handler: async (ctx) => {
+    // Récupérer tous les lacs
+    const allLacs = await ctx.db.query("lacs").collect();
+
+    // Enrichir avec les données liées
+    const enrichedLacs = await Promise.all(
+      allLacs.map(async (lac) => {
+        // Récupérer les espèces
+        const especes = await Promise.all(
+          lac.especeIds.map((id) => ctx.db.get(id))
+        );
+
+        // Récupérer les campings avec leurs infos
+        const hebergements = await Promise.all(
+          lac.hebergements.map(async (h) => {
+            const camping = await ctx.db.get(h.campingId);
+            return {
+              ...camping,
+              distanceDepuisAcceuil: h.distanceDepuisAcceuil,
+              distanceDepuisLac: h.distanceDepuisLac,
+            };
+          })
+        );
+
+        return {
+          ...lac,
+          especes: especes.filter((e) => e !== null),
+          hebergements,
+        };
+      })
+    );
+
+    // 🎯 Tri modifié: Motorisation EN PREMIER, puis nombre d'hébergements
+    return enrichedLacs.sort((a, b) => {
+      // Priorité 1: Motorisation (électrique > essence > autre)
+      const motorA = a.embarcation?.motorisation?.necessaire;
+      const motorB = b.embarcation?.motorisation?.necessaire;
+      const priorityA = motorA === 'electrique' ? 1 : motorA === 'essence' ? 2 : 3;
+      const priorityB = motorB === 'electrique' ? 1 : motorB === 'essence' ? 2 : 3;
+
+      if (priorityA !== priorityB) return priorityA - priorityB;
+
+      // Priorité 2: Nombre d'hébergements (décroissant)
+      const countA = a.hebergements?.length || 0;
+      const countB = b.hebergements?.length || 0;
+      return countB - countA;
     });
   },
 });

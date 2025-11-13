@@ -72,25 +72,40 @@ export default defineSchema({
     acces: v.object({
       portage: v.string(),
       acceuil: v.string(),
-      // Supporte à la fois les nombres simples (32) et les objets complexes
       distanceAcceuilLac: v.union(
-        v.number(),
         v.object({
           temps: v.number(), // en minutes
           kilometrage: v.number(),
         })
       ),
-      accessible: v.string(), // Plus flexible pour supporter toutes les variantes
+      accessible: v.union(
+        v.literal("auto"),
+        v.literal("véhicule utilitaire sport (VUS)"),
+        v.literal("camion 4x4"),
+      ),
     }),
 
     embarcation: v.object({
-      type: v.string(), // Plus flexible pour tous les types
+      type: v.union(
+        v.literal("Embarcation personnelle"),
+        v.literal("Embarcation Sépaq fournie"),
+        v.literal("Embarcation Pourvoirie fournie"),
+        v.literal("Location"),
+      ),
       motorisation: v.object({
-        type: v.union(
-          v.literal("electrique"),
-          v.literal("essence"),
+        puissance: v.optional(
+          v.object({
+            minimum: v.optional(v.union(v.number(), v.null())),
+            maximum: v.optional(v.union(v.number(), v.null())),
+          })
         ),
-        puissanceMin: v.optional(v.number()),
+        necessaire: v.optional(
+          v.union(
+            v.literal("electrique"),
+            v.literal("essence"),
+            v.literal("a determiner"),
+          )
+        )
       }),
     }),
 
@@ -110,7 +125,6 @@ export default defineSchema({
         campingId: v.id("campings"),
         distanceDepuisAcceuil: v.optional(
           v.union(
-            v.number(),
             v.object({
               temps: v.number(),
               kilometrage: v.number(),
@@ -119,7 +133,6 @@ export default defineSchema({
         ),
         distanceDepuisLac: v.optional(
           v.union(
-            v.number(),
             v.object({
               temps: v.number(),
               kilometrage: v.number(),
@@ -132,11 +145,19 @@ export default defineSchema({
     // Métadonnées
     createdAt: v.number(),
     updatedAt: v.optional(v.number()),
+    isChoixInteressant: v.optional(v.boolean()),
+
+    // Champs calculés pour optimiser les requêtes
+    nbHebergements: v.optional(v.number()), // calculé lors de l'insertion/update
+    isMoteurisationElectrique: v.optional(v.boolean()),
+
   })
     .index("by_region", ["regionAdministrativeQuebec"])
     .index("by_site", ["site"])
     .index("by_zone", ["zone"])
     .index("by_coordonnees", ["coordonnees.latitude", "coordonnees.longitude"])
+    .index("by_hebergements_electrique", ["nbHebergements", "isMoteurisationElectrique"])
+    .index("by_choix_interessant", ["isChoixInteressant"])
     .searchIndex("search_nom", {
       searchField: "nomDuLac",
       filterFields: ["regionAdministrativeQuebec", "site"],
@@ -151,7 +172,6 @@ export default defineSchema({
     campingId: v.id("campings"),
     distanceDepuisAcceuil: v.optional(
       v.union(
-        v.number(),
         v.object({
           temps: v.number(),
           kilometrage: v.number(),
@@ -160,7 +180,6 @@ export default defineSchema({
     ),
     distanceDepuisLac: v.optional(
       v.union(
-        v.number(),
         v.object({
           temps: v.number(),
           kilometrage: v.number(),
