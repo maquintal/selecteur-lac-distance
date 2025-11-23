@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useQuery } from 'convex/react';
-import { api } from '../../convex/_generated/api';
+import { api } from '@/convex/_generated/api';
 import {
   Box, Container, Typography, Paper, Button,
   IconButton, Table, TableBody, TableCell,
@@ -13,18 +13,19 @@ import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import LockIcon from '@mui/icons-material/Lock';
-import LacDialog from '../components/LacDialog';
-import GestionNavBar from '../components/GestionNavBar';
-import { LacDoc, LacWithDetails } from '../types/schema.types';
-import { useReadOnlyMode } from '../hooks/useReadOnlyMode';
-import { useMobileDetect } from '../hooks/useMobileDetect';
+import LacDialog from '@/app/components/LacDialog';
+import GestionNavBar from '@/app/components/GestionNavBar';
+import { LacDoc, LacWithDetails } from '@/app/types/schema.types';
+// import { useReadOnlyMode } from '@/app/hooks/useReadOnlyMode';
+import { useMobileDetect } from '@/app/hooks/useMobileDetect';
+import { checkReadOnlyModeConvex } from '@/convex/checkReadOnlyMode';
 
 export default function GestionLacs() {
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedLac, setSelectedLac] = useState<LacDoc | LacWithDetails | undefined>(undefined);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
   const [dialogMode, setDialogMode] = useState<'create' | 'edit'>('create');
-  const isReadOnly = useReadOnlyMode();
+  // const isReadOnly = useReadOnlyMode();
   
   const { isMobile, isLoaded } = useMobileDetect();
 
@@ -61,7 +62,7 @@ export default function GestionLacs() {
             Gestion des Lacs
           </Typography>
           <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', flexDirection: { xs: 'column', sm: 'row' }, width: { xs: '100%', sm: 'auto' } }}>
-            {isReadOnly && (
+            {/* isReadOnly && (
               <Chip
                 icon={<LockIcon />}
                 label="Mode Read-Only"
@@ -70,12 +71,12 @@ export default function GestionLacs() {
                 size="small"
                 sx={{ fontSize: '0.7rem' }}
               />
-            )}
+            ) */}
             <Button
               variant="contained"
               startIcon={<AddIcon />}
               onClick={() => handleOpenDialog('create')}
-              disabled={isReadOnly}
+              disabled={checkReadOnlyModeConvex()}
               fullWidth={isMobile}
               size={isMobile ? "small" : "medium"}
             >
@@ -110,7 +111,7 @@ export default function GestionLacs() {
                       <IconButton
                         size="small"
                         onClick={() => handleOpenDialog('edit', lac)}
-                        disabled={isReadOnly}
+                        // disabled={isReadOnly}
                         color="primary"
                       >
                         <EditIcon fontSize="small" />
@@ -118,7 +119,7 @@ export default function GestionLacs() {
                       <IconButton 
                         size="small" 
                         color="error"
-                        disabled={isReadOnly}
+                        // disabled={isReadOnly}
                       >
                         <DeleteIcon fontSize="small" />
                       </IconButton>
@@ -157,7 +158,7 @@ export default function GestionLacs() {
                       aria-label={`Éditer ${lac.nomDuLac}`}
                       size="small"
                       onClick={() => handleOpenDialog('edit', lac)}
-                      disabled={isReadOnly}
+                      // disabled={isReadOnly}
                       sx={{ width: 36, height: 36 }}
                     >
                       <EditIcon fontSize="small" />
@@ -165,7 +166,7 @@ export default function GestionLacs() {
                     <IconButton
                       aria-label={`Supprimer ${lac.nomDuLac}`}
                       size="small"
-                      disabled={isReadOnly}
+                      // disabled={isReadOnly}
                       sx={{ width: 36, height: 36, color: (theme) => theme.palette.error.main }}
                     >
                       <DeleteIcon fontSize="small" />

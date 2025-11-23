@@ -30,7 +30,6 @@ import EditIcon from '@mui/icons-material/Edit';
 import { useMutation, useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import LacDialog from '../components/LacDialog';
-import { LacDoc } from '../types/schema.types';
 import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
@@ -52,7 +51,7 @@ type Filters = {
 export default function LakesSearchCards() {
     // Utilisation de la query Convex triée
     const queryResult = useQuery(api.lacs.getLacsSortedOptimized);
-    console.log('queryResult structure:', JSON.stringify(queryResult?.[0], null, 2));
+    // console.log('queryResult structure:', JSON.stringify(queryResult?.[0], null, 2));
     const loading = queryResult === undefined;
     
     // Mémoiser les données de la requête

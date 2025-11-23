@@ -13,9 +13,9 @@ import type {
   FilterApi,
   FunctionReference,
 } from "convex/server";
+import type * as checkReadOnlyMode from "../checkReadOnlyMode.js";
 import type * as lacs from "../lacs.js";
 import type * as mutations_removeCampingFromLac from "../mutations/removeCampingFromLac.js";
-import type * as readOnlyMode from "../readOnlyMode.js";
 import type * as types from "../types.js";
 
 /**
@@ -27,9 +27,9 @@ import type * as types from "../types.js";
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  checkReadOnlyMode: typeof checkReadOnlyMode;
   lacs: typeof lacs;
   "mutations/removeCampingFromLac": typeof mutations_removeCampingFromLac;
-  readOnlyMode: typeof readOnlyMode;
   types: typeof types;
 }>;
 export declare const api: FilterApi<

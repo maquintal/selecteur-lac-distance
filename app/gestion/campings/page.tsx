@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useQuery } from 'convex/react';
-import { api } from '../../../convex/_generated/api';
+import { api } from '@/convex/_generated/api';
 import { 
   Box, Container, Typography, Paper, Button, 
   IconButton, Table, TableBody, TableCell, 
@@ -12,18 +12,19 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import LockIcon from '@mui/icons-material/Lock';
-import { CampingDoc } from '../../../app/types/schema.types';
-import CampingDialog from '../../../app/components/CampingDialog';
-import GestionNavBar from '../../../app/components/GestionNavBar';
-import { useReadOnlyMode } from '../../../app/hooks/useReadOnlyMode';
-import { useMobileDetect } from '../../../app/hooks/useMobileDetect';
+import { CampingDoc } from '@/app/types/schema.types';
+import CampingDialog from '@/app/components/CampingDialog';
+import GestionNavBar from '@/app/components/GestionNavBar';
+// import { useReadOnlyMode } from '@/app/hooks/useReadOnlyMode';
+import { useMobileDetect } from '@/app/hooks/useMobileDetect';
+import { checkReadOnlyModeConvex } from '@/convex/checkReadOnlyMode';
 
 export default function GestionCampings() {
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedCamping, setSelectedCamping] = useState<CampingDoc | undefined>(undefined);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
   const [dialogMode, setDialogMode] = useState<'create' | 'edit'>('create');
-  const isReadOnly = useReadOnlyMode();
+  // const isReadOnly = useReadOnlyMode();
 
   const { isMobile, isLoaded } = useMobileDetect();
 
@@ -55,7 +56,7 @@ export default function GestionCampings() {
             Gestion des campings
           </Typography>
           <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', flexDirection: { xs: 'column', sm: 'row' }, width: { xs: '100%', sm: 'auto' } }}>
-            {isReadOnly && (
+            {/* isReadOnly && (
               <Chip
                 icon={<LockIcon />}
                 label="Mode Read-Only"
@@ -64,12 +65,12 @@ export default function GestionCampings() {
                 size="small"
                 sx={{ fontSize: '0.7rem' }}
               />
-            )}
+            ) */}
             <Button
               variant="contained"
               startIcon={<AddIcon />}
               onClick={() => handleOpenDialog('create')}
-              disabled={isReadOnly}
+              // disabled={isReadOnly}
               fullWidth={isMobile}
               size={isMobile ? "small" : "medium"}
             >
@@ -102,7 +103,7 @@ export default function GestionCampings() {
                       <IconButton 
                         size="small"
                         onClick={() => handleOpenDialog('edit', camping)}
-                        disabled={isReadOnly}
+                        // disabled={isReadOnly}
                         color="primary"
                       >
                         <EditIcon fontSize="small" />
@@ -145,7 +146,7 @@ export default function GestionCampings() {
                       variant="outlined"
                       startIcon={<EditIcon />}
                       onClick={() => handleOpenDialog('edit', camping)}
-                      disabled={isReadOnly}
+                      disabled={checkReadOnlyModeConvex()}
                       sx={{ fontSize: '0.75rem', py: 0.5 }}
                     >
                       Éditer

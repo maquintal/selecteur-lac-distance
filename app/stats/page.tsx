@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import {
   Container,
   Paper,
@@ -14,7 +14,6 @@ import {
   List,
   ListItem,
   ListItemText,
-  Alert
 } from '@mui/material';
 import {
   Droplet,
@@ -26,58 +25,8 @@ import {
   MapPin,
   Navigation
 } from 'lucide-react';
-
-interface LakeStats {
-  global: {
-    totalLacs: number;
-    lacsAvecHebergement: number;
-    lacsMoteurElectrique: number;
-    lacsMoteurEssence: number;
-    lacsSansMotorisation: number;
-  };
-  parRegion: Array<{
-    region: string;
-    nombreLacs: number;
-    pourcentage: number;
-  }>;
-  parSite: Array<{
-    site: string;
-    nombreLacs: number;
-    pourcentage: number;
-  }>;
-  parOrganisme: Array<{
-    organisme: string;
-    nombreLacs: number;
-    pourcentage: number;
-  }>;
-  parMotorisation: Array<{
-    type: string;
-    nombreLacs: number;
-    pourcentage: number;
-  }>;
-  parTypeEmbarcation: Array<{
-    type: string;
-    nombreLacs: number;
-    pourcentage: number;
-  }>;
-  parAccessibilite: Array<{
-    type: string;
-    nombreLacs: number;
-    pourcentage: number;
-  }>;
-  especesPopulaires: Array<{
-    espece: string;
-    nombreLacs: number;
-    pourcentage: number;
-  }>;
-  distancesMoyennes: {
-    globale: number;
-    parSite: Array<{
-      site: string;
-      distanceMoyenne: number;
-    }>;
-  };
-}
+import { useQuery } from 'convex/react';
+import { api } from '@/convex/_generated/api';
 
 const StatCard = ({
   title,
@@ -156,43 +105,15 @@ const ProgressBar = ({
 };
 
 export default function LakeStatsDashboard() {
-  const [stats, setStats] = useState<LakeStats | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const stats = useQuery(api.lacs.getLakesStats);
 
-  useEffect(() => {
-    fetch('/api/lakesStats')
-      .then(res => {
-        if (!res.ok) throw new Error('Erreur lors du chargement des statistiques');
-        return res.json();
-      })
-      .then(data => {
-        setStats(data);
-        setLoading(false);
-      })
-      .catch(err => {
-        setError(err.message);
-        setLoading(false);
-      });
-  }, []);
-
-  if (loading) {
+  if (!stats) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
         <CircularProgress size={60} />
       </Box>
     );
   }
-
-  if (error) {
-    return (
-      <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Alert severity="error">{error}</Alert>
-      </Container>
-    );
-  }
-
-  if (!stats) return null;
 
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
