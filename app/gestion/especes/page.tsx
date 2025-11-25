@@ -70,7 +70,7 @@ export default function GestionEspeces() {
               variant="contained"
               startIcon={<AddIcon />}
               onClick={() => handleOpenDialog('create')}
-              // disabled={isReadOnly}
+              disabled={checkReadOnlyModeConvex()}
               fullWidth={isMobile}
               size={isMobile ? "small" : "medium"}
             >

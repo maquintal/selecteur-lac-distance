@@ -39,6 +39,7 @@ import DoNotDisturbAltOutlinedIcon from '@mui/icons-material/DoNotDisturbAltOutl
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
 import ShuffleIcon from '@mui/icons-material/Shuffle';
 import { useMobileDetect } from '../hooks/useMobileDetect';
+import { checkReadOnlyModeConvex } from '@/convex/checkReadOnlyMode';
 
 type Filters = {
     region: string;
@@ -51,9 +52,8 @@ type Filters = {
 export default function LakesSearchCards() {
     // Utilisation de la query Convex triée
     const queryResult = useQuery(api.lacs.getLacsSortedOptimized);
-    // console.log('queryResult structure:', JSON.stringify(queryResult?.[0], null, 2));
     const loading = queryResult === undefined;
-    
+
     // Mémoiser les données de la requête
     const data = useMemo(() => {
         if (queryResult === undefined) return [];

@@ -2,11 +2,12 @@
 export function isReadOnlyConvex(): boolean {
   const readOnlyMode = process.env.READONLY_MODE ?? process.env.NEXT_PUBLIC_READ_ONLY_MODE ?? '';
 
-  return readOnlyMode === 'false';
+  console.log(process.env.NEXT_PUBLIC_READ_ONLY_MODE);
+  console.log('READONLY_MODE:', readOnlyMode);
+  return readOnlyMode === 'true';
 }
 
 export function checkReadOnlyModeConvex(): boolean {
-  console.log(isReadOnlyConvex())
   if (isReadOnlyConvex()) { throw new Error('Mode read-only activé. Les modifications de données ne sont pas autorisées.'); }
 
   else { return isReadOnlyConvex() }

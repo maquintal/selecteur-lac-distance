@@ -451,6 +451,8 @@ export const addLac = mutation({
   handler: async (ctx, args) => {
     checkReadOnlyModeConvex()
 
+    console.log(checkReadOnlyModeConvex())
+
     return await ctx.db.insert("lacs", {
       ...args,
       especeIds: args.especeIds || [],
@@ -519,6 +521,7 @@ export const updateLac = mutation({
   },
   handler: async (ctx, args) => {
     checkReadOnlyModeConvex()
+    console.log(checkReadOnlyModeConvex())
     const { lacId, ...updateData } = args;
 
     await ctx.db.patch(lacId, {

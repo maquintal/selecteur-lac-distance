@@ -25,7 +25,6 @@ export default function GestionLacs() {
   const [selectedLac, setSelectedLac] = useState<LacDoc | LacWithDetails | undefined>(undefined);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
   const [dialogMode, setDialogMode] = useState<'create' | 'edit'>('create');
-  // const isReadOnly = useReadOnlyMode();
   
   const { isMobile, isLoaded } = useMobileDetect();
 
@@ -62,16 +61,6 @@ export default function GestionLacs() {
             Gestion des Lacs
           </Typography>
           <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', flexDirection: { xs: 'column', sm: 'row' }, width: { xs: '100%', sm: 'auto' } }}>
-            {/* isReadOnly && (
-              <Chip
-                icon={<LockIcon />}
-                label="Mode Read-Only"
-                color="error"
-                variant="outlined"
-                size="small"
-                sx={{ fontSize: '0.7rem' }}
-              />
-            ) */}
             <Button
               variant="contained"
               startIcon={<AddIcon />}
@@ -111,7 +100,7 @@ export default function GestionLacs() {
                       <IconButton
                         size="small"
                         onClick={() => handleOpenDialog('edit', lac)}
-                        // disabled={isReadOnly}
+                        disabled={checkReadOnlyModeConvex()}
                         color="primary"
                       >
                         <EditIcon fontSize="small" />
@@ -119,7 +108,7 @@ export default function GestionLacs() {
                       <IconButton 
                         size="small" 
                         color="error"
-                        // disabled={isReadOnly}
+                        disabled={checkReadOnlyModeConvex()}
                       >
                         <DeleteIcon fontSize="small" />
                       </IconButton>
@@ -158,7 +147,7 @@ export default function GestionLacs() {
                       aria-label={`Éditer ${lac.nomDuLac}`}
                       size="small"
                       onClick={() => handleOpenDialog('edit', lac)}
-                      // disabled={isReadOnly}
+                      disabled={checkReadOnlyModeConvex()}
                       sx={{ width: 36, height: 36 }}
                     >
                       <EditIcon fontSize="small" />
@@ -166,7 +155,7 @@ export default function GestionLacs() {
                     <IconButton
                       aria-label={`Supprimer ${lac.nomDuLac}`}
                       size="small"
-                      // disabled={isReadOnly}
+                      disabled={checkReadOnlyModeConvex()}
                       sx={{ width: 36, height: 36, color: (theme) => theme.palette.error.main }}
                     >
                       <DeleteIcon fontSize="small" />
