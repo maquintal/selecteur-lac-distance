@@ -9,7 +9,7 @@ import {
   FormControl, InputLabel, Select, MenuItem,
 } from '@mui/material';
 import { EspeceDoc, NewEspeceInput, defaultEspeceInput } from '../types/schema.types';
-import { checkReadOnlyModeConvex } from '@/convex/checkReadOnlyMode';
+import { isReadOnlyConvex } from '@/convex/checkReadOnlyMode';
 
 type EspeceDialogProps = {
   open: boolean;
@@ -88,7 +88,7 @@ export default function EspeceDialog({ open, onClose, espece, mode }: EspeceDial
         <Button
           variant="contained"
           onClick={handleSubmit}
-          disabled={checkReadOnlyModeConvex()}
+          disabled={isReadOnlyConvex() === false}
         >
           {mode === 'create' ? 'Ajouter' : 'Enregistrer'}
         </Button>

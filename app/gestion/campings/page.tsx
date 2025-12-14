@@ -15,7 +15,7 @@ import { CampingDoc } from '@/app/types/schema.types';
 import CampingDialog from '@/app/components/CampingDialog';
 import GestionNavBar from '@/app/components/GestionNavBar';
 import { useMobileDetect } from '@/app/hooks/useMobileDetect';
-import { checkReadOnlyModeConvex } from '@/convex/checkReadOnlyMode';
+import { isReadOnlyConvex } from '@/convex/checkReadOnlyMode';
 
 export default function GestionCampings() {
   const [openDialog, setOpenDialog] = useState(false);
@@ -57,7 +57,7 @@ export default function GestionCampings() {
               variant="contained"
               startIcon={<AddIcon />}
               onClick={() => handleOpenDialog('create')}
-              disabled={checkReadOnlyModeConvex()}
+              disabled={isReadOnlyConvex() === false}
               fullWidth={isMobile}
               size={isMobile ? "small" : "medium"}
             >
@@ -90,7 +90,7 @@ export default function GestionCampings() {
                       <IconButton 
                         size="small"
                         onClick={() => handleOpenDialog('edit', camping)}
-                        disabled={checkReadOnlyModeConvex()}
+                        disabled={isReadOnlyConvex() === false}
                         color="primary"
                       >
                         <EditIcon fontSize="small" />
@@ -133,7 +133,7 @@ export default function GestionCampings() {
                       variant="outlined"
                       startIcon={<EditIcon />}
                       onClick={() => handleOpenDialog('edit', camping)}
-                      disabled={checkReadOnlyModeConvex()}
+                      disabled={isReadOnlyConvex() === false}
                       sx={{ fontSize: '0.75rem', py: 0.5 }}
                     >
                       Éditer

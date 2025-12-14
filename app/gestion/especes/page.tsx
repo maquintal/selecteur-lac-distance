@@ -15,7 +15,7 @@ import { EspeceDoc } from '@/app/types/schema.types';
 import GestionNavBar from '@/app/components/GestionNavBar';
 import EspeceDialog from '@/app/components/EspeceDialog';
 import { useMobileDetect } from '@/app/hooks/useMobileDetect';
-import { checkReadOnlyModeConvex } from '@/convex/checkReadOnlyMode';
+import { isReadOnlyConvex } from '@/convex/checkReadOnlyMode';
 
 export default function GestionEspeces() {
   const [openDialog, setOpenDialog] = useState(false);
@@ -68,7 +68,7 @@ export default function GestionEspeces() {
               variant="contained"
               startIcon={<AddIcon />}
               onClick={() => handleOpenDialog('create')}
-              disabled={checkReadOnlyModeConvex()}
+              disabled={isReadOnlyConvex() === false}
               fullWidth={isMobile}
               size={isMobile ? "small" : "medium"}
             >
@@ -96,7 +96,7 @@ export default function GestionEspeces() {
                       <IconButton 
                         size="small"
                         onClick={() => handleOpenDialog('edit', espece)}
-                        // disabled={isReadOnly}
+                        disabled={isReadOnlyConvex() === false}
                         color="primary"
                       >
                         <EditIcon fontSize="small" />
@@ -131,7 +131,7 @@ export default function GestionEspeces() {
                       variant="outlined"
                       startIcon={<EditIcon />}
                       onClick={() => handleOpenDialog('edit', espece)}
-                      disabled={checkReadOnlyModeConvex()}
+                      disabled={isReadOnlyConvex() === false}
                       sx={{ fontSize: '0.75rem', py: 0.5 }}
                     >
                       Éditer

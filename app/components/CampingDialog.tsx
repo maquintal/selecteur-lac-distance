@@ -10,6 +10,7 @@ import {
   FormControlLabel, Checkbox
 } from '@mui/material';
 import { CampingDoc, NewCampingInput, defaultCampingInput } from '../types/schema.types';
+import { isReadOnlyConvex } from '@/convex/checkReadOnlyMode';
 
 type CampingDialogProps = {
   open: boolean;
@@ -217,7 +218,7 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
         <Button
           variant="contained"
           onClick={handleSubmit}
-          // disabled={checkReadOnlyModeConvex()}
+          disabled={isReadOnlyConvex() === false}
         >
           {mode === 'create' ? 'Ajouter' : 'Enregistrer'}
         </Button>

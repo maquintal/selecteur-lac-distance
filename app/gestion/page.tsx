@@ -16,14 +16,14 @@ import LacDialog from '@/app/components/LacDialog';
 import GestionNavBar from '@/app/components/GestionNavBar';
 import { LacDoc, LacWithDetails } from '@/app/types/schema.types';
 import { useMobileDetect } from '@/app/hooks/useMobileDetect';
-import { checkReadOnlyModeConvex } from '@/convex/checkReadOnlyMode';
+import { isReadOnlyConvex } from '@/convex/checkReadOnlyMode';
 
 export default function GestionLacs() {
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedLac, setSelectedLac] = useState<LacDoc | LacWithDetails | undefined>(undefined);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
   const [dialogMode, setDialogMode] = useState<'create' | 'edit'>('create');
-  
+
   const { isMobile, isLoaded } = useMobileDetect();
 
   // Queries Convex
@@ -63,7 +63,7 @@ export default function GestionLacs() {
               variant="contained"
               startIcon={<AddIcon />}
               onClick={() => handleOpenDialog('create')}
-              disabled={checkReadOnlyModeConvex()}
+              disabled={isReadOnlyConvex() === false}
               fullWidth={isMobile}
               size={isMobile ? "small" : "medium"}
             >
@@ -98,15 +98,15 @@ export default function GestionLacs() {
                       <IconButton
                         size="small"
                         onClick={() => handleOpenDialog('edit', lac)}
-                        disabled={checkReadOnlyModeConvex()}
+                        disabled={isReadOnlyConvex() === false}
                         color="primary"
                       >
                         <EditIcon fontSize="small" />
                       </IconButton>
-                      <IconButton 
-                        size="small" 
+                      <IconButton
+                        size="small"
                         color="error"
-                        disabled={checkReadOnlyModeConvex()}
+                        disabled={isReadOnlyConvex() === false}
                       >
                         <DeleteIcon fontSize="small" />
                       </IconButton>
@@ -145,7 +145,7 @@ export default function GestionLacs() {
                       aria-label={`Éditer ${lac.nomDuLac}`}
                       size="small"
                       onClick={() => handleOpenDialog('edit', lac)}
-                      disabled={checkReadOnlyModeConvex()}
+                      disabled={isReadOnlyConvex() === false}
                       sx={{ width: 36, height: 36 }}
                     >
                       <EditIcon fontSize="small" />
@@ -153,7 +153,7 @@ export default function GestionLacs() {
                     <IconButton
                       aria-label={`Supprimer ${lac.nomDuLac}`}
                       size="small"
-                      disabled={checkReadOnlyModeConvex()}
+                      disabled={isReadOnlyConvex() === false}
                       sx={{ width: 36, height: 36, color: (theme) => theme.palette.error.main }}
                     >
                       <DeleteIcon fontSize="small" />
