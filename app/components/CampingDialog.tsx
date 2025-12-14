@@ -10,7 +10,6 @@ import {
   FormControlLabel, Checkbox
 } from '@mui/material';
 import { CampingDoc, NewCampingInput, defaultCampingInput } from '../types/schema.types';
-import { checkReadOnlyModeConvex } from '@/convex/checkReadOnlyMode';
 
 type CampingDialogProps = {
   open: boolean;
