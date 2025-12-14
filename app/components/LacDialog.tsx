@@ -18,7 +18,7 @@ import { Id } from "../../convex/_generated/dataModel";
 import { Embarcation, Acces } from "../types/lake";
 import { EMBARCATION_TYPES, MOTORISATION_TYPES, VEHICLE_TYPES } from "../constants/options";
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import { checkReadOnlyModeConvex } from '@/convex/checkReadOnlyMode';
+import { isReadOnlyConvex } from '@/convex/checkReadOnlyMode';
 
 type LacDialogProps = {
   open: boolean;
@@ -112,7 +112,7 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
           site: lac.site,
           superficie: lac.superficie || { hectares: 0, km2: 0 }
         };
-        
+
         setFormData(newFormData);
       } else {
         // Réinitialiser pour le mode création
@@ -137,10 +137,10 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
   const especes = useQuery(api.lacs.getAllEspeces);
 
   const handleInputChange = (
-    field: keyof NewLacInput, 
-    value: string | number | Id<"especes">[] | 
-    Partial<Embarcation> | 
-    Partial<Acces>
+    field: keyof NewLacInput,
+    value: string | number | Id<"especes">[] |
+      Partial<Embarcation> |
+      Partial<Acces>
   ) => {
     setFormData((prev: NewLacInput) => {
       if (field === 'superficie') {
@@ -153,7 +153,7 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
           }
         };
       }
-      
+
       if (field === 'acces' && typeof value === 'object' && value !== null) {
         return {
           ...prev,
@@ -163,7 +163,7 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
           }
         };
       }
-      
+
       if (field === 'embarcation' && typeof value === 'object' && value !== null) {
         return {
           ...prev,
@@ -173,7 +173,7 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
           }
         };
       }
-      
+
       if (field === 'especeIds') {
         if (Array.isArray(value)) {
           return {
@@ -189,7 +189,7 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
         }
         return prev;
       }
-      
+
       if (field === 'zone') {
         const zoneValue = typeof value === 'string' ? parseInt(value) : (typeof value === 'number' ? value : 0);
         return {
@@ -313,7 +313,7 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
             label="Nom du lac"
             value={formData.nomDuLac}
             onChange={(e) => handleInputChange('nomDuLac', e.target.value)}
-            disabled={checkReadOnlyModeConvex()}
+            disabled={isReadOnlyConvex() === false}
           />
 
           <Box sx={{ display: 'flex', gap: 2 }}>
@@ -322,7 +322,7 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
               options={regionsOptions}
               value={formData.regionAdministrativeQuebec}
               onChange={(_, newValue) => handleInputChange('regionAdministrativeQuebec', newValue || '')}
-              disabled={checkReadOnlyModeConvex()}
+              disabled={isReadOnlyConvex() === false}
               renderInput={(params) => (
                 <TextField {...params} label="Région Administrative du Québec" />
               )}
@@ -334,7 +334,7 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
               options={siteOptions}
               value={formData.site}
               onChange={(_, newValue) => handleInputChange('site', newValue || '')}
-              disabled={checkReadOnlyModeConvex()}
+              disabled={isReadOnlyConvex() === false}
               renderInput={(params) => (
                 <TextField {...params} label="Site" />
               )}
@@ -350,14 +350,14 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
                 label="Latitude"
                 value={formData.coordonnees.latitude || ''}
                 onChange={(e) => handleCoordChange('latitude', e.target.value)}
-                disabled={checkReadOnlyModeConvex()}
+                disabled={isReadOnlyConvex() === false}
               />
               <TextField
                 type="number"
                 label="Longitude"
                 value={formData.coordonnees.longitude || ''}
                 onChange={(e) => handleCoordChange('longitude', e.target.value)}
-                disabled={checkReadOnlyModeConvex()}
+                disabled={isReadOnlyConvex() === false}
               />
               <Tooltip title="Copier les coordonnées">
                 <IconButton
@@ -605,7 +605,7 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
                                   size="small"
                                   color="error"
                                   onClick={() => campingId && handleRemoveHebergement(campingId)}
-                                  disabled={checkReadOnlyModeConvex()}
+                                  disabled={isReadOnlyConvex() === false}
                                 >
                                   <DeleteIcon />
                                 </IconButton>
@@ -674,13 +674,13 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
                     kilometrage: hebergement.distanceDepuisLac?.kilometrage || 0
                   })}
                   sx={{ width: '150px' }}
-                      />
-                      <Tooltip title={"Ajouter l'hébergement"}>
+                />
+                <Tooltip title={"Ajouter l'hébergement"}>
                   <span>
                     <Button
                       variant="contained"
                       onClick={handleAddHebergement}
-                      disabled={!hebergement.campingId || hebergement.campingId === null || checkReadOnlyModeConvex()}
+                      disabled={!hebergement.campingId || hebergement.campingId === null || isReadOnlyConvex() === false}
                       startIcon={<AddIcon />}
                     >
                       Ajouter
@@ -695,10 +695,10 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Annuler</Button>
-        <Button 
-          onClick={handleSubmit} 
+        <Button
+          onClick={handleSubmit}
           variant="contained"
-          disabled={checkReadOnlyModeConvex()}
+          disabled={isReadOnlyConvex() === false}
         >
           {mode === 'create' ? 'Créer' : 'Enregistrer'}
         </Button>

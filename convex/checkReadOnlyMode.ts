@@ -2,8 +2,6 @@
 export function isReadOnlyConvex(): boolean {
   const readOnlyMode = process.env.READONLY_MODE ?? process.env.NEXT_PUBLIC_READ_ONLY_MODE ?? '';
 
-  console.log(process.env.NEXT_PUBLIC_READ_ONLY_MODE);
-  console.log('READONLY_MODE:', readOnlyMode);
   return readOnlyMode === 'true';
 }
 
