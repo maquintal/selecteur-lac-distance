@@ -30,7 +30,6 @@ import EditIcon from '@mui/icons-material/Edit';
 import { useMutation, useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import LacDialog from '../components/LacDialog';
-import { LacDoc } from '../types/schema.types';
 import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
@@ -39,6 +38,7 @@ import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
 import DoNotDisturbAltOutlinedIcon from '@mui/icons-material/DoNotDisturbAltOutlined';
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
 import ShuffleIcon from '@mui/icons-material/Shuffle';
+import { useMobileDetect } from '../hooks/useMobileDetect';
 
 type Filters = {
     region: string;
@@ -51,9 +51,8 @@ type Filters = {
 export default function LakesSearchCards() {
     // Utilisation de la query Convex triée
     const queryResult = useQuery(api.lacs.getLacsSortedOptimized);
-    console.log('queryResult structure:', JSON.stringify(queryResult?.[0], null, 2));
     const loading = queryResult === undefined;
-    
+
     // Mémoiser les données de la requête
     const data = useMemo(() => {
         if (queryResult === undefined) return [];
@@ -69,6 +68,8 @@ export default function LakesSearchCards() {
     // État pour le dialog d'édition
     const [openDialog, setOpenDialog] = useState(false);
     const [selectedLac, setSelectedLac] = useState<LacWithDetails | undefined>(undefined);
+
+    const { isMobile } = useMobileDetect();
 
     const filtered = useMemo(() => {
         if (!data) return [];
@@ -334,44 +335,49 @@ export default function LakesSearchCards() {
 
     return (
         <>
-            <Box className="p-4 bg-white rounded-lg shadow">
-                <Box display="flex" gap={2} mb={3} alignItems="center">
+            <Box className="p-3 bg-white rounded-lg shadow-sm">
+                <Box display="flex" gap={1} mb={2} alignItems="center" sx={{ flexDirection: { xs: 'column', sm: 'row' }, alignItems: { xs: 'stretch', sm: 'center' } }}>
                     <Button
                         variant="contained"
                         startIcon={<ShuffleIcon />}
                         onClick={handleRandomInteressant}
-                        sx={{ minWidth: 200 }}
+                        sx={{ minWidth: isMobile ? 120 : 200, mb: { xs: 1, sm: 0 } }}
                     >
                         Lac au hasard
                     </Button>
-                    <Box display="flex" gap={8} flex={1}>
+                    <Box sx={{ display: 'grid', gap: { xs: 1, sm: 2 }, flex: 1, gridTemplateColumns: { xs: '1fr', sm: 'repeat(2,1fr)', md: 'repeat(5,1fr)' } }}>
                         <TextField
                             label="Région"
                             size="small"
+                            fullWidth
                             value={filters.region}
                             onChange={e => setFilters(f => ({ ...f, region: e.target.value }))}
                         />
                         <TextField
                             label="Réserve / Site (SEPAQ)"
                             size="small"
+                            fullWidth
                             value={filters.reserve}
                             onChange={e => setFilters(f => ({ ...f, reserve: e.target.value }))}
                         />
                         <TextField
                             label="Organisme"
                             size="small"
+                            fullWidth
                             value={filters.organisme}
                             onChange={e => setFilters(f => ({ ...f, organisme: e.target.value }))}
                         />
                         <TextField
                             label="Nom du lac"
                             size="small"
+                            fullWidth
                             value={filters.nom}
                             onChange={e => setFilters(f => ({ ...f, nom: e.target.value }))}
                         />
                         <TextField
                             label="Motorisation"
                             size="small"
+                            fullWidth
                             value={filters.motorisation}
                             onChange={e => setFilters(f => ({ ...f, motorisation: e.target.value }))}
                         />
@@ -381,7 +387,7 @@ export default function LakesSearchCards() {
                 <Box
                     sx={{
                         display: 'grid',
-                        gap: 2,
+                        gap: 1,
                         gridTemplateColumns: {
                             xs: '1fr',
                             sm: '1fr 1fr',
@@ -402,16 +408,18 @@ export default function LakesSearchCards() {
                             <CardHeader
                                 avatar={
                                     l.site ? (
-                                        <Image src="/sepaq_logo2-transparent.png" alt="sepaq" width={40} height={40} />
+                                        <Image src="/sepaq_logo2-transparent.png" alt="sepaq" width={isMobile ? 28 : 40} height={isMobile ? 28 : 40} />
                                     ) : undefined
                                 }
                                 title={l.nomDuLac}
+                                titleTypographyProps={{ sx: { fontSize: isMobile ? '1rem' : '1.15rem', fontWeight: 600 } }}
+                                subheaderTypographyProps={{ sx: { fontSize: isMobile ? '0.7rem' : '0.85rem' } }}
                                 subheader={
                                     <Box display="flex" flexDirection="column">
-                                        <Typography variant="subtitle1" color="text.secondary">
+                                        <Typography variant="subtitle2" color="text.secondary">
                                             {l.regionAdministrativeQuebec}
                                         </Typography>
-                                        <Typography variant="subtitle2" color="text.secondary">
+                                        <Typography variant="caption" color="text.secondary">
                                             {l.site || 'privé'}
                                         </Typography>
                                     </Box>
@@ -475,20 +483,20 @@ export default function LakesSearchCards() {
                                 }}
                             >
                                 <ReactCardFlip isFlipped={!!flippedCards[l._id]} flipDirection="horizontal">
-                                    <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                                    <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', py: 0.4, px: 0.6, border: '1px solid #eaeaea' }}>
                                         {cardHeader}
-                                        <CardContent sx={{ flexGrow: 1 }}>
-                                            <Box display="flex" justifyContent="space-between" gap={2}>
+                                        <CardContent sx={{ flexGrow: 1, py: 0.6, px: 0.5 }}>
+                                            <Box display="flex" justifyContent="space-between" gap={1}>
                                                 <Box flex={1}>
-                                                    <Box mt={0.5} display="flex" gap={1} flexWrap="wrap">
-                                                        {getEspeces(l).slice(0, 6).map((sp: EspeceDoc) => (
-                                                            <Chip key={sp.nomCommun} label={sp.nomCommun} size="small" />
+                                                    <Box mt={0.4} display="flex" gap={0.5} flexWrap="wrap">
+                                                        {getEspeces(l).slice(0, isMobile ? 3 : 5).map((sp: EspeceDoc) => (
+                                                            <Chip key={sp.nomCommun} label={sp.nomCommun} size="small" sx={{ fontSize: '0.68rem', height: 22 }} />
                                                         ))}
                                                     </Box>
 
-                                                    <Box mt={2}>
-                                                        <Typography variant="body2"><strong>Accès</strong></Typography>
-                                                        <Typography variant="caption" color="textSecondary">
+                                                    <Box mt={0.8}>
+                                                        <Typography variant="body2" sx={{ fontSize: '0.78rem' }}><strong>Accès</strong></Typography>
+                                                        <Typography variant="caption" color="textSecondary" sx={{ fontSize: '0.68rem' }}>
                                                             {l.acces?.acceuil ? `Accueil: ${l.acces.acceuil}` : ''}
                                                             {l.acces?.distanceAcceuilLac != null ?
                                                                 ` • ${l.acces.distanceAcceuilLac.kilometrage} km (${l.acces.distanceAcceuilLac.temps} min)`
@@ -499,21 +507,21 @@ export default function LakesSearchCards() {
                                                     </Box>
                                                 </Box>
 
-                                                <Box sx={{ width: 160, textAlign: 'right' }}>
-                                                    <Box mt={1}>
-                                                        <Typography variant="caption" color="textSecondary">
+                                                <Box sx={{ width: isMobile ? 90 : 140, textAlign: 'right' }}>
+                                                    <Box mt={0.6}>
+                                                        <Typography variant="caption" color="textSecondary" sx={{ fontSize: '0.68rem' }}>
                                                             Superficie
                                                         </Typography>
-                                                        <Typography variant="body2">{getSuperficieText(l) ?? '—'}</Typography>
+                                                        <Typography variant="body2" sx={{ fontSize: '0.78rem' }}>{getSuperficieText(l) ?? '—'}</Typography>
                                                         {icon}
                                                     </Box>
-                                                    <Typography variant="caption" color="textSecondary">
+                                                    <Typography variant="caption" color="textSecondary" sx={{ fontSize: '0.68rem' }}>
                                                         Motorisation
                                                     </Typography>
                                                     <Box>
                                                         {getMotorisationChip(l)}
                                                     </Box>
-                                                    <Box mt={1}>
+                                                    <Box mt={0.6}>
                                                         <Tooltip title={"voir les hébergements"}>
                                                             <ButtonBase
                                                                 onClick={() => { handleFlip(l._id) }}
@@ -521,45 +529,47 @@ export default function LakesSearchCards() {
                                                                     width: '100%',
                                                                     display: 'flex',
                                                                     justifyContent: 'flex-end',
-                                                                    transition: 'all 0.2s'
+                                                                    transition: 'all 0.12s'
                                                                 }}
                                                             >
                                                                 <Box sx={{ textAlign: 'right' }}>
-                                                                    <Typography variant="caption" color="textSecondary" display="block">
+                                                                    <Typography variant="caption" color="textSecondary" display="block" sx={{ fontSize: '0.68rem' }}>
                                                                         Hébergement ({l.hebergements?.length ?? 0})
                                                                     </Typography>
                                                                 </Box>
-                                                                <KeyboardArrowRightIcon />
+                                                                <KeyboardArrowRightIcon fontSize="small" />
                                                             </ButtonBase>
                                                         </Tooltip>
                                                     </Box>
                                                 </Box>
                                             </Box>
                                         </CardContent>
-                                        <Box sx={{ p: 1 }}>
-                                            <Typography variant="caption" color="textSecondary">Lat: {getLatitude(l) ?? '—'} • Lon: {getLongitude(l) ?? '—'}</Typography>
+                                        <Box sx={{ p: 0.6 }}>
+                                            <Typography variant="caption" color="textSecondary" sx={{ fontSize: '0.62rem' }}>Lat: {getLatitude(l) ?? '—'} • Lon: {getLongitude(l) ?? '—'}</Typography>
                                         </Box>
 
                                     </Card>
 
                                     {/* BACK */}
-                                    <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                                    <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', py: 0.4, px: 0.6, border: '1px solid #eaeaea' }}>
                                         {cardHeader}
-                                        <CardContent sx={{ flexGrow: 1 }}>
+                                        <CardContent sx={{ flexGrow: 1, py: 0.6 }}>
                                             {getHebergement(l.acces, l.hebergements)}
                                         </CardContent>
-                                        <CardActions sx={{ justifyContent: 'space-between' }}>
+                                        <CardActions sx={{ justifyContent: 'space-between', py: 0.25 }}>
                                             <IconButton
                                                 aria-label="voir les campings sur Google Maps"
                                                 onClick={(e) => handleButtonClick(e, getLatitude(l), getLongitude(l))}
+                                                size="small"
                                             >
-                                                <Icon path={mdiMapSearchOutline} size={1} />
+                                                <Icon path={mdiMapSearchOutline} size={0.9} />
                                             </IconButton>
                                             <IconButton
                                                 aria-label="retour à la recherche"
                                                 onClick={() => handleFlip(l._id)}
+                                                size="small"
                                             >
-                                                <ReplyOutlinedIcon />
+                                                <ReplyOutlinedIcon fontSize="small" />
                                             </IconButton>
                                         </CardActions>
                                     </Card>

@@ -2,27 +2,28 @@
 
 import { useState } from 'react';
 import { useQuery } from 'convex/react';
-import { api } from '../../../convex/_generated/api';
+import { api } from '@/convex/_generated/api';
 import { 
   Box, Container, Typography, Paper, Button, 
   IconButton, Table, TableBody, TableCell, 
   TableContainer, TableHead, TableRow,
-  Snackbar, Alert, Chip
+  Snackbar, Alert, Card, CardContent
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
-import LockIcon from '@mui/icons-material/Lock';
-import { CampingDoc } from '../../../app/types/schema.types';
-import CampingDialog from '../../../app/components/CampingDialog';
-import GestionNavBar from '../../../app/components/GestionNavBar';
-import { useReadOnlyMode } from '../../../app/hooks/useReadOnlyMode';
+import { CampingDoc } from '@/app/types/schema.types';
+import CampingDialog from '@/app/components/CampingDialog';
+import GestionNavBar from '@/app/components/GestionNavBar';
+import { useMobileDetect } from '@/app/hooks/useMobileDetect';
+import { checkReadOnlyModeConvex } from '@/convex/checkReadOnlyMode';
 
 export default function GestionCampings() {
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedCamping, setSelectedCamping] = useState<CampingDoc | undefined>(undefined);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
   const [dialogMode, setDialogMode] = useState<'create' | 'edit'>('create');
-  const isReadOnly = useReadOnlyMode();
+
+  const { isMobile, isLoaded } = useMobileDetect();
 
   // Queries Convex
   const campings = useQuery(api.lacs.getAllCampings) || [];
@@ -45,64 +46,104 @@ export default function GestionCampings() {
   return (
     <>
       <GestionNavBar />
-      <Container maxWidth="xl">
-      <Box sx={{ mt: 4, mb: 4 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-          <Typography variant="h4" component="h1">
+      <Container maxWidth="xl" sx={{ px: { xs: 0.5, sm: 2, md: 3 } }}>
+      <Box sx={{ mt: 2, mb: 2 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, flexDirection: { xs: 'column', sm: 'row' }, gap: 1 }}>
+          <Typography variant="h5" component="h1" sx={{ fontSize: { xs: '1.2rem', sm: '2rem' } }}>
             Gestion des campings
           </Typography>
-          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-            {isReadOnly && (
-              <Chip
-                icon={<LockIcon />}
-                label="Mode Read-Only (Production)"
-                color="error"
-                variant="outlined"
-              />
-            )}
+          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', flexDirection: { xs: 'column', sm: 'row' }, width: { xs: '100%', sm: 'auto' } }}>
             <Button
               variant="contained"
               startIcon={<AddIcon />}
               onClick={() => handleOpenDialog('create')}
-              disabled={isReadOnly}
+              disabled={checkReadOnlyModeConvex()}
+              fullWidth={isMobile}
+              size={isMobile ? "small" : "medium"}
             >
-              Ajouter un camping
+              Ajouter
             </Button>
           </Box>
         </Box>
 
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Nom</TableCell>
-                <TableCell>Organisme</TableCell>
-                <TableCell>Commodités</TableCell>
-                <TableCell>Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {campings.map((camping) => (
-                <TableRow key={camping._id}>
-                  <TableCell>{camping.nom}</TableCell>
-                  <TableCell>{camping.organisme}</TableCell>
-                  <TableCell>
-                    {camping.commodites.eau && 'Eau '}
-                    {camping.commodites.electricite && 'Électricité'}
-                  </TableCell>
-                  <TableCell>
-                    <IconButton 
-                      onClick={() => handleOpenDialog('edit', camping)}
-                      disabled={isReadOnly}
-                    >
-                      <EditIcon />
-                    </IconButton>
-                  </TableCell>
+        {!isMobile && isLoaded && (
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
+                  <TableCell><strong>Nom</strong></TableCell>
+                  <TableCell><strong>Organisme</strong></TableCell>
+                  <TableCell><strong>Commodités</strong></TableCell>
+                  <TableCell align="center"><strong>Actions</strong></TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableHead>
+              <TableBody>
+                {campings.map((camping) => (
+                  <TableRow key={camping._id} hover>
+                    <TableCell>{camping.nom}</TableCell>
+                    <TableCell>{camping.organisme}</TableCell>
+                    <TableCell>
+                      {camping.commodites.eau && 'Eau '}
+                      {camping.commodites.electricite && 'Électricité'}
+                    </TableCell>
+                    <TableCell align="center">
+                      <IconButton 
+                        size="small"
+                        onClick={() => handleOpenDialog('edit', camping)}
+                        disabled={checkReadOnlyModeConvex()}
+                        color="primary"
+                      >
+                        <EditIcon fontSize="small" />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+
+        {isMobile && isLoaded && (
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+            {campings.map((camping) => (
+              <Card key={camping._id} sx={{ boxShadow: 1, pb: 0 }}>
+                <CardContent sx={{ pb: 1, '&:last-child': { pb: 1 } }}>
+                  <Typography variant="subtitle1" sx={{ mb: 0.5, fontWeight: 'bold', fontSize: '0.95rem' }}>
+                    {camping.nom}
+                  </Typography>
+                  
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, mb: 1 }}>
+                    <Box>
+                      <Typography variant="caption" color="textSecondary" sx={{ fontSize: '0.7rem' }}>Organisme</Typography>
+                      <Typography variant="caption" sx={{ fontSize: '0.8rem', display: 'block' }}>{camping.organisme}</Typography>
+                    </Box>
+                    
+                    <Box>
+                      <Typography variant="caption" color="textSecondary" sx={{ fontSize: '0.7rem' }}>Commodités</Typography>
+                      <Typography variant="caption" sx={{ fontSize: '0.8rem', display: 'block' }}>
+                        {camping.commodites.eau && 'Eau '}
+                        {camping.commodites.electricite && 'Électricité'}
+                      </Typography>
+                    </Box>
+                  </Box>
+
+                  <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'flex-end' }}>
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      startIcon={<EditIcon />}
+                      onClick={() => handleOpenDialog('edit', camping)}
+                      disabled={checkReadOnlyModeConvex()}
+                      sx={{ fontSize: '0.75rem', py: 0.5 }}
+                    >
+                      Éditer
+                    </Button>
+                  </Box>
+                </CardContent>
+              </Card>
+            ))}
+          </Box>
+        )}
       </Box>
 
       <CampingDialog

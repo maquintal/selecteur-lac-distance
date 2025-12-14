@@ -6,7 +6,7 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 import { paginationOptsValidator } from "convex/server";
-import { checkReadOnlyModeConvex } from "./readOnlyMode";
+import { checkReadOnlyModeConvex } from "./checkReadOnlyMode";
 
 // ============================================
 // MUTATIONS
@@ -32,7 +32,7 @@ export const createCamping = mutation({
     regionAdministrative: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    checkReadOnlyModeConvex();
+    checkReadOnlyModeConvex()
     return await ctx.db.insert("campings", args);
   },
 });
@@ -58,7 +58,7 @@ export const updateCamping = mutation({
     regionAdministrative: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    checkReadOnlyModeConvex();
+    checkReadOnlyModeConvex()
     const { id, ...data } = args;
     return await ctx.db.patch(id, data);
   },
@@ -78,7 +78,7 @@ export const updateEspece = mutation({
     ),
   },
   handler: async (ctx, args) => {
-    checkReadOnlyModeConvex();
+    checkReadOnlyModeConvex()
     const { id, ...data } = args;
     return await ctx.db.patch(id, data);
   },
@@ -90,7 +90,7 @@ export const removeCampingFromLac = mutation({
     campingId: v.id("campings"),
   },
   handler: async (ctx, args) => {
-    checkReadOnlyModeConvex();
+    checkReadOnlyModeConvex()
     const lac = await ctx.db.get(args.lacId);
     if (!lac) throw new Error("Lac non trouvé");
 
@@ -449,7 +449,10 @@ export const addLac = mutation({
 
   },
   handler: async (ctx, args) => {
-    checkReadOnlyModeConvex();
+    checkReadOnlyModeConvex()
+
+    console.log(checkReadOnlyModeConvex())
+
     return await ctx.db.insert("lacs", {
       ...args,
       especeIds: args.especeIds || [],
@@ -517,7 +520,8 @@ export const updateLac = mutation({
     especeIds: v.optional(v.array(v.id("especes"))),
   },
   handler: async (ctx, args) => {
-    checkReadOnlyModeConvex();
+    checkReadOnlyModeConvex()
+    console.log(checkReadOnlyModeConvex())
     const { lacId, ...updateData } = args;
 
     await ctx.db.patch(lacId, {
@@ -542,7 +546,8 @@ export const addCampingToLac = mutation({
     ),
   },
   handler: async (ctx, args) => {
-    checkReadOnlyModeConvex();
+    checkReadOnlyModeConvex()
+    
     const lac = await ctx.db.get(args.lacId);
     if (!lac) throw new Error("Lac non trouvé");
 
@@ -578,7 +583,8 @@ export const addEspece = mutation({
     ),
   },
   handler: async (ctx, args) => {
-    checkReadOnlyModeConvex();
+    checkReadOnlyModeConvex()
+    
     return await ctx.db.insert("especes", args);
   },
 });
@@ -589,7 +595,8 @@ export const addEspeceToLac = mutation({
     especeId: v.id("especes"),
   },
   handler: async (ctx, args) => {
-    checkReadOnlyModeConvex();
+    checkReadOnlyModeConvex()
+    
     const lac = await ctx.db.get(args.lacId);
     if (!lac) throw new Error("Lac non trouvé");
 
@@ -611,7 +618,8 @@ export const toggleChoixInteressant = mutation({
     lacId: v.id("lacs"),
   },
   handler: async (ctx, args) => {
-    checkReadOnlyModeConvex();
+    checkReadOnlyModeConvex()
+    
     const lac = await ctx.db.get(args.lacId);
     if (!lac) throw new Error("Lac non trouvé");
 
@@ -633,6 +641,7 @@ export const toggleChoixInteressant = mutation({
 
 export const getLacsSortedOptimized = query({
   handler: async (ctx) => {
+
     // Récupérer tous les lacs
     const allLacs = await ctx.db.query("lacs").collect();
 
@@ -679,5 +688,208 @@ export const getLacsSortedOptimized = query({
       const countB = b.hebergements?.length || 0;
       return countB - countA;
     });
+  },
+});
+
+// ============================================
+// STATISTIQUES
+// ============================================
+
+export const getLakesStats = query({
+  handler: async (ctx) => {
+    const lacs = await ctx.db.query("lacs").collect();
+
+    // Enrichir avec les espèces et campings
+    const enrichedLacs = await Promise.all(
+      lacs.map(async (lac) => {
+        const especes = await Promise.all(
+          lac.especeIds.map((id) => ctx.db.get(id))
+        );
+        const hebergements = await Promise.all(
+          lac.hebergements.map(async (h) => {
+            const camping = await ctx.db.get(h.campingId);
+            return camping;
+          })
+        );
+        return {
+          ...lac,
+          especes: especes.filter((e) => e !== null),
+          hebergements: hebergements.filter((h) => h !== null),
+        };
+      })
+    );
+
+    const totalLacs = enrichedLacs.length;
+
+    // Statistiques globales
+    const lacsAvecHebergement = enrichedLacs.filter((l) => l.hebergements.length > 0).length;
+    const lacsMoteurElectrique = enrichedLacs.filter(
+      (l) => l.embarcation?.motorisation?.necessaire === "electrique"
+    ).length;
+    const lacsMoteurEssence = enrichedLacs.filter(
+      (l) => l.embarcation?.motorisation?.necessaire === "essence"
+    ).length;
+    const lacsSansMotorisation = enrichedLacs.filter(
+      (l) => l.embarcation?.motorisation?.necessaire === "a determiner" || !l.embarcation?.motorisation?.necessaire
+    ).length;
+
+    // Par région
+    const regionMap = new Map<string, number>();
+    enrichedLacs.forEach((l) => {
+      const region = l.regionAdministrativeQuebec || "Non défini";
+      regionMap.set(region, (regionMap.get(region) || 0) + 1);
+    });
+    const parRegion = Array.from(regionMap.entries())
+      .map(([region, count]) => ({
+        region,
+        nombreLacs: count,
+        pourcentage: (count / totalLacs) * 100,
+      }))
+      .sort((a, b) => b.nombreLacs - a.nombreLacs);
+
+    // Par site
+    const siteMap = new Map<string, number>();
+    enrichedLacs.forEach((l) => {
+      const site = l.site || "Non défini";
+      siteMap.set(site, (siteMap.get(site) || 0) + 1);
+    });
+    const parSite = Array.from(siteMap.entries())
+      .map(([site, count]) => ({
+        site,
+        nombreLacs: count,
+        pourcentage: (count / totalLacs) * 100,
+      }))
+      .sort((a, b) => b.nombreLacs - a.nombreLacs);
+
+    // Par organisme
+    const organismeMap = new Map<string, number>();
+    enrichedLacs.forEach((l) => {
+      l.hebergements.forEach((h) => {
+        const organisme = h.organisme || "Non défini";
+        organismeMap.set(organisme, (organismeMap.get(organisme) || 0) + 1);
+      });
+    });
+    const parOrganisme = Array.from(organismeMap.entries())
+      .map(([organisme, count]) => ({
+        organisme,
+        nombreLacs: count,
+        pourcentage: (count / lacsAvecHebergement) * 100,
+      }))
+      .sort((a, b) => b.nombreLacs - a.nombreLacs);
+
+    // Par motorisation
+    const parMotorisation = [
+      {
+        type: "Électrique",
+        nombreLacs: lacsMoteurElectrique,
+        pourcentage: (lacsMoteurElectrique / totalLacs) * 100,
+      },
+      {
+        type: "Essence",
+        nombreLacs: lacsMoteurEssence,
+        pourcentage: (lacsMoteurEssence / totalLacs) * 100,
+      },
+      {
+        type: "Sans motorisation",
+        nombreLacs: lacsSansMotorisation,
+        pourcentage: (lacsSansMotorisation / totalLacs) * 100,
+      },
+    ];
+
+    // Par type d'embarcation
+    const embarcationMap = new Map<string, number>();
+    enrichedLacs.forEach((l) => {
+      const type = l.embarcation?.type || "Non défini";
+      embarcationMap.set(type, (embarcationMap.get(type) || 0) + 1);
+    });
+    const parTypeEmbarcation = Array.from(embarcationMap.entries())
+      .map(([type, count]) => ({
+        type,
+        nombreLacs: count,
+        pourcentage: (count / totalLacs) * 100,
+      }))
+      .sort((a, b) => b.nombreLacs - a.nombreLacs);
+
+    // Par accessibilité
+    const accessibiliteMap = new Map<string, number>();
+    enrichedLacs.forEach((l) => {
+      const type = l.acces?.accessible || "Non défini";
+      accessibiliteMap.set(type, (accessibiliteMap.get(type) || 0) + 1);
+    });
+    const parAccessibilite = Array.from(accessibiliteMap.entries())
+      .map(([type, count]) => ({
+        type,
+        nombreLacs: count,
+        pourcentage: (count / totalLacs) * 100,
+      }))
+      .sort((a, b) => b.nombreLacs - a.nombreLacs);
+
+    // Espèces populaires
+    const especeMap = new Map<string, number>();
+    enrichedLacs.forEach((l) => {
+      l.especes.forEach((e) => {
+        const nom = e?.nomCommun || "Non défini";
+        especeMap.set(nom, (especeMap.get(nom) || 0) + 1);
+      });
+    });
+    const especesPopulaires = Array.from(especeMap.entries())
+      .map(([espece, count]) => ({
+        espece,
+        nombreLacs: count,
+        pourcentage: (count / totalLacs) * 100,
+      }))
+      .sort((a, b) => b.nombreLacs - a.nombreLacs)
+      .slice(0, 10);
+
+    // Distances moyennes
+    let totalDistance = 0;
+    let countWithDistance = 0;
+    enrichedLacs.forEach((l) => {
+      if (l.acces?.distanceAcceuilLac?.kilometrage) {
+        totalDistance += l.acces.distanceAcceuilLac.kilometrage;
+        countWithDistance++;
+      }
+    });
+    const distanceMoyenneGlobale = countWithDistance > 0 ? Math.round(totalDistance / countWithDistance) : 0;
+
+    // Distances moyennes par site
+    const siteDistanceMap = new Map<string, { total: number; count: number }>();
+    enrichedLacs.forEach((l) => {
+      if (l.acces?.distanceAcceuilLac?.kilometrage) {
+        const site = l.site || "Non défini";
+        const current = siteDistanceMap.get(site) || { total: 0, count: 0 };
+        siteDistanceMap.set(site, {
+          total: current.total + l.acces.distanceAcceuilLac.kilometrage,
+          count: current.count + 1,
+        });
+      }
+    });
+    const distancesParSite = Array.from(siteDistanceMap.entries())
+      .map(([site, data]) => ({
+        site,
+        distanceMoyenne: Math.round(data.total / data.count),
+      }))
+      .sort((a, b) => a.distanceMoyenne - b.distanceMoyenne);
+
+    return {
+      global: {
+        totalLacs,
+        lacsAvecHebergement,
+        lacsMoteurElectrique,
+        lacsMoteurEssence,
+        lacsSansMotorisation,
+      },
+      parRegion,
+      parSite,
+      parOrganisme,
+      parMotorisation,
+      parTypeEmbarcation,
+      parAccessibilite,
+      especesPopulaires,
+      distancesMoyennes: {
+        globale: distanceMoyenneGlobale,
+        parSite: distancesParSite,
+      },
+    };
   },
 });

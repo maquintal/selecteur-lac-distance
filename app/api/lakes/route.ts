@@ -1,61 +1,11 @@
 import { NextResponse } from 'next/server';
-import clientPromise from '@/lib/mongodb';
-import { Lake } from '@/app/types/lake';
+import lacs from '@/data/lacs.json';
 
 export async function GET() {
-    try {
-        const client = await clientPromise;
-        const db = client.db("peche_plan_eau");
-
-        const peche_plan_eau = await db.collection<Lake>("peche_plan_eau")
-            .aggregate([
-                {
-                    $addFields: {
-                        hebergementCount: {
-                            $cond: {
-                                if: { $isArray: "$hebergement" },
-                                then: { $size: "$hebergement" },
-                                else: 0
-                            }
-                        },
-                        motorisationPriority: {
-                            $switch: {
-                                branches: [
-                                    {
-                                        case: { $eq: ["$embarcation.motorisation.type", "electrique"] },
-                                        then: 1
-                                    },
-                                    {
-                                        case: { $eq: ["$embarcation.motorisation.type", "essence"] },
-                                        then: 2
-                                    }
-                                ],
-                                default: 3
-                            }
-                        }
-                    }
-                },
-                {
-                    $sort: { 
-                        hebergementCount: -1,
-                        motorisationPriority: 1
-                    }
-                },
-                {
-                    $project: {
-                        hebergementCount: 0,
-                        motorisationPriority: 0
-                    }
-                }
-            ])
-            .toArray();
-
-        return NextResponse.json(peche_plan_eau);
-    } catch (error) {
-        console.error('Database Error:', error);
-        return NextResponse.json(
-            { error: 'Failed to fetch peche_plan_eau' },
-            { status: 500 }
-        );
-    }
+	try {
+		return NextResponse.json(lacs);
+	} catch (error) {
+		console.error('Error returning lacs data:', error);
+		return NextResponse.json({ error: 'Failed to return lacs' }, { status: 500 });
+	}
 }

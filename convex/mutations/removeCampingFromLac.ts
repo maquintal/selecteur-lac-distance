@@ -1,6 +1,5 @@
 import { mutation } from "../_generated/server";
 import { v } from "convex/values";
-import { checkReadOnlyModeConvex } from "../readOnlyMode";
 
 export const removeCampingFromLac = mutation({
   args: {
@@ -8,7 +7,6 @@ export const removeCampingFromLac = mutation({
     campingId: v.id("campings"),
   },
   handler: async (ctx, args) => {
-    checkReadOnlyModeConvex();
     const lac = await ctx.db.get(args.lacId);
     if (!lac) throw new Error("Lac non trouvé");
 
