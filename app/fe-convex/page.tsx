@@ -39,7 +39,6 @@ import DoNotDisturbAltOutlinedIcon from '@mui/icons-material/DoNotDisturbAltOutl
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
 import ShuffleIcon from '@mui/icons-material/Shuffle';
 import { useMobileDetect } from '../hooks/useMobileDetect';
-import { checkReadOnlyModeConvex } from '@/convex/checkReadOnlyMode';
 
 type Filters = {
     region: string;

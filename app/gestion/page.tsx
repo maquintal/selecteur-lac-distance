@@ -7,16 +7,14 @@ import {
   Box, Container, Typography, Paper, Button,
   IconButton, Table, TableBody, TableCell,
   TableContainer, TableHead, TableRow,
-  Snackbar, Alert, Chip, Card, CardContent
+  Snackbar, Alert, Card, CardContent
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import LockIcon from '@mui/icons-material/Lock';
 import LacDialog from '@/app/components/LacDialog';
 import GestionNavBar from '@/app/components/GestionNavBar';
 import { LacDoc, LacWithDetails } from '@/app/types/schema.types';
-// import { useReadOnlyMode } from '@/app/hooks/useReadOnlyMode';
 import { useMobileDetect } from '@/app/hooks/useMobileDetect';
 import { checkReadOnlyModeConvex } from '@/convex/checkReadOnlyMode';
 

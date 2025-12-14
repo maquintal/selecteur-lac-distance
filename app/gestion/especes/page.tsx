@@ -7,15 +7,13 @@ import {
   Box, Container, Typography, Paper, Button, 
   IconButton, Table, TableBody, TableCell, 
   TableContainer, TableHead, TableRow,
-  Snackbar, Alert, Chip, Card, CardContent
+  Snackbar, Alert, Card, CardContent
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
-import LockIcon from '@mui/icons-material/Lock';
 import { EspeceDoc } from '@/app/types/schema.types';
 import GestionNavBar from '@/app/components/GestionNavBar';
 import EspeceDialog from '@/app/components/EspeceDialog';
-// import { useReadOnlyMode } from '@/app/hooks/useReadOnlyMode';
 import { useMobileDetect } from '@/app/hooks/useMobileDetect';
 import { checkReadOnlyModeConvex } from '@/convex/checkReadOnlyMode';
 

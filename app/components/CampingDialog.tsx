@@ -218,7 +218,7 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
         <Button
           variant="contained"
           onClick={handleSubmit}
-          disabled={checkReadOnlyModeConvex()}
+          // disabled={checkReadOnlyModeConvex()}
         >
           {mode === 'create' ? 'Ajouter' : 'Enregistrer'}
         </Button>
