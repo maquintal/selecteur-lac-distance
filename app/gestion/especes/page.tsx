@@ -68,7 +68,7 @@ export default function GestionEspeces() {
               variant="contained"
               startIcon={<AddIcon />}
               onClick={() => handleOpenDialog('create')}
-              disabled={isReadOnlyConvex() === false}
+              disabled={isReadOnlyConvex()}
               fullWidth={isMobile}
               size={isMobile ? "small" : "medium"}
             >
@@ -96,7 +96,7 @@ export default function GestionEspeces() {
                       <IconButton 
                         size="small"
                         onClick={() => handleOpenDialog('edit', espece)}
-                        disabled={isReadOnlyConvex() === false}
+                        disabled={isReadOnlyConvex()}
                         color="primary"
                       >
                         <EditIcon fontSize="small" />
@@ -131,7 +131,7 @@ export default function GestionEspeces() {
                       variant="outlined"
                       startIcon={<EditIcon />}
                       onClick={() => handleOpenDialog('edit', espece)}
-                      disabled={isReadOnlyConvex() === false}
+                      disabled={isReadOnlyConvex()}
                       sx={{ fontSize: '0.75rem', py: 0.5 }}
                     >
                       Éditer

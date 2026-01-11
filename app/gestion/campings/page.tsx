@@ -57,7 +57,7 @@ export default function GestionCampings() {
               variant="contained"
               startIcon={<AddIcon />}
               onClick={() => handleOpenDialog('create')}
-              disabled={isReadOnlyConvex() === false}
+              disabled={isReadOnlyConvex()}
               fullWidth={isMobile}
               size={isMobile ? "small" : "medium"}
             >
@@ -90,7 +90,7 @@ export default function GestionCampings() {
                       <IconButton 
                         size="small"
                         onClick={() => handleOpenDialog('edit', camping)}
-                        disabled={isReadOnlyConvex() === false}
+                        disabled={isReadOnlyConvex()}
                         color="primary"
                       >
                         <EditIcon fontSize="small" />
@@ -133,7 +133,7 @@ export default function GestionCampings() {
                       variant="outlined"
                       startIcon={<EditIcon />}
                       onClick={() => handleOpenDialog('edit', camping)}
-                      disabled={isReadOnlyConvex() === false}
+                      disabled={isReadOnlyConvex()}
                       sx={{ fontSize: '0.75rem', py: 0.5 }}
                     >
                       Éditer
