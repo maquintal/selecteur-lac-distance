@@ -20,6 +20,16 @@ export default defineSchema({
       latitude: v.number(),
       longitude: v.number(),
     }),
+    typeEmplacement: v.optional(
+      v.union(
+        v.literal("Tente-roulotte"),
+        v.literal("moins de 4,5 mètres (15 pieds)"),
+        v.literal("moins de 6 mètres (20 pieds)"),
+        v.literal("moins de 8 mètres (25 pieds)"),
+        v.literal("moins de 9 mètres (30 pieds)"),
+        v.literal("9 mètres (30 pieds) et plus")
+      )
+    ),
     commodites: v.object({
       eau: v.boolean(),
       electricite: v.boolean(),

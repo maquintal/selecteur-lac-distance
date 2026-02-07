@@ -30,9 +30,9 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
   useEffect(() => {
     if (open) {
       if (mode === 'edit' && camping) {
-        // Extraire seulement les champs modifiables
-        const { ...editableData } = camping;
-        setFormData(editableData);
+        // Extraire seulement les champs modifiables (retirer champs système)
+        const { _id, _creationTime, ...editableData } = camping as any;
+        setFormData(editableData as NewCampingInput);
       } else {
         setFormData(defaultCampingInput);
       }
@@ -81,7 +81,12 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
       } else if (mode === 'edit' && camping) {
         await updateCamping({
           id: camping._id,
-          ...formData
+          nom: formData.nom,
+          organisme: formData.organisme,
+          coordonnees: formData.coordonnees,
+          commodites: formData.commodites,
+          regionAdministrative: formData.regionAdministrative,
+          typeEmplacement: (formData as any).typeEmplacement,
         });
       }
       onClose();
@@ -132,6 +137,22 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
               <MenuItem value="Mauricie">Mauricie</MenuItem>
               <MenuItem value="Outaouais">Outaouais</MenuItem>
               <MenuItem value="Portneuf">Portneuf</MenuItem>
+            </Select>
+          </FormControl>
+
+          <FormControl fullWidth>
+            <InputLabel>Type d'emplacement</InputLabel>
+            <Select
+              value={(formData as any).typeEmplacement || ''}
+              label="Type d'emplacement"
+              onChange={(e) => handleInputChange('typeEmplacement' as any, e.target.value)}
+            >
+              <MenuItem value="Tente-roulotte">Tente-roulotte</MenuItem>
+              <MenuItem value="moins de 4,5 mètres (15 pieds)">moins de 4,5 mètres (15 pieds)</MenuItem>
+              <MenuItem value="moins de 6 mètres (20 pieds)">moins de 6 mètres (20 pieds)</MenuItem>
+              <MenuItem value="moins de 8 mètres (25 pieds)">moins de 8 mètres (25 pieds)</MenuItem>
+              <MenuItem value="moins de 9 mètres (30 pieds)">moins de 9 mètres (30 pieds)</MenuItem>
+              <MenuItem value="9 mètres (30 pieds) et plus">9 mètres (30 pieds) et plus</MenuItem>
             </Select>
           </FormControl>
 
