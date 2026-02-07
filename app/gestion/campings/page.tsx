@@ -74,6 +74,7 @@ export default function GestionCampings() {
                   <TableCell><strong>Nom</strong></TableCell>
                   <TableCell><strong>Organisme</strong></TableCell>
                   <TableCell><strong>Commodités</strong></TableCell>
+                  <TableCell><strong>Type d'emplacement</strong></TableCell>
                   <TableCell align="center"><strong>Actions</strong></TableCell>
                 </TableRow>
               </TableHead>
@@ -86,6 +87,7 @@ export default function GestionCampings() {
                       {camping.commodites.eau && 'Eau '}
                       {camping.commodites.electricite && 'Électricité'}
                     </TableCell>
+                    <TableCell>{(camping as any).typeEmplacement || '—'}</TableCell>
                     <TableCell align="center">
                       <IconButton 
                         size="small"
@@ -123,6 +125,13 @@ export default function GestionCampings() {
                       <Typography variant="caption" sx={{ fontSize: '0.8rem', display: 'block' }}>
                         {camping.commodites.eau && 'Eau '}
                         {camping.commodites.electricite && 'Électricité'}
+                      </Typography>
+                    </Box>
+                    
+                    <Box>
+                      <Typography variant="caption" color="textSecondary" sx={{ fontSize: '0.7rem' }}>Type d'emplacement</Typography>
+                      <Typography variant="caption" sx={{ fontSize: '0.8rem', display: 'block' }}>
+                        {(camping as any).typeEmplacement || '—'}
                       </Typography>
                     </Box>
                   </Box>
