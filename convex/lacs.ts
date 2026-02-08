@@ -25,14 +25,20 @@ export const createCamping = mutation({
       latitude: v.number(),
       longitude: v.number(),
     }),
-    typeEmplacement: v.optional(
-      v.union(
-        v.literal("Tente-roulotte"),
-        v.literal("moins de 4,5 mètres (15 pieds)"),
-        v.literal("moins de 6 mètres (20 pieds)"),
-        v.literal("moins de 8 mètres (25 pieds)"),
-        v.literal("moins de 9 mètres (30 pieds)"),
-        v.literal("9 mètres (30 pieds) et plus")
+    terrains: v.optional(
+      v.array(
+        v.object({
+          nom: v.string(),
+          equipementAdmissible: v.optional(v.array(v.string())),
+          capaciteMaximale: v.optional(v.string()),
+          acces: v.optional(v.string()),
+          terrain: v.optional(
+            v.object({
+              longueur: v.optional(v.string()),
+              largeur: v.optional(v.string()),
+            })
+          ),
+        })
       )
     ),
     commodites: v.object({
@@ -61,14 +67,20 @@ export const updateCamping = mutation({
       latitude: v.number(),
       longitude: v.number(),
     }),
-    typeEmplacement: v.optional(
-      v.union(
-        v.literal("Tente-roulotte"),
-        v.literal("moins de 4,5 mètres (15 pieds)"),
-        v.literal("moins de 6 mètres (20 pieds)"),
-        v.literal("moins de 8 mètres (25 pieds)"),
-        v.literal("moins de 9 mètres (30 pieds)"),
-        v.literal("9 mètres (30 pieds) et plus")
+    terrains: v.optional(
+      v.array(
+        v.object({
+          nom: v.string(),
+          equipementAdmissible: v.optional(v.array(v.string())),
+          capaciteMaximale: v.optional(v.string()),
+          acces: v.optional(v.string()),
+          terrain: v.optional(
+            v.object({
+              longueur: v.optional(v.string()),
+              largeur: v.optional(v.string()),
+            })
+          ),
+        })
       )
     ),
     commodites: v.object({

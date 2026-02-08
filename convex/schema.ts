@@ -20,6 +20,23 @@ export default defineSchema({
       latitude: v.number(),
       longitude: v.number(),
     }),
+    terrains: v.optional(
+      v.array(
+        v.object({
+          nom: v.string(),
+          equipementAdmissible: v.optional(v.array(v.string())),
+          capaciteMaximale: v.optional(v.string()),
+          acces: v.optional(v.string()),
+          terrain: v.optional(
+            v.object({
+              longueur: v.optional(v.string()),
+              largeur: v.optional(v.string()),
+            })
+          ),
+        })
+      )
+    ),
+    // Allow legacy `typeEmplacement` (optional) so existing documents validate.
     typeEmplacement: v.optional(
       v.union(
         v.literal("Tente-roulotte"),

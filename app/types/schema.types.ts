@@ -100,6 +100,7 @@ export const defaultCampingInput: NewCampingInput = {
     eau: false,
     electricite: false,
   },
+  terrains: [],
 };
 
 export const defaultEspeceInput: NewEspeceInput = {
