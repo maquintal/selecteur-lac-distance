@@ -24,6 +24,44 @@ type CampingDialogProps = {
 export default function CampingDialog({ open, onClose, camping, mode }: CampingDialogProps) {
   const [formData, setFormData] = useState<NewCampingInput>(defaultCampingInput);
 
+  const ACCESS_OPTIONS: readonly any[] = [
+    // 'véhicule utilitaire sport (VUS)',
+    // 'auto',
+    // 'camion 4x4',
+    // 'Accessible en automobile',
+    // 'Chemin forestier 35 km',
+  ];
+
+  const SERVICES_OPTIONS: readonly any[] = [
+    // 'Eau potable',
+    // 'Électricité',
+    // 'Toilettes',
+    // 'Douches',
+    // 'Stationnement',
+    // 'Réception',
+    // 'Wi-Fi',
+  ];
+
+  const TERRAIN_OPTIONS: readonly any[] = [
+    // 'Longueur du terrain : 70 pieds (21,3 mètres)',
+    // 'Largeur du terrain : 20 pieds (6,1 mètres)',
+    // 'Longueur du terrain incluant le stationnement : 70 pieds (21,3 mètres)',
+  ];
+
+  const DESCRIPTION_OPTIONS: readonly any[] = [
+    // 'Accès direct',
+    // 'Vue sur le lac',
+    // 'Proche des commodités',
+    // 'Ombre partielle',
+  ];
+
+  const IMPORTANT_OPTIONS: readonly any[] = [
+    // 'Sans fumée',
+    // 'Animaux interdits',
+    // 'Accessible PMR',
+    // 'Zone calme',
+  ];
+
   // Mutations Convex
   const createCamping = useMutation(api.lacs.createCamping);
   const updateCamping = useMutation(api.lacs.updateCamping);
@@ -36,6 +74,18 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
         const { _id, _creationTime, ...editableData } = camping as any;
         // ensure terrains array exists
         if (!(editableData as any).terrains) (editableData as any).terrains = [];
+        // normalize terrains.acces to arrays
+        (editableData as any).terrains = (editableData as any).terrains.map((tr: any) => ({
+          ...tr,
+          acces: Array.isArray(tr?.acces) ? tr.acces : (tr?.acces ? [tr.acces] : []),
+          services: tr?.services || [],
+          description: tr?.description || [],
+          important: tr?.important || [],
+          terrain: {
+            ...(tr?.terrain || {}),
+            selections: (tr?.terrain && Array.isArray(tr.terrain.selections)) ? tr.terrain.selections : (tr?.terrain?.selections ? [tr.terrain.selections] : []),
+          }
+        }));
         setFormData(editableData as NewCampingInput);
       } else {
         setFormData(defaultCampingInput);
@@ -53,7 +103,7 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
   const handleAddTerrain = () => {
     setFormData(prev => ({
       ...prev,
-      terrains: [ ...(prev as any).terrains || [], { nom: '', equipementAdmissible: [], capaciteMaximale: '', acces: '', terrain: { longueur: '', largeur: '' } } ]
+      terrains: [ ...(prev as any).terrains || [], { nom: '', equipementAdmissible: [], services: [], description: [], important: [], capaciteMaximale: '', acces: [], terrain: { longueur: '', largeur: '', longueurAvecStationnement: '', selections: [] } } ]
     }));
   };
 
@@ -68,7 +118,11 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
     setFormData(prev => {
       const terrains = [ ...(prev as any).terrains || [] ];
       const t = { ...(terrains[index] || {}) };
-      if (field === 'longueur' || field === 'largeur') {
+      // support nested terrain.* fields
+      if (field.startsWith('terrain.')) {
+        const sub = field.split('.')[1];
+        t.terrain = { ...(t.terrain || {}), [sub]: value };
+      } else if (field === 'longueur' || field === 'largeur' || field === 'longueurAvecStationnement') {
         t.terrain = { ...(t.terrain || {}), [field]: value };
       } else {
         t[field] = value;
@@ -225,6 +279,72 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
                   />
                 </Box>
 
+                <Box sx={{ mt: 1 }}>
+                  <Autocomplete
+                    multiple
+                    freeSolo
+                    options={SERVICES_OPTIONS}
+                    value={t.services || []}
+                    onChange={(_, newValue) => handleTerrainChange(idx, 'services', newValue)}
+                    renderTags={(value: string[], getTagProps) =>
+                      value.map((option: string, index: number) => {
+                        const tagProps = getTagProps({ index }) as any;
+                        const { key, ...other } = tagProps;
+                        return (
+                          <Chip key={key} variant="outlined" label={option} {...other} />
+                        );
+                      })
+                    }
+                    renderInput={(params) => (
+                      <TextField {...params} label="Services" placeholder="Ajouter un service" />
+                    )}
+                  />
+                </Box>
+
+                <Box sx={{ mt: 1 }}>
+                  <Autocomplete
+                    multiple
+                    freeSolo
+                    options={DESCRIPTION_OPTIONS}
+                    value={t.description || []}
+                    onChange={(_, newValue) => handleTerrainChange(idx, 'description', newValue)}
+                    renderTags={(value: string[], getTagProps) =>
+                      value.map((option: string, index: number) => {
+                        const tagProps = getTagProps({ index }) as any;
+                        const { key, ...other } = tagProps;
+                        return (
+                          <Chip key={key} variant="outlined" label={option} {...other} />
+                        );
+                      })
+                    }
+                    renderInput={(params) => (
+                      <TextField {...params} label="Description" placeholder="Ajouter une description" />
+                    )}
+                  />
+                </Box>
+
+                <Box sx={{ mt: 1 }}>
+                  <Autocomplete
+                    multiple
+                    freeSolo
+                    options={IMPORTANT_OPTIONS}
+                    value={t.important || []}
+                    onChange={(_, newValue) => handleTerrainChange(idx, 'important', newValue)}
+                    renderTags={(value: string[], getTagProps) =>
+                      value.map((option: string, index: number) => {
+                        const tagProps = getTagProps({ index }) as any;
+                        const { key, ...other } = tagProps;
+                        return (
+                          <Chip key={key} variant="outlined" label={option} {...other} />
+                        );
+                      })
+                    }
+                    renderInput={(params) => (
+                      <TextField {...params} label="Important" placeholder="Ajouter un élément important" />
+                    )}
+                  />
+                </Box>
+
                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mt: 1 }}>
                   <TextField
                     label="Capacité maximale"
@@ -232,28 +352,49 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
                     onChange={(e) => handleTerrainChange(idx, 'capaciteMaximale', e.target.value)}
                     fullWidth
                   />
-                  <TextField
-                    label="Accès"
-                    value={t.acces || ''}
-                    onChange={(e) => handleTerrainChange(idx, 'acces', e.target.value)}
+                  <Autocomplete
+                    multiple
+                    freeSolo
+                    options={ACCESS_OPTIONS}
+                    value={Array.isArray(t.acces) ? t.acces : (t.acces ? [t.acces] : [])}
+                    onChange={(_, newValue) => handleTerrainChange(idx, 'acces', newValue)}
+                    renderTags={(value: string[], getTagProps) =>
+                      value.map((option: string, index: number) => {
+                        const tagProps = getTagProps({ index }) as any;
+                        const { key, ...other } = tagProps;
+                        return (
+                          <Chip key={key} variant="outlined" label={option} {...other} />
+                        );
+                      })
+                    }
+                    renderInput={(params) => (
+                      <TextField {...params} label="Accès" placeholder="Ajouter un accès (ex: Accessible en automobile)" />
+                    )}
                     fullWidth
                   />
                 </Stack>
 
-                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mt: 1 }}>
-                  <TextField
-                    label="Longueur du terrain"
-                    value={(t.terrain && t.terrain.longueur) || ''}
-                    onChange={(e) => handleTerrainChange(idx, 'longueur', e.target.value)}
-                    fullWidth
+                <Box sx={{ mt: 1 }}>
+                  <Autocomplete
+                    multiple
+                    freeSolo
+                    options={TERRAIN_OPTIONS}
+                    value={(t.terrain && t.terrain.selections) || []}
+                    onChange={(_, newValue) => handleTerrainChange(idx, 'terrain.selections', newValue)}
+                    renderTags={(value: string[], getTagProps) =>
+                      value.map((option: string, index: number) => {
+                        const tagProps = getTagProps({ index }) as any;
+                        const { key, ...other } = tagProps;
+                        return (
+                          <Chip key={key} variant="outlined" label={option} {...other} />
+                        );
+                      })
+                    }
+                    renderInput={(params) => (
+                      <TextField {...params} label="Terrain (sélection multiple)" placeholder="Choisir dimensions/option" />
+                    )}
                   />
-                  <TextField
-                    label="Largeur du terrain"
-                    value={(t.terrain && t.terrain.largeur) || ''}
-                    onChange={(e) => handleTerrainChange(idx, 'largeur', e.target.value)}
-                    fullWidth
-                  />
-                </Stack>
+                </Box>
               </Box>
             ))}
           </Box>
