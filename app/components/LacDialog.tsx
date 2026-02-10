@@ -313,7 +313,7 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
             label="Nom du lac"
             value={formData.nomDuLac}
             onChange={(e) => handleInputChange('nomDuLac', e.target.value)}
-            disabled={isReadOnlyConvex() === false}
+            disabled={isReadOnlyConvex()}
           />
 
           <Box sx={{ display: 'flex', gap: 2 }}>
@@ -322,7 +322,7 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
               options={regionsOptions}
               value={formData.regionAdministrativeQuebec}
               onChange={(_, newValue) => handleInputChange('regionAdministrativeQuebec', newValue || '')}
-              disabled={isReadOnlyConvex() === false}
+              disabled={isReadOnlyConvex()}
               renderInput={(params) => (
                 <TextField {...params} label="Région Administrative du Québec" />
               )}
@@ -334,7 +334,7 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
               options={siteOptions}
               value={formData.site}
               onChange={(_, newValue) => handleInputChange('site', newValue || '')}
-              disabled={isReadOnlyConvex() === false}
+              disabled={isReadOnlyConvex()}
               renderInput={(params) => (
                 <TextField {...params} label="Site" />
               )}
@@ -350,14 +350,14 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
                 label="Latitude"
                 value={formData.coordonnees.latitude || ''}
                 onChange={(e) => handleCoordChange('latitude', e.target.value)}
-                disabled={isReadOnlyConvex() === false}
+                disabled={isReadOnlyConvex()}
               />
               <TextField
                 type="number"
                 label="Longitude"
                 value={formData.coordonnees.longitude || ''}
                 onChange={(e) => handleCoordChange('longitude', e.target.value)}
-                disabled={isReadOnlyConvex() === false}
+                disabled={isReadOnlyConvex()}
               />
               <Tooltip title="Copier les coordonnées">
                 <IconButton
@@ -605,7 +605,7 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
                                   size="small"
                                   color="error"
                                   onClick={() => campingId && handleRemoveHebergement(campingId)}
-                                  disabled={isReadOnlyConvex() === false}
+                                  disabled={isReadOnlyConvex()}
                                 >
                                   <DeleteIcon />
                                 </IconButton>
@@ -680,7 +680,7 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
                     <Button
                       variant="contained"
                       onClick={handleAddHebergement}
-                      disabled={!hebergement.campingId || hebergement.campingId === null || isReadOnlyConvex() === false}
+                      disabled={!hebergement.campingId || hebergement.campingId === null || isReadOnlyConvex()}
                       startIcon={<AddIcon />}
                     >
                       Ajouter
@@ -698,7 +698,7 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
         <Button
           onClick={handleSubmit}
           variant="contained"
-          disabled={isReadOnlyConvex() === false}
+          disabled={isReadOnlyConvex()}
         >
           {mode === 'create' ? 'Créer' : 'Enregistrer'}
         </Button>

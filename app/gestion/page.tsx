@@ -63,7 +63,7 @@ export default function GestionLacs() {
               variant="contained"
               startIcon={<AddIcon />}
               onClick={() => handleOpenDialog('create')}
-              disabled={isReadOnlyConvex() === false}
+              disabled={isReadOnlyConvex()}
               fullWidth={isMobile}
               size={isMobile ? "small" : "medium"}
             >
@@ -98,7 +98,7 @@ export default function GestionLacs() {
                       <IconButton
                         size="small"
                         onClick={() => handleOpenDialog('edit', lac)}
-                        disabled={isReadOnlyConvex() === false}
+                        disabled={isReadOnlyConvex()}
                         color="primary"
                       >
                         <EditIcon fontSize="small" />
@@ -106,7 +106,7 @@ export default function GestionLacs() {
                       <IconButton
                         size="small"
                         color="error"
-                        disabled={isReadOnlyConvex() === false}
+                        disabled={isReadOnlyConvex()}
                       >
                         <DeleteIcon fontSize="small" />
                       </IconButton>
@@ -145,7 +145,7 @@ export default function GestionLacs() {
                       aria-label={`Éditer ${lac.nomDuLac}`}
                       size="small"
                       onClick={() => handleOpenDialog('edit', lac)}
-                      disabled={isReadOnlyConvex() === false}
+                      disabled={isReadOnlyConvex()}
                       sx={{ width: 36, height: 36 }}
                     >
                       <EditIcon fontSize="small" />
@@ -153,7 +153,7 @@ export default function GestionLacs() {
                     <IconButton
                       aria-label={`Supprimer ${lac.nomDuLac}`}
                       size="small"
-                      disabled={isReadOnlyConvex() === false}
+                      disabled={isReadOnlyConvex()}
                       sx={{ width: 36, height: 36, color: (theme) => theme.palette.error.main }}
                     >
                       <DeleteIcon fontSize="small" />

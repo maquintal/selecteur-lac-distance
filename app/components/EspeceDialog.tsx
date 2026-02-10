@@ -88,7 +88,7 @@ export default function EspeceDialog({ open, onClose, espece, mode }: EspeceDial
         <Button
           variant="contained"
           onClick={handleSubmit}
-          disabled={isReadOnlyConvex() === false}
+          disabled={isReadOnlyConvex()}
         >
           {mode === 'create' ? 'Ajouter' : 'Enregistrer'}
         </Button>

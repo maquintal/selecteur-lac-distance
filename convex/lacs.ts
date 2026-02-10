@@ -25,6 +25,27 @@ export const createCamping = mutation({
       latitude: v.number(),
       longitude: v.number(),
     }),
+    terrains: v.optional(
+      v.array(
+        v.object({
+          nom: v.string(),
+          equipementAdmissible: v.optional(v.array(v.string())),
+          services: v.optional(v.array(v.string())),
+          capaciteMaximale: v.optional(v.string()),
+          acces: v.optional(v.array(v.string())),
+          terrain: v.optional(
+            v.object({
+              longueur: v.optional(v.string()),
+              largeur: v.optional(v.string()),
+                  longueurAvecStationnement: v.optional(v.string()),
+                  selections: v.optional(v.array(v.string())),
+                  description: v.optional(v.array(v.string())),
+                  important: v.optional(v.array(v.string())),
+            })
+          ),
+        })
+      )
+    ),
     commodites: v.object({
       eau: v.boolean(),
       electricite: v.boolean(),
@@ -51,6 +72,27 @@ export const updateCamping = mutation({
       latitude: v.number(),
       longitude: v.number(),
     }),
+    terrains: v.optional(
+      v.array(
+        v.object({
+          nom: v.string(),
+          equipementAdmissible: v.optional(v.array(v.string())),
+            services: v.optional(v.array(v.string())),
+          capaciteMaximale: v.optional(v.string()),
+          acces: v.optional(v.array(v.string())),
+          terrain: v.optional(
+            v.object({
+              longueur: v.optional(v.string()),
+              largeur: v.optional(v.string()),
+              longueurAvecStationnement: v.optional(v.string()),
+              selections: v.optional(v.array(v.string())),
+              description: v.optional(v.array(v.string())),
+              important: v.optional(v.array(v.string())),
+            })
+          ),
+        })
+      )
+    ),
     commodites: v.object({
       eau: v.boolean(),
       electricite: v.boolean(),

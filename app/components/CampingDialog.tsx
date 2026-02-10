@@ -7,10 +7,14 @@ import {
   Box, TextField, Button,
   Dialog, DialogTitle, DialogContent, DialogActions,
   FormControl, InputLabel, Select, MenuItem,
-  FormControlLabel, Checkbox
+  FormControlLabel, Checkbox, IconButton, Autocomplete, Chip, Typography, Stack,
+  Accordion, AccordionSummary, AccordionDetails
 } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { CampingDoc, NewCampingInput, defaultCampingInput } from '../types/schema.types';
 import { isReadOnlyConvex } from '@/convex/checkReadOnlyMode';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 
 type CampingDialogProps = {
   open: boolean;
@@ -21,6 +25,48 @@ type CampingDialogProps = {
 
 export default function CampingDialog({ open, onClose, camping, mode }: CampingDialogProps) {
   const [formData, setFormData] = useState<NewCampingInput>(defaultCampingInput);
+  const [expandedSet, setExpandedSet] = useState<Record<number, boolean>>({});
+
+  const ACCESS_OPTIONS: readonly any[] = [
+    'Accessible en automobile',
+  ];
+
+  const SERVICES_OPTIONS: readonly any[] = [
+    // 'Eau potable',
+    // 'Électricité',
+    // 'Toilettes',
+    // 'Douches',
+    // 'Stationnement',
+    // 'Réception',
+    // 'Wi-Fi',
+  ];
+
+  const TERRAIN_OPTIONS: readonly any[] = [
+    // 'Longueur du terrain : 70 pieds (21,3 mètres)',
+    // 'Largeur du terrain : 20 pieds (6,1 mètres)',
+    // 'Longueur du terrain incluant le stationnement : 70 pieds (21,3 mètres)',
+  ];
+
+  const DESCRIPTION_OPTIONS: readonly any[] = [
+    'Stationnement sur l\'emplacement',
+    'Trou à feu',
+    // 'Proche des commodités',
+    // 'Ombre partielle',
+  ];
+
+  const IMPORTANT_OPTIONS: readonly any[] = [
+    // 'Sans fumée',
+    // 'Animaux interdits',
+    // 'Accessible PMR',
+    // 'Zone calme',
+  ];
+
+  const EQUIPEMENT_ADMISSIBLE_OPTIONS: readonly any[] = [
+    'Tous les types de tentes-roulottes',
+    'Tente-roulotte de moins de 6 mètres (20 pieds)',
+    'Tente-roulotte de moins de 8 mètres (25 pieds)',
+    'Roulotte de moins de 6 mètres (20 pieds)',
+  ];
 
   // Mutations Convex
   const createCamping = useMutation(api.lacs.createCamping);
@@ -30,11 +76,26 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
   useEffect(() => {
     if (open) {
       if (mode === 'edit' && camping) {
-        // Extraire seulement les champs modifiables
-        const { ...editableData } = camping;
-        setFormData(editableData);
+        // Extraire seulement les champs modifiables (retirer champs système)
+        const { _id, _creationTime, ...editableData } = camping as any;
+        // ensure terrains array exists
+        if (!(editableData as any).terrains) (editableData as any).terrains = [];
+        // normalize terrains fields to expected shapes (arrays, nested terrain fields)
+        (editableData as any).terrains = (editableData as any).terrains.map((tr: any) => ({
+          ...tr,
+          acces: Array.isArray(tr?.acces) ? tr.acces : (tr?.acces ? [tr.acces] : []),
+          services: tr?.services || [],
+          terrain: {
+            ...(tr?.terrain || {}),
+            selections: (tr?.terrain && Array.isArray(tr.terrain.selections)) ? tr.terrain.selections : (tr?.terrain?.selections ? [tr.terrain.selections] : []),
+            description: (tr?.terrain && Array.isArray(tr.terrain.description)) ? tr.terrain.description : (tr?.description ? [tr.description].flat() : (tr?.terrain?.description || [])),
+            important: (tr?.terrain && Array.isArray(tr.terrain.important)) ? tr.terrain.important : (tr?.important ? [tr.important].flat() : (tr?.terrain?.important || [])),
+          }
+        }));
+        setFormData(editableData as NewCampingInput);
       } else {
         setFormData(defaultCampingInput);
+        // defaultCampingInput already contains terrains = []
       }
     }
   }, [open, mode, camping]);
@@ -42,6 +103,59 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
   type Coordonnees = {
     latitude: number;
     longitude: number;
+  };
+
+  // Terrains helpers (add / remove / update)
+  const handleAddTerrain = () => {
+    setFormData(prev => ({
+      ...prev,
+      terrains: [ ...(prev as any).terrains || [], { nom: '', equipementAdmissible: [], services: [], capaciteMaximale: '', acces: [], terrain: { longueur: '', largeur: '', longueurAvecStationnement: '', selections: [], description: [], important: [] } } ]
+    }));
+    // expand the newly added terrain (will be last index)
+    setExpandedSet(prev => {
+      const next = { ...prev };
+      const idx = ((formData as any).terrains || []).length; // previous length
+      next[idx] = true;
+      return next;
+    });
+  };
+
+  const handleRemoveTerrain = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      terrains: (prev as any).terrains.filter((_: any, i: number) => i !== index)
+    }));
+    // adjust expanded set to shift indexes after removal
+    setExpandedSet(prev => {
+      const next: Record<number, boolean> = {};
+      Object.keys(prev).map(k => parseInt(k, 10)).forEach(i => {
+        if (i < index && prev[i]) next[i] = true;
+        if (i > index && prev[i]) next[i - 1] = true;
+      });
+      return next;
+    });
+  };
+
+  const handleTerrainChange = (index: number, field: string, value: any) => {
+    setFormData(prev => {
+      const terrains = [ ...(prev as any).terrains || [] ];
+      const t = { ...(terrains[index] || {}) };
+      // support nested terrain.* fields
+      if (field.startsWith('terrain.')) {
+        const sub = field.split('.')[1];
+        t.terrain = { ...(t.terrain || {}), [sub]: value };
+      } else if (field === 'longueur' || field === 'largeur' || field === 'longueurAvecStationnement') {
+        t.terrain = { ...(t.terrain || {}), [field]: value };
+      } else {
+        t[field] = value;
+      }
+      terrains[index] = t;
+      return { ...prev, terrains };
+    });
+  };
+
+  const toggleExpanded = (index: number) => {
+    setExpandedSet(prev => ({ ...prev, [index]: !prev[index] }));
   };
 
   type Commodites = {
@@ -77,11 +191,23 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
   const handleSubmit = async () => {
     try {
       if (mode === 'create') {
-        await createCamping(formData);
+        await createCamping({
+          nom: formData.nom,
+          organisme: formData.organisme,
+          coordonnees: formData.coordonnees,
+          commodites: formData.commodites,
+          regionAdministrative: formData.regionAdministrative,
+          terrains: (formData as any).terrains,
+        });
       } else if (mode === 'edit' && camping) {
         await updateCamping({
           id: camping._id,
-          ...formData
+          nom: formData.nom,
+          organisme: formData.organisme,
+          coordonnees: formData.coordonnees,
+          commodites: formData.commodites,
+          regionAdministrative: formData.regionAdministrative,
+          terrains: (formData as any).terrains,
         });
       }
       onClose();
@@ -134,6 +260,181 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
               <MenuItem value="Portneuf">Portneuf</MenuItem>
             </Select>
           </FormControl>
+
+          <Box>
+            <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
+              <Typography variant="subtitle1">Terrains</Typography>
+              <Button startIcon={<AddCircleOutlineIcon />} size="small" onClick={handleAddTerrain} disabled={isReadOnlyConvex()}>
+                Ajouter un terrain
+              </Button>
+            </Stack>
+
+            {((formData as any).terrains || []).map((t: any, idx: number) => (
+              <Accordion key={idx} expanded={!!expandedSet[idx]} onChange={() => toggleExpanded(idx)} sx={{ mb: 1 }}>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}> 
+                  <Typography sx={{ fontWeight: 600 }}>{t.nom || `Terrain ${idx + 1}`}</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Box sx={{ border: '1px solid rgba(0,0,0,0.04)', p: 2, borderRadius: 1 }}>
+                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="flex-start">
+                  <TextField
+                    label="Nom"
+                    value={t.nom || ''}
+                    onChange={(e) => handleTerrainChange(idx, 'nom', e.target.value)}
+                    fullWidth
+                  />
+                  <IconButton onClick={() => handleRemoveTerrain(idx)} aria-label="Supprimer" size="small">
+                    <DeleteOutlineIcon />
+                  </IconButton>
+                </Stack>
+
+                <Box sx={{ mt: 1 }}>
+                  <Autocomplete
+                    multiple
+                    freeSolo
+                    options={EQUIPEMENT_ADMISSIBLE_OPTIONS}
+                    value={t.equipementAdmissible || []}
+                    onChange={(_, newValue) => handleTerrainChange(idx, 'equipementAdmissible', newValue)}
+                    renderTags={(value: string[], getTagProps) =>
+                      value.map((option: string, index: number) => {
+                        const tagProps = getTagProps({ index }) as any;
+                        const { key, ...other } = tagProps;
+                        return (
+                          <Chip key={key} variant="outlined" label={option} {...other} />
+                        );
+                      })
+                    }
+                    renderInput={(params) => (
+                      <TextField {...params} label="Équipement admissible" placeholder="Ajouter un équipement" />
+                    )}
+                  />
+                </Box>
+
+                <Box sx={{ mt: 1 }}>
+                  <Autocomplete
+                    multiple
+                    freeSolo
+                    options={SERVICES_OPTIONS}
+                    value={t.services || []}
+                    onChange={(_, newValue) => handleTerrainChange(idx, 'services', newValue)}
+                    renderTags={(value: string[], getTagProps) =>
+                      value.map((option: string, index: number) => {
+                        const tagProps = getTagProps({ index }) as any;
+                        const { key, ...other } = tagProps;
+                        return (
+                          <Chip key={key} variant="outlined" label={option} {...other} />
+                        );
+                      })
+                    }
+                    renderInput={(params) => (
+                      <TextField {...params} label="Services" placeholder="Ajouter un service" />
+                    )}
+                  />
+                </Box>
+
+                <Box sx={{ mt: 1 }}>
+                  <Autocomplete
+                    multiple
+                    freeSolo
+                    options={DESCRIPTION_OPTIONS}
+                    value={(t.terrain && t.terrain.description) || []}
+                    onChange={(_, newValue) => handleTerrainChange(idx, 'terrain.description', newValue)}
+                    renderTags={(value: string[], getTagProps) =>
+                      value.map((option: string, index: number) => {
+                        const tagProps = getTagProps({ index }) as any;
+                        const { key, ...other } = tagProps;
+                        return (
+                          <Chip key={key} variant="outlined" label={option} {...other} />
+                        );
+                      })
+                    }
+                    renderInput={(params) => (
+                      <TextField {...params} label="Description" placeholder="Ajouter une description" />
+                    )}
+                  />
+                </Box>
+
+                <Box sx={{ mt: 1 }}>
+                  <Autocomplete
+                    multiple
+                    freeSolo
+                    options={IMPORTANT_OPTIONS}
+                    value={(t.terrain && t.terrain.important) || []}
+                    onChange={(_, newValue) => handleTerrainChange(idx, 'terrain.important', newValue)}
+                    renderTags={(value: string[], getTagProps) =>
+                      value.map((option: string, index: number) => {
+                        const tagProps = getTagProps({ index }) as any;
+                        const { key, ...other } = tagProps;
+                        return (
+                          <Chip key={key} variant="outlined" label={option} {...other} />
+                        );
+                      })
+                    }
+                    renderInput={(params) => (
+                      <TextField {...params} label="Important" placeholder="Ajouter un élément important" />
+                    )}
+                  />
+                </Box>
+
+                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mt: 1 }}>
+                  <TextField
+                    label="Capacité maximale"
+                    value={t.capaciteMaximale || ''}
+                    onChange={(e) => handleTerrainChange(idx, 'capaciteMaximale', e.target.value)}
+                    fullWidth
+                  />
+                  <Autocomplete
+                    multiple
+                    freeSolo
+                    options={ACCESS_OPTIONS}
+                    value={Array.isArray(t.acces) ? t.acces : (t.acces ? [t.acces] : [])}
+                    onChange={(_, newValue) => handleTerrainChange(idx, 'acces', newValue)}
+                    renderTags={(value: string[], getTagProps) =>
+                      value.map((option: string, index: number) => {
+                        const tagProps = getTagProps({ index }) as any;
+                        const { key, ...other } = tagProps;
+                        return (
+                          <Chip key={key} variant="outlined" label={option} {...other} />
+                        );
+                      })
+                    }
+                    renderInput={(params) => (
+                      <TextField
+                        {...params} 
+                        label="Accès" 
+                        placeholder="Ajouter un accès (ex: Accessible en automobile)"
+                      />
+                    )}
+                    fullWidth
+                  />
+                </Stack>
+
+                <Box sx={{ mt: 1 }}>
+                  <Autocomplete
+                    multiple
+                    freeSolo
+                    options={TERRAIN_OPTIONS}
+                    value={(t.terrain && t.terrain.selections) || []}
+                    onChange={(_, newValue) => handleTerrainChange(idx, 'terrain.selections', newValue)}
+                    renderTags={(value: string[], getTagProps) =>
+                      value.map((option: string, index: number) => {
+                        const tagProps = getTagProps({ index }) as any;
+                        const { key, ...other } = tagProps;
+                        return (
+                          <Chip key={key} variant="outlined" label={option} {...other} />
+                        );
+                      })
+                    }
+                    renderInput={(params) => (
+                      <TextField {...params} label="Terrain (sélection multiple)" placeholder="Choisir dimensions/option" />
+                    )}
+                  />
+                </Box>
+                  </Box>
+                </AccordionDetails>
+              </Accordion>
+            ))}
+          </Box>
 
           {/* <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
             <TextField
@@ -218,7 +519,7 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
         <Button
           variant="contained"
           onClick={handleSubmit}
-          disabled={isReadOnlyConvex() === false}
+          disabled={isReadOnlyConvex()}
         >
           {mode === 'create' ? 'Ajouter' : 'Enregistrer'}
         </Button>
