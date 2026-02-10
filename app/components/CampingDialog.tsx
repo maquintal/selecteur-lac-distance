@@ -27,11 +27,11 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
   const [formData, setFormData] = useState<NewCampingInput>(defaultCampingInput);
   const [expandedSet, setExpandedSet] = useState<Record<number, boolean>>({});
 
-  const ACCESS_OPTIONS: readonly any[] = [
+  const ACCESS_OPTIONS: readonly string[] = [
     'Accessible en automobile',
   ];
 
-  const SERVICES_OPTIONS: readonly any[] = [
+  const SERVICES_OPTIONS: readonly string[] = [
     // 'Eau potable',
     // 'Électricité',
     // 'Toilettes',
@@ -41,32 +41,48 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
     // 'Wi-Fi',
   ];
 
-  const TERRAIN_OPTIONS: readonly any[] = [
+  const TERRAIN_OPTIONS: readonly string[] = [
     // 'Longueur du terrain : 70 pieds (21,3 mètres)',
     // 'Largeur du terrain : 20 pieds (6,1 mètres)',
     // 'Longueur du terrain incluant le stationnement : 70 pieds (21,3 mètres)',
   ];
 
-  const DESCRIPTION_OPTIONS: readonly any[] = [
+  const DESCRIPTION_OPTIONS: readonly string[] = [
     'Stationnement sur l\'emplacement',
     'Trou à feu',
     // 'Proche des commodités',
     // 'Ombre partielle',
   ];
 
-  const IMPORTANT_OPTIONS: readonly any[] = [
+  const IMPORTANT_OPTIONS: readonly string[] = [
     // 'Sans fumée',
     // 'Animaux interdits',
     // 'Accessible PMR',
     // 'Zone calme',
   ];
 
-  const EQUIPEMENT_ADMISSIBLE_OPTIONS: readonly any[] = [
+  const EQUIPEMENT_ADMISSIBLE_OPTIONS: readonly string[] = [
     'Tous les types de tentes-roulottes',
     'Tente-roulotte de moins de 6 mètres (20 pieds)',
     'Tente-roulotte de moins de 8 mètres (25 pieds)',
     'Roulotte de moins de 6 mètres (20 pieds)',
   ];
+
+  type TerrainInput = {
+    nom: string;
+    equipementAdmissible?: string[];
+    services?: string[];
+    capaciteMaximale?: string;
+    acces?: string[];
+    terrain?: {
+      longueur?: string;
+      largeur?: string;
+      longueurAvecStationnement?: string;
+      selections?: string[];
+      description?: string[];
+      important?: string[];
+    };
+  };
 
   // Mutations Convex
   const createCamping = useMutation(api.lacs.createCamping);
@@ -77,21 +93,28 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
     if (open) {
       if (mode === 'edit' && camping) {
         // Extraire seulement les champs modifiables (retirer champs système)
-        const { _id, _creationTime, ...editableData } = camping as any;
+        const { _id, _creationTime, ...rest } = camping;
+        const editableData = { ...(rest as unknown as NewCampingInput) };
         // ensure terrains array exists
-        if (!(editableData as any).terrains) (editableData as any).terrains = [];
+        if (!editableData.terrains) editableData.terrains = [];
         // normalize terrains fields to expected shapes (arrays, nested terrain fields)
-        (editableData as any).terrains = (editableData as any).terrains.map((tr: any) => ({
-          ...tr,
-          acces: Array.isArray(tr?.acces) ? tr.acces : (tr?.acces ? [tr.acces] : []),
-          services: tr?.services || [],
-          terrain: {
-            ...(tr?.terrain || {}),
-            selections: (tr?.terrain && Array.isArray(tr.terrain.selections)) ? tr.terrain.selections : (tr?.terrain?.selections ? [tr.terrain.selections] : []),
-            description: (tr?.terrain && Array.isArray(tr.terrain.description)) ? tr.terrain.description : (tr?.description ? [tr.description].flat() : (tr?.terrain?.description || [])),
-            important: (tr?.terrain && Array.isArray(tr.terrain.important)) ? tr.terrain.important : (tr?.important ? [tr.important].flat() : (tr?.terrain?.important || [])),
-          }
-        }));
+        editableData.terrains = (editableData.terrains || []).map((tr) => {
+          const t = tr as unknown as TerrainInput;
+          const legacy = tr as unknown as { description?: string | string[]; important?: string | string[] };
+          return {
+            nom: t.nom ?? '',
+            acces: Array.isArray(t?.acces) ? t.acces : (t?.acces ? [String(t.acces)] : []),
+            services: t?.services || [],
+            equipementAdmissible: t?.equipementAdmissible || [],
+            capaciteMaximale: t?.capaciteMaximale || '',
+            terrain: {
+              ...(t?.terrain || {}),
+              selections: (t?.terrain && Array.isArray(t.terrain.selections)) ? t.terrain.selections : (t?.terrain?.selections ? [t.terrain.selections] : []),
+              description: (t?.terrain && Array.isArray(t.terrain.description)) ? t.terrain.description : (legacy.description ? (Array.isArray(legacy.description) ? legacy.description : [legacy.description]) : (t?.terrain?.description || [])),
+              important: (t?.terrain && Array.isArray(t.terrain.important)) ? t.terrain.important : (legacy.important ? (Array.isArray(legacy.important) ? legacy.important : [legacy.important]) : (t?.terrain?.important || [])),
+            }
+          } as TerrainInput;
+        });
         setFormData(editableData as NewCampingInput);
       } else {
         setFormData(defaultCampingInput);
@@ -109,12 +132,12 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
   const handleAddTerrain = () => {
     setFormData(prev => ({
       ...prev,
-      terrains: [ ...(prev as any).terrains || [], { nom: '', equipementAdmissible: [], services: [], capaciteMaximale: '', acces: [], terrain: { longueur: '', largeur: '', longueurAvecStationnement: '', selections: [], description: [], important: [] } } ]
+      terrains: [ ...(prev.terrains ?? []), { nom: '', equipementAdmissible: [], services: [], capaciteMaximale: '', acces: [], terrain: { longueur: '', largeur: '', longueurAvecStationnement: '', selections: [], description: [], important: [] } } ]
     }));
     // expand the newly added terrain (will be last index)
     setExpandedSet(prev => {
       const next = { ...prev };
-      const idx = ((formData as any).terrains || []).length; // previous length
+      const idx = (formData.terrains ?? []).length; // previous length
       next[idx] = true;
       return next;
     });
@@ -123,7 +146,7 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
   const handleRemoveTerrain = (index: number) => {
     setFormData(prev => ({
       ...prev,
-      terrains: (prev as any).terrains.filter((_: any, i: number) => i !== index)
+      terrains: (prev.terrains ?? []).filter((_: unknown, i: number) => i !== index)
     }));
     // adjust expanded set to shift indexes after removal
     setExpandedSet(prev => {
@@ -136,10 +159,10 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
     });
   };
 
-  const handleTerrainChange = (index: number, field: string, value: any) => {
+  const handleTerrainChange = (index: number, field: string, value: unknown) => {
     setFormData(prev => {
-      const terrains = [ ...(prev as any).terrains || [] ];
-      const t = { ...(terrains[index] || {}) };
+      const terrains = [ ...(prev.terrains ?? []) ];
+      const t = { ...(terrains[index] || {}) } as TerrainInput & Record<string, unknown>;
       // support nested terrain.* fields
       if (field.startsWith('terrain.')) {
         const sub = field.split('.')[1];
@@ -147,7 +170,7 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
       } else if (field === 'longueur' || field === 'largeur' || field === 'longueurAvecStationnement') {
         t.terrain = { ...(t.terrain || {}), [field]: value };
       } else {
-        t[field] = value;
+        (t as Record<string, unknown>)[field] = value;
       }
       terrains[index] = t;
       return { ...prev, terrains };
@@ -197,7 +220,7 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
           coordonnees: formData.coordonnees,
           commodites: formData.commodites,
           regionAdministrative: formData.regionAdministrative,
-          terrains: (formData as any).terrains,
+          terrains: formData.terrains,
         });
       } else if (mode === 'edit' && camping) {
         await updateCamping({
@@ -207,7 +230,7 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
           coordonnees: formData.coordonnees,
           commodites: formData.commodites,
           regionAdministrative: formData.regionAdministrative,
-          terrains: (formData as any).terrains,
+          terrains: formData.terrains,
         });
       }
       onClose();
@@ -269,7 +292,7 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
               </Button>
             </Stack>
 
-            {((formData as any).terrains || []).map((t: any, idx: number) => (
+            {(formData.terrains ?? []).map((t: TerrainInput, idx: number) => (
               <Accordion key={idx} expanded={!!expandedSet[idx]} onChange={() => toggleExpanded(idx)} sx={{ mb: 1 }}>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}> 
                   <Typography sx={{ fontWeight: 600 }}>{t.nom || `Terrain ${idx + 1}`}</Typography>
@@ -295,14 +318,10 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
                     options={EQUIPEMENT_ADMISSIBLE_OPTIONS}
                     value={t.equipementAdmissible || []}
                     onChange={(_, newValue) => handleTerrainChange(idx, 'equipementAdmissible', newValue)}
-                    renderTags={(value: string[], getTagProps) =>
-                      value.map((option: string, index: number) => {
-                        const tagProps = getTagProps({ index }) as any;
-                        const { key, ...other } = tagProps;
-                        return (
-                          <Chip key={key} variant="outlined" label={option} {...other} />
-                        );
-                      })
+                    renderTags={(value: string[]) =>
+                      value.map((option: string, index: number) => (
+                        <Chip key={`${option}-${index}`} variant="outlined" label={option} />
+                      ))
                     }
                     renderInput={(params) => (
                       <TextField {...params} label="Équipement admissible" placeholder="Ajouter un équipement" />
@@ -317,14 +336,10 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
                     options={SERVICES_OPTIONS}
                     value={t.services || []}
                     onChange={(_, newValue) => handleTerrainChange(idx, 'services', newValue)}
-                    renderTags={(value: string[], getTagProps) =>
-                      value.map((option: string, index: number) => {
-                        const tagProps = getTagProps({ index }) as any;
-                        const { key, ...other } = tagProps;
-                        return (
-                          <Chip key={key} variant="outlined" label={option} {...other} />
-                        );
-                      })
+                    renderTags={(value: string[]) =>
+                      value.map((option: string, index: number) => (
+                        <Chip key={`${option}-${index}`} variant="outlined" label={option} />
+                      ))
                     }
                     renderInput={(params) => (
                       <TextField {...params} label="Services" placeholder="Ajouter un service" />
@@ -339,14 +354,10 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
                     options={DESCRIPTION_OPTIONS}
                     value={(t.terrain && t.terrain.description) || []}
                     onChange={(_, newValue) => handleTerrainChange(idx, 'terrain.description', newValue)}
-                    renderTags={(value: string[], getTagProps) =>
-                      value.map((option: string, index: number) => {
-                        const tagProps = getTagProps({ index }) as any;
-                        const { key, ...other } = tagProps;
-                        return (
-                          <Chip key={key} variant="outlined" label={option} {...other} />
-                        );
-                      })
+                    renderTags={(value: string[]) =>
+                      value.map((option: string, index: number) => (
+                        <Chip key={`${option}-${index}`} variant="outlined" label={option} />
+                      ))
                     }
                     renderInput={(params) => (
                       <TextField {...params} label="Description" placeholder="Ajouter une description" />
@@ -361,14 +372,10 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
                     options={IMPORTANT_OPTIONS}
                     value={(t.terrain && t.terrain.important) || []}
                     onChange={(_, newValue) => handleTerrainChange(idx, 'terrain.important', newValue)}
-                    renderTags={(value: string[], getTagProps) =>
-                      value.map((option: string, index: number) => {
-                        const tagProps = getTagProps({ index }) as any;
-                        const { key, ...other } = tagProps;
-                        return (
-                          <Chip key={key} variant="outlined" label={option} {...other} />
-                        );
-                      })
+                    renderTags={(value: string[]) =>
+                      value.map((option: string, index: number) => (
+                        <Chip key={`${option}-${index}`} variant="outlined" label={option} />
+                      ))
                     }
                     renderInput={(params) => (
                       <TextField {...params} label="Important" placeholder="Ajouter un élément important" />
@@ -389,14 +396,10 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
                     options={ACCESS_OPTIONS}
                     value={Array.isArray(t.acces) ? t.acces : (t.acces ? [t.acces] : [])}
                     onChange={(_, newValue) => handleTerrainChange(idx, 'acces', newValue)}
-                    renderTags={(value: string[], getTagProps) =>
-                      value.map((option: string, index: number) => {
-                        const tagProps = getTagProps({ index }) as any;
-                        const { key, ...other } = tagProps;
-                        return (
-                          <Chip key={key} variant="outlined" label={option} {...other} />
-                        );
-                      })
+                    renderTags={(value: string[]) =>
+                      value.map((option: string, index: number) => (
+                        <Chip key={`${option}-${index}`} variant="outlined" label={option} />
+                      ))
                     }
                     renderInput={(params) => (
                       <TextField
@@ -416,14 +419,10 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
                     options={TERRAIN_OPTIONS}
                     value={(t.terrain && t.terrain.selections) || []}
                     onChange={(_, newValue) => handleTerrainChange(idx, 'terrain.selections', newValue)}
-                    renderTags={(value: string[], getTagProps) =>
-                      value.map((option: string, index: number) => {
-                        const tagProps = getTagProps({ index }) as any;
-                        const { key, ...other } = tagProps;
-                        return (
-                          <Chip key={key} variant="outlined" label={option} {...other} />
-                        );
-                      })
+                    renderTags={(value: string[]) =>
+                      value.map((option: string, index: number) => (
+                        <Chip key={`${option}-${index}`} variant="outlined" label={option} />
+                      ))
                     }
                     renderInput={(params) => (
                       <TextField {...params} label="Terrain (sélection multiple)" placeholder="Choisir dimensions/option" />
