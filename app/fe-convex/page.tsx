@@ -260,11 +260,17 @@ export default function LakesSearchCards() {
                     const campingNom = h.nom || h.camping || 'N/A';
                     const organisme = h.organisme || 'privé';
 
+                    const terrainsCount = ((h as any).terrains || []).length;
+
                     return (
                         <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                             <Box sx={{ flex: 1 }}>
                                 <CardHeader
-                                    title={campingNom}
+                                    title={
+                                        <>
+                                            {campingNom}{organisme === 'SEPAQ' && terrainsCount > 0 ? ` (${terrainsCount})` : ''}
+                                        </>
+                                    }
                                     avatar={
                                         organisme === 'SEPAQ' ? (
                                             <Image src="/sepaq_logo2-transparent.png" alt="sepaq" width={15} height={15} />

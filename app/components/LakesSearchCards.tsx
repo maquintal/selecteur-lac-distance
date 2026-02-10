@@ -2,6 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { Acces, Hebergement, Lake, Superficie } from '../types/lake';
+import type { CampingDoc } from '../types/schema.types';
 import {
     Box,
     TextField,
@@ -179,16 +180,24 @@ export default function LakesSearchCards() {
             return <Typography variant="body2" color="text.secondary">—</Typography>;
         }
 
+        {console.log('183')}
         return (
             <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                 {hebergement.map((h, index) => {
+                    const campingDoc = h as unknown as CampingDoc;
+                    const terrainsCount = (campingDoc.terrains || []).length;
                     return (
                         <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                             {/* Colonne gauche : Nom + distances détaillées */}
                             <Box sx={{ flex: 1 }}>
                                 <CardHeader
-                                    title={h.camping}
-                                    avatar={
+                                    title={
+                                        <>
+                                        {console.log('196')}
+                                            {h.camping}{h.organisme === 'SEPAQ' && terrainsCount > 0 ? ` (${terrainsCount})` : ''}
+                                        </>
+                                    }
+                                    /* avatar={
                                         h.organisme === 'SEPAQ' ? (
                                             <Image src="/sepaq_logo2-transparent.png" alt="sepaq" width={15} height={15} />
                                         ) : (
@@ -200,7 +209,7 @@ export default function LakesSearchCards() {
                                                 ) : undefined
                                             )
                                         )
-                                    }
+                                    } */
                                 />
                             </Box>
 
@@ -395,7 +404,10 @@ export default function LakesSearchCards() {
                                 <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                                     {cardHeader}
                                     <CardContent sx={{ flexGrow: 1 }}>
+                                        <>
                                         {getHebergement(l.acces, l.hebergement)}
+                                        {console.log("409")}
+                                        </>
                                     </CardContent>
                                     <CardActions sx={{ justifyContent: 'space-between' }}>
 
