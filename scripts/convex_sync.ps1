@@ -34,7 +34,8 @@ param(
     [string]$ProdBackup = "prod-backup.zip",
     [string]$BackupDir = "C:\temp\convex_backups",
     [switch]$IncludeStorage,
-    [switch]$AutoConfirm,
+    [switch]$AutoConfirm = $true,
+    [switch]$AutoDeploy = $true,
     [switch]$ReplaceAll = $true,
     [switch]$RemoveLocal = $false
 )
@@ -127,7 +128,19 @@ try {
         exit 0
     }
 
-    # 5) Importer
+    # 6) Optionnel: déployer le schéma local vers la production avant d'importer
+    if ($AutoDeploy) {
+        Write-Host "Deploying local schema to deployment '$ProdDeployment'..." -ForegroundColor Cyan
+        $env:CONVEX_DEPLOYMENT = $ProdDeployment
+        & npx convex deploy --yes
+        if ($LASTEXITCODE -ne 0) {
+            throw "Deploy failed (exit $LASTEXITCODE)"
+        }
+        Write-Host "Deploy succeeded." -ForegroundColor Green
+        Remove-Item Env:\CONVEX_DEPLOYMENT -ErrorAction SilentlyContinue
+    }
+
+    # 7) Importer
     $importPath = if ($BackupDir -ne "") { Join-Path $BackupDir $DevBackup } else { $DevBackup }
     Run-ConvexImport -path $importPath -deployment $ProdDeployment -replaceAll:$ReplaceAll
     Write-Host "Import terminé. Vérifier l'instance de production via le dashboard ou des queries." -ForegroundColor Green
