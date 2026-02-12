@@ -33,16 +33,9 @@ export const createCamping = mutation({
           services: v.optional(v.array(v.string())),
           capaciteMaximale: v.optional(v.string()),
           acces: v.optional(v.array(v.string())),
-          terrain: v.optional(
-            v.object({
-              longueur: v.optional(v.string()),
-              largeur: v.optional(v.string()),
-                  longueurAvecStationnement: v.optional(v.string()),
-                  selections: v.optional(v.array(v.string())),
-                  description: v.optional(v.array(v.string())),
-                  important: v.optional(v.array(v.string())),
-            })
-          ),
+          selections: v.optional(v.array(v.string())),
+          description: v.optional(v.array(v.string())),
+          important: v.optional(v.array(v.string())),
         })
       )
     ),
@@ -77,19 +70,12 @@ export const updateCamping = mutation({
         v.object({
           nom: v.string(),
           equipementAdmissible: v.optional(v.array(v.string())),
-            services: v.optional(v.array(v.string())),
+          services: v.optional(v.array(v.string())),
           capaciteMaximale: v.optional(v.string()),
           acces: v.optional(v.array(v.string())),
-          terrain: v.optional(
-            v.object({
-              longueur: v.optional(v.string()),
-              largeur: v.optional(v.string()),
-              longueurAvecStationnement: v.optional(v.string()),
-              selections: v.optional(v.array(v.string())),
-              description: v.optional(v.array(v.string())),
-              important: v.optional(v.array(v.string())),
-            })
-          ),
+          selections: v.optional(v.array(v.string())),
+          description: v.optional(v.array(v.string())),
+          important: v.optional(v.array(v.string())),
         })
       )
     ),
@@ -589,7 +575,7 @@ export const addCampingToLac = mutation({
   },
   handler: async (ctx, args) => {
     checkReadOnlyModeConvex()
-    
+
     const lac = await ctx.db.get(args.lacId);
     if (!lac) throw new Error("Lac non trouvé");
 
@@ -626,7 +612,7 @@ export const addEspece = mutation({
   },
   handler: async (ctx, args) => {
     checkReadOnlyModeConvex()
-    
+
     return await ctx.db.insert("especes", args);
   },
 });
@@ -638,7 +624,7 @@ export const addEspeceToLac = mutation({
   },
   handler: async (ctx, args) => {
     checkReadOnlyModeConvex()
-    
+
     const lac = await ctx.db.get(args.lacId);
     if (!lac) throw new Error("Lac non trouvé");
 
@@ -661,7 +647,7 @@ export const toggleChoixInteressant = mutation({
   },
   handler: async (ctx, args) => {
     checkReadOnlyModeConvex()
-    
+
     const lac = await ctx.db.get(args.lacId);
     if (!lac) throw new Error("Lac non trouvé");
 

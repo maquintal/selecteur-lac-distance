@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState } from 'react';
 import { Acces } from '../types/lake';
-import { LacWithDetails, EspeceDoc } from '../types/schema.types';
+import { LacWithDetails, EspeceDoc, CampingDoc } from '../types/schema.types';
 import { Id } from "../../convex/_generated/dataModel";
 import {
     Box,
@@ -236,26 +236,44 @@ export default function LakesSearchCards() {
     };
 
 
-    const getHebergement = (acces: Acces | undefined, hebergement: Array<{
-        nom?: string;
-        camping?: string;
-        organisme?: string;
-        commodites?: {
-            eau?: boolean;
-            electricite?: boolean;
-        };
-        distanceDepuisLac?: {
-            kilometrage: number;
-            temps: number;
-        };
-    }> | null) => {
+    const getHebergement = (
+        acces: Acces | undefined,
+        hebergement: Array<{
+            nom?: string;
+            camping?: string;
+            organisme?: string;
+            commodites?: {
+                eau?: boolean;
+                electricite?: boolean;
+            };
+            coordonnees?: {
+                latitude: number;
+                longitude: number;
+            };
+            distanceDepuisLac?: {
+                kilometrage: number;
+                temps: number;
+            };
+            terrains?: Array<{
+                nom: string;
+                equipementAdmissible?: string[];
+            }>;
+        }> | null) => {
         if (!hebergement || hebergement.length === 0) {
             return <Typography variant="body2" color="text.secondary">—</Typography>;
         }
 
+        const sortedHebergement = [...hebergement].sort((a, b) => {
+
+            const timeA = a.distanceDepuisLac?.temps ?? Infinity;
+            const timeB = b.distanceDepuisLac?.temps ?? Infinity;
+
+            return timeA - timeB;
+        });
+
         return (
             <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                {hebergement.map((h, index) => {
+                {sortedHebergement.map((h, index) => {
                     // h contient déjà les données du camping enrichies par getLacsSortedOptimized
                     const campingNom = h.nom || h.camping || 'N/A';
                     const organisme = h.organisme || 'privé';

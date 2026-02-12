@@ -8,13 +8,15 @@ import {
   Dialog, DialogTitle, DialogContent, DialogActions,
   FormControl, InputLabel, Select, MenuItem,
   FormControlLabel, Checkbox, IconButton, Autocomplete, Chip, Typography, Stack,
-  Accordion, AccordionSummary, AccordionDetails
+  Accordion, AccordionSummary, AccordionDetails,
+  Tooltip
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { CampingDoc, NewCampingInput, defaultCampingInput } from '../types/schema.types';
 import { isReadOnlyConvex } from '@/convex/checkReadOnlyMode';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
 type CampingDialogProps = {
   open: boolean;
@@ -68,20 +70,16 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
     'Roulotte de moins de 6 mètres (20 pieds)',
   ];
 
+  // devrait etre le schema...
   type TerrainInput = {
     nom: string;
     equipementAdmissible?: string[];
     services?: string[];
     capaciteMaximale?: string;
     acces?: string[];
-    terrain?: {
-      longueur?: string;
-      largeur?: string;
-      longueurAvecStationnement?: string;
-      selections?: string[];
-      description?: string[];
-      important?: string[];
-    };
+    selections?: string[];
+    description?: string[];
+    important?: string[];
   };
 
   // Mutations Convex
@@ -107,18 +105,14 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
             services: t?.services || [],
             equipementAdmissible: t?.equipementAdmissible || [],
             capaciteMaximale: t?.capaciteMaximale || '',
-            terrain: {
-              ...(t?.terrain || {}),
-              selections: (t?.terrain && Array.isArray(t.terrain.selections)) ? t.terrain.selections : (t?.terrain?.selections ? [t.terrain.selections] : []),
-              description: (t?.terrain && Array.isArray(t.terrain.description)) ? t.terrain.description : (legacy.description ? (Array.isArray(legacy.description) ? legacy.description : [legacy.description]) : (t?.terrain?.description || [])),
-              important: (t?.terrain && Array.isArray(t.terrain.important)) ? t.terrain.important : (legacy.important ? (Array.isArray(legacy.important) ? legacy.important : [legacy.important]) : (t?.terrain?.important || [])),
-            }
+            selections: Array.isArray(t?.selections) ? t.selections : (t?.selections ? [String(t.selections)] : []),
+            description: Array.isArray(t?.description) ? t.description : (legacy.description ? (Array.isArray(legacy.description) ? legacy.description : [legacy.description]) : []),
+            important: Array.isArray(t?.important) ? t.important : (legacy.important ? (Array.isArray(legacy.important) ? legacy.important : [legacy.important]) : []),
           } as TerrainInput;
         });
         setFormData(editableData as NewCampingInput);
       } else {
         setFormData(defaultCampingInput);
-        // defaultCampingInput already contains terrains = []
       }
     }
   }, [open, mode, camping]);
@@ -132,7 +126,16 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
   const handleAddTerrain = () => {
     setFormData(prev => ({
       ...prev,
-      terrains: [ ...(prev.terrains ?? []), { nom: '', equipementAdmissible: [], services: [], capaciteMaximale: '', acces: [], terrain: { longueur: '', largeur: '', longueurAvecStationnement: '', selections: [], description: [], important: [] } } ]
+      terrains: [...(prev.terrains ?? []), {
+        nom: '',
+        equipementAdmissible: [],
+        services: [],
+        capaciteMaximale: '',
+        acces: [],
+        selections: [],
+        description: [],
+        important: []
+      }]
     }));
     // expand the newly added terrain (will be last index)
     setExpandedSet(prev => {
@@ -161,17 +164,13 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
 
   const handleTerrainChange = (index: number, field: string, value: unknown) => {
     setFormData(prev => {
-      const terrains = [ ...(prev.terrains ?? []) ];
+      const terrains = [...(prev.terrains ?? [])];
       const t = { ...(terrains[index] || {}) } as TerrainInput & Record<string, unknown>;
-      // support nested terrain.* fields
-      if (field.startsWith('terrain.')) {
-        const sub = field.split('.')[1];
-        t.terrain = { ...(t.terrain || {}), [sub]: value };
-      } else if (field === 'longueur' || field === 'largeur' || field === 'longueurAvecStationnement') {
-        t.terrain = { ...(t.terrain || {}), [field]: value };
-      } else {
-        (t as Record<string, unknown>)[field] = value;
-      }
+      // if (field.startsWith('terrain.')) {
+      //   t.terrain = { ...(t.terrain || {}), ["longueur"]: undefined, ["largeur"]: undefined, ["longueurAvecStationnement"]: undefined };
+      // } else {
+      (t as Record<string, unknown>)[field] = value;
+      // }
       terrains[index] = t;
       return { ...prev, terrains };
     });
@@ -243,6 +242,20 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <DialogTitle>
         {mode === 'create' ? 'Ajouter un camping' : 'Modifier le camping'}
+        <Tooltip title="Copier les coordonnées">
+          <IconButton
+            onClick={() => {
+              const lat = formData.coordonnees.latitude.toString().replace(',', '.');
+              const lng = formData.coordonnees.longitude.toString().replace(',', '.');
+              const coords = `${lat}, ${lng}`;
+              navigator.clipboard.writeText(coords);
+            }}
+            color="primary"
+          >
+            <ContentCopyIcon />
+          </IconButton>
+        </Tooltip>
+
       </DialogTitle>
       <DialogContent>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
@@ -294,141 +307,145 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
 
             {(formData.terrains ?? []).map((t: TerrainInput, idx: number) => (
               <Accordion key={idx} expanded={!!expandedSet[idx]} onChange={() => toggleExpanded(idx)} sx={{ mb: 1 }}>
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}> 
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                   <Typography sx={{ fontWeight: 600 }}>{t.nom || `Terrain ${idx + 1}`}</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                   <Box sx={{ border: '1px solid rgba(0,0,0,0.04)', p: 2, borderRadius: 1 }}>
-                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="flex-start">
-                  <TextField
-                    label="Nom"
-                    value={t.nom || ''}
-                    onChange={(e) => handleTerrainChange(idx, 'nom', e.target.value)}
-                    fullWidth
-                  />
-                  <IconButton onClick={() => handleRemoveTerrain(idx)} aria-label="Supprimer" size="small">
-                    <DeleteOutlineIcon />
-                  </IconButton>
-                </Stack>
-
-                <Box sx={{ mt: 1 }}>
-                  <Autocomplete
-                    multiple
-                    freeSolo
-                    options={EQUIPEMENT_ADMISSIBLE_OPTIONS}
-                    value={t.equipementAdmissible || []}
-                    onChange={(_, newValue) => handleTerrainChange(idx, 'equipementAdmissible', newValue)}
-                    renderTags={(value: string[]) =>
-                      value.map((option: string, index: number) => (
-                        <Chip key={`${option}-${index}`} variant="outlined" label={option} />
-                      ))
-                    }
-                    renderInput={(params) => (
-                      <TextField {...params} label="Équipement admissible" placeholder="Ajouter un équipement" />
-                    )}
-                  />
-                </Box>
-
-                <Box sx={{ mt: 1 }}>
-                  <Autocomplete
-                    multiple
-                    freeSolo
-                    options={SERVICES_OPTIONS}
-                    value={t.services || []}
-                    onChange={(_, newValue) => handleTerrainChange(idx, 'services', newValue)}
-                    renderTags={(value: string[]) =>
-                      value.map((option: string, index: number) => (
-                        <Chip key={`${option}-${index}`} variant="outlined" label={option} />
-                      ))
-                    }
-                    renderInput={(params) => (
-                      <TextField {...params} label="Services" placeholder="Ajouter un service" />
-                    )}
-                  />
-                </Box>
-
-                <Box sx={{ mt: 1 }}>
-                  <Autocomplete
-                    multiple
-                    freeSolo
-                    options={DESCRIPTION_OPTIONS}
-                    value={(t.terrain && t.terrain.description) || []}
-                    onChange={(_, newValue) => handleTerrainChange(idx, 'terrain.description', newValue)}
-                    renderTags={(value: string[]) =>
-                      value.map((option: string, index: number) => (
-                        <Chip key={`${option}-${index}`} variant="outlined" label={option} />
-                      ))
-                    }
-                    renderInput={(params) => (
-                      <TextField {...params} label="Description" placeholder="Ajouter une description" />
-                    )}
-                  />
-                </Box>
-
-                <Box sx={{ mt: 1 }}>
-                  <Autocomplete
-                    multiple
-                    freeSolo
-                    options={IMPORTANT_OPTIONS}
-                    value={(t.terrain && t.terrain.important) || []}
-                    onChange={(_, newValue) => handleTerrainChange(idx, 'terrain.important', newValue)}
-                    renderTags={(value: string[]) =>
-                      value.map((option: string, index: number) => (
-                        <Chip key={`${option}-${index}`} variant="outlined" label={option} />
-                      ))
-                    }
-                    renderInput={(params) => (
-                      <TextField {...params} label="Important" placeholder="Ajouter un élément important" />
-                    )}
-                  />
-                </Box>
-
-                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mt: 1 }}>
-                  <TextField
-                    label="Capacité maximale"
-                    value={t.capaciteMaximale || ''}
-                    onChange={(e) => handleTerrainChange(idx, 'capaciteMaximale', e.target.value)}
-                    fullWidth
-                  />
-                  <Autocomplete
-                    multiple
-                    freeSolo
-                    options={ACCESS_OPTIONS}
-                    value={Array.isArray(t.acces) ? t.acces : (t.acces ? [t.acces] : [])}
-                    onChange={(_, newValue) => handleTerrainChange(idx, 'acces', newValue)}
-                    renderTags={(value: string[]) =>
-                      value.map((option: string, index: number) => (
-                        <Chip key={`${option}-${index}`} variant="outlined" label={option} />
-                      ))
-                    }
-                    renderInput={(params) => (
+                    <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="flex-start">
                       <TextField
-                        {...params} 
-                        label="Accès" 
-                        placeholder="Ajouter un accès (ex: Accessible en automobile)"
+                        label="Nom"
+                        value={t.nom || ''}
+                        onChange={(e) => handleTerrainChange(idx, 'nom', e.target.value)}
+                        fullWidth
                       />
-                    )}
-                    fullWidth
-                  />
-                </Stack>
+                      <IconButton onClick={() => handleRemoveTerrain(idx)} aria-label="Supprimer" size="small">
+                        <DeleteOutlineIcon />
+                      </IconButton>
+                    </Stack>
 
-                <Box sx={{ mt: 1 }}>
-                  <Autocomplete
-                    multiple
-                    freeSolo
-                    options={TERRAIN_OPTIONS}
-                    value={(t.terrain && t.terrain.selections) || []}
-                    onChange={(_, newValue) => handleTerrainChange(idx, 'terrain.selections', newValue)}
-                    renderTags={(value: string[]) =>
-                      value.map((option: string, index: number) => (
-                        <Chip key={`${option}-${index}`} variant="outlined" label={option} />
-                      ))
-                    }
-                    renderInput={(params) => (
-                      <TextField {...params} label="Terrain (sélection multiple)" placeholder="Choisir dimensions/option" />
-                    )}
-                  />
-                </Box>
+                    <Box sx={{ mt: 1 }}>
+                      <Autocomplete
+                        multiple
+                        freeSolo
+                        options={SERVICES_OPTIONS}
+                        value={t.services || []}
+                        onChange={(_, newValue) => handleTerrainChange(idx, 'services', newValue)}
+                        renderTags={(value: string[], getTagProps) =>
+                          value.map((option: string, index: number) => (
+                            <Chip {...getTagProps({ index })} key={`${option}-${index}`} variant="outlined" label={option} />
+                          ))
+                        }
+                        renderInput={(params) => (
+                          <TextField {...params} label="Services" placeholder="Ajouter un service" />
+                        )}
+                      />
+                    </Box>
+
+                    <Box sx={{ mt: 1 }}>
+                      <Autocomplete
+                        multiple
+                        freeSolo
+                        options={ACCESS_OPTIONS}
+                        value={Array.isArray(t.acces) ? t.acces : (t.acces ? [t.acces] : [])}
+                        onChange={(_, newValue) => handleTerrainChange(idx, 'acces', newValue)}
+                        renderTags={(value: string[], getTagProps) =>
+                          value.map((option: string, index: number) => (
+                            <Chip {...getTagProps({ index })} key={`${option}-${index}`} variant="outlined" label={option} />
+                          ))
+                        }
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            label="Accès"
+                            placeholder="Ajouter un accès (ex: Accessible en automobile)"
+                          />
+                        )}
+                        fullWidth
+                      />
+                    </Box>
+
+                    <Box sx={{ mt: 1 }}>
+                      <Autocomplete
+                        multiple
+                        freeSolo
+                        options={DESCRIPTION_OPTIONS}
+                        value={(t && t.description) || []}
+                        onChange={(_, newValue) => handleTerrainChange(idx, 'description', newValue)}
+                        renderTags={(value: string[], getTagProps) =>
+                          value.map((option: string, index: number) => (
+                            <Chip {...getTagProps({ index })} key={`${option}-${index}`} variant="outlined" label={option} />
+                          ))
+                        }
+                        renderInput={(params) => (
+                          <TextField {...params} label="Description" placeholder="Ajouter une description" />
+                        )}
+                      />
+                    </Box>
+
+                    <Box sx={{ mt: 1 }}>
+                      <Autocomplete
+                        multiple
+                        freeSolo
+                        options={EQUIPEMENT_ADMISSIBLE_OPTIONS}
+                        value={t.equipementAdmissible || []}
+                        onChange={(_, newValue) => handleTerrainChange(idx, 'equipementAdmissible', newValue)}
+                        renderTags={(value: string[], getTagProps) =>
+                          value.map((option: string, index: number) => (
+                            <Chip {...getTagProps({ index })} key={`${option}-${index}`} variant="outlined" label={option} />
+                          ))
+                        }
+                        renderInput={(params) => (
+                          <TextField {...params} label="Équipement admissible" placeholder="Ajouter un équipement" />
+                        )}
+                      />
+                    </Box>
+
+                    <Box sx={{ mt: 1 }}>
+                      <Autocomplete
+                        multiple
+                        freeSolo
+                        options={TERRAIN_OPTIONS}
+                        value={(t && t.selections) || []}
+                        onChange={(_, newValue) => handleTerrainChange(idx, 'selections', newValue)}
+                        renderTags={(value: string[], getTagProps) =>
+                          value.map((option: string, index: number) => (
+                            <Chip {...getTagProps({ index })} key={`${option}-${index}`} variant="outlined" label={option} />
+                          ))
+                        }
+                        renderInput={(params) => (
+                          <TextField {...params} label="Terrain (sélection multiple)" placeholder="Choisir dimensions/option" />
+                        )}
+                      />
+                    </Box>
+
+                    <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mt: 1 }}>
+                      <TextField
+                        label="Capacité maximale"
+                        value={t.capaciteMaximale || ''}
+                        onChange={(e) => handleTerrainChange(idx, 'capaciteMaximale', e.target.value)}
+                        fullWidth
+                      />
+                    </Stack>
+
+                    <Box sx={{ mt: 1 }}>
+                      <Autocomplete
+                        multiple
+                        freeSolo
+                        options={IMPORTANT_OPTIONS}
+                        value={(t && t.important) || []}
+                        onChange={(_, newValue) => handleTerrainChange(idx, 'important', newValue)}
+                        renderTags={(value: string[], getTagProps) =>
+                          value.map((option: string, index: number) => (
+                            <Chip {...getTagProps({ index })} key={`${option}-${index}`} variant="outlined" label={option} />
+                          ))
+                        }
+                        renderInput={(params) => (
+                          <TextField {...params} label="Important" placeholder="Ajouter un élément important" />
+                        )}
+                      />
+                    </Box>
+
                   </Box>
                 </AccordionDetails>
               </Accordion>
