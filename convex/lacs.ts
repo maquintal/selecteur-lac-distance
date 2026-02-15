@@ -5,7 +5,7 @@
 // convex/lacs.ts
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
-import { paginationOptsValidator } from "convex/server";
+// import { paginationOptsValidator } from "convex/server";
 import { checkReadOnlyModeConvex } from "./checkReadOnlyMode";
 
 // ============================================
@@ -144,11 +144,11 @@ export const removeCampingFromLac = mutation({
 // const lacs = await ctx.db.query("lacs");
 
 // ✅ CORRECT - Avec .collect()
-export const getAllLacs = query({
-  handler: async (ctx) => {
-    return await ctx.db.query("lacs").collect();
-  },
-});
+// export const getAllLacs = query({
+//   handler: async (ctx) => {
+//     return await ctx.db.query("lacs").collect();
+//   },
+// });
 
 export const getAllLacsSorted = query({
   handler: async (ctx) => {
@@ -169,212 +169,213 @@ export const getAllLacsSorted = query({
 });
 
 // ✅ CORRECT - Avec .first()
-export const getFirstLac = query({
-  handler: async (ctx) => {
-    return await ctx.db.query("lacs").first();
-  },
-});
+
+// export const getFirstLac = query({
+//   handler: async (ctx) => {
+//     return await ctx.db.query("lacs").first();
+//   },
+// });
 
 // ✅ CORRECT - Avec .unique() sur un index
-export const getLacByName = query({
-  args: { nom: v.string() },
-  handler: async (ctx, args) => {
-    const results = await ctx.db
-      .query("lacs")
-      .withSearchIndex("search_nom", (q) => q.search("nomDuLac", args.nom))
-      .take(1);
-    return results[0] || null;
-  },
-});
+// export const getLacByName = query({
+//   args: { nom: v.string() },
+//   handler: async (ctx, args) => {
+//     const results = await ctx.db
+//       .query("lacs")
+//       .withSearchIndex("search_nom", (q) => q.search("nomDuLac", args.nom))
+//       .take(1);
+//     return results[0] || null;
+//   },
+// });
 
 // ✅ CORRECT - Avec .take(n)
-export const getRecentLacs = query({
-  args: { limit: v.number() },
-  handler: async (ctx, args) => {
-    return await ctx.db
-      .query("lacs")
-      .order("desc")
-      .take(args.limit);
-  },
-});
+// export const getRecentLacs = query({
+//   args: { limit: v.number() },
+//   handler: async (ctx, args) => {
+//     return await ctx.db
+//       .query("lacs")
+//       .order("desc")
+//       .take(args.limit);
+//   },
+// });
 
 // ✅ CORRECT - Pagination avec .paginate()
-export const getLacsPaginated = query({
-  args: {
-    paginationOpts: paginationOptsValidator,
-  },
-  handler: async (ctx, args) => {
-    return await ctx.db
-      .query("lacs")
-      .order("desc")
-      .paginate(args.paginationOpts);
-  },
-});
+// export const getLacsPaginated = query({
+//   args: {
+//     paginationOpts: paginationOptsValidator,
+//   },
+//   handler: async (ctx, args) => {
+//     return await ctx.db
+//       .query("lacs")
+//       .order("desc")
+//       .paginate(args.paginationOpts);
+//   },
+// });
 
 // ✅ CORRECT - Filtrage conditionnel
-export const searchLacsAdvanced = query({
-  args: {
-    region: v.optional(v.string()),
-    hasSuperficie: v.optional(v.boolean()),
-    minSuperficie: v.optional(v.number()),
-  },
-  handler: async (ctx, args) => {
-    // Récupérer les lacs avec filtre de région si fourni
-    let lacs;
-    if (args.region !== undefined) {
-      const region = args.region; // Capturer la valeur pour satisfaire TypeScript
-      lacs = await ctx.db
-        .query("lacs")
-        .withIndex("by_region", (q) =>
-          q.eq("regionAdministrativeQuebec", region)
-        )
-        .collect();
-    } else {
-      lacs = await ctx.db.query("lacs").collect();
-    }
+// export const searchLacsAdvanced = query({
+//   args: {
+//     region: v.optional(v.string()),
+//     hasSuperficie: v.optional(v.boolean()),
+//     minSuperficie: v.optional(v.number()),
+//   },
+//   handler: async (ctx, args) => {
+//     // Récupérer les lacs avec filtre de région si fourni
+//     let lacs;
+//     if (args.region !== undefined) {
+//       const region = args.region; // Capturer la valeur pour satisfaire TypeScript
+//       lacs = await ctx.db
+//         .query("lacs")
+//         .withIndex("by_region", (q) =>
+//           q.eq("regionAdministrativeQuebec", region)
+//         )
+//         .collect();
+//     } else {
+//       lacs = await ctx.db.query("lacs").collect();
+//     }
 
-    // Filtrage en JavaScript pour conditions complexes
-    return lacs.filter((lac) => {
-      if (args.hasSuperficie && !lac.superficie) return false;
-      if (args.minSuperficie && (!lac.superficie || lac.superficie.hectares < args.minSuperficie)) {
-        return false;
-      }
-      return true;
-    });
-  },
-});
+//     // Filtrage en JavaScript pour conditions complexes
+//     return lacs.filter((lac) => {
+//       if (args.hasSuperficie && !lac.superficie) return false;
+//       if (args.minSuperficie && (!lac.superficie || lac.superficie.hectares < args.minSuperficie)) {
+//         return false;
+//       }
+//       return true;
+//     });
+//   },
+// });
 
 // Obtenir tous les lacs avec leurs détails complets
-export const getLacsWithDetails = query({
-  args: {
-    region: v.optional(v.string()),
-    especeId: v.optional(v.id("especes")),
-  },
-  handler: async (ctx, args) => {
-    // Récupérer les lacs avec filtre de région si fourni
-    let lacs;
-    if (args.region !== undefined) {
-      const region = args.region; // Capturer la valeur pour satisfaire TypeScript
-      lacs = await ctx.db
-        .query("lacs")
-        .withIndex("by_region", (q) =>
-          q.eq("regionAdministrativeQuebec", region)
-        )
-        .collect();
-    } else {
-      lacs = await ctx.db.query("lacs").collect();
-    }
+// export const getLacsWithDetails = query({
+//   args: {
+//     region: v.optional(v.string()),
+//     especeId: v.optional(v.id("especes")),
+//   },
+//   handler: async (ctx, args) => {
+//     // Récupérer les lacs avec filtre de région si fourni
+//     let lacs;
+//     if (args.region !== undefined) {
+//       const region = args.region; // Capturer la valeur pour satisfaire TypeScript
+//       lacs = await ctx.db
+//         .query("lacs")
+//         .withIndex("by_region", (q) =>
+//           q.eq("regionAdministrativeQuebec", region)
+//         )
+//         .collect();
+//     } else {
+//       lacs = await ctx.db.query("lacs").collect();
+//     }
 
-    // Filtrer par espèce si nécessaire et s'assurer que especeId est défini
-    const filteredLacs = args.especeId !== undefined
-      ? lacs.filter((lac) => {
-        const especeId = args.especeId;
-        return especeId !== undefined && lac.especeIds.includes(especeId);
-      })
-      : lacs;
+//     // Filtrer par espèce si nécessaire et s'assurer que especeId est défini
+//     const filteredLacs = args.especeId !== undefined
+//       ? lacs.filter((lac) => {
+//         const especeId = args.especeId;
+//         return especeId !== undefined && lac.especeIds.includes(especeId);
+//       })
+//       : lacs;
 
-    // Enrichir avec les données liées
-    return Promise.all(
-      filteredLacs.map(async (lac) => {
-        // Récupérer le site
-        // const site = lac.siteId
-        //   ? await ctx.db.get(lac.siteId)
-        //   : null;
+//     // Enrichir avec les données liées
+//     return Promise.all(
+//       filteredLacs.map(async (lac) => {
+//         // Récupérer le site
+//         // const site = lac.siteId
+//         //   ? await ctx.db.get(lac.siteId)
+//         //   : null;
 
-        // Récupérer les espèces
-        const especes = await Promise.all(
-          lac.especeIds.map((id) => ctx.db.get(id))
-        );
+//         // Récupérer les espèces
+//         const especes = await Promise.all(
+//           lac.especeIds.map((id) => ctx.db.get(id))
+//         );
 
-        // Récupérer les campings
-        const hebergements = await Promise.all(
-          lac.hebergements.map(async (h) => {
-            const camping = await ctx.db.get(h.campingId);
-            return {
-              ...camping,
-              distanceDepuisAcceuil: h.distanceDepuisAcceuil,
-              distanceDepuisLac: h.distanceDepuisLac,
-            };
-          })
-        );
+//         // Récupérer les campings
+//         const hebergements = await Promise.all(
+//           lac.hebergements.map(async (h) => {
+//             const camping = await ctx.db.get(h.campingId);
+//             return {
+//               ...camping,
+//               distanceDepuisAcceuil: h.distanceDepuisAcceuil,
+//               distanceDepuisLac: h.distanceDepuisLac,
+//             };
+//           })
+//         );
 
-        return {
-          ...lac,
-          // site,
-          especes: especes.filter((e) => e !== null),
-          hebergements,
-        };
-      })
-    );
-  },
-});
+//         return {
+//           ...lac,
+//           // site,
+//           especes: especes.filter((e) => e !== null),
+//           hebergements,
+//         };
+//       })
+//     );
+//   },
+// });
 
 // Rechercher des lacs par nom
-export const searchLacs = query({
-  args: {
-    searchTerm: v.string(),
-    region: v.optional(v.string()),
-  },
-  handler: async (ctx, args) => {
-    const results = await ctx.db
-      .query("lacs")
-      .withSearchIndex("search_nom", (q) => {
-        let search = q.search("nomDuLac", args.searchTerm);
-        if (args.region) {
-          search = search.eq("regionAdministrativeQuebec", args.region);
-        }
-        return search;
-      })
-      .take(20);
+// export const searchLacs = query({
+//   args: {
+//     searchTerm: v.string(),
+//     region: v.optional(v.string()),
+//   },
+//   handler: async (ctx, args) => {
+//     const results = await ctx.db
+//       .query("lacs")
+//       .withSearchIndex("search_nom", (q) => {
+//         let search = q.search("nomDuLac", args.searchTerm);
+//         if (args.region) {
+//           search = search.eq("regionAdministrativeQuebec", args.region);
+//         }
+//         return search;
+//       })
+//       .take(20);
 
-    return results;
-  },
-});
+//     return results;
+//   },
+// });
 
 // Trouver les lacs à proximité (géospatial)
-export const getLacsNearby = query({
-  args: {
-    latitude: v.number(),
-    longitude: v.number(),
-    radiusKm: v.number(),
-  },
-  handler: async (ctx, args) => {
-    const allLacs = await ctx.db.query("lacs").collect();
+// export const getLacsNearby = query({
+//   args: {
+//     latitude: v.number(),
+//     longitude: v.number(),
+//     radiusKm: v.number(),
+//   },
+//   handler: async (ctx, args) => {
+//     const allLacs = await ctx.db.query("lacs").collect();
 
-    // Fonction pour calculer la distance
-    const haversineDistance = (
-      lat1: number,
-      lon1: number,
-      lat2: number,
-      lon2: number
-    ) => {
-      const R = 6371; // Rayon de la Terre en km
-      const dLat = ((lat2 - lat1) * Math.PI) / 180;
-      const dLon = ((lon2 - lon1) * Math.PI) / 180;
-      const a =
-        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos((lat1 * Math.PI) / 180) *
-        Math.cos((lat2 * Math.PI) / 180) *
-        Math.sin(dLon / 2) *
-        Math.sin(dLon / 2);
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-      return R * c;
-    };
+//     // Fonction pour calculer la distance
+//     const haversineDistance = (
+//       lat1: number,
+//       lon1: number,
+//       lat2: number,
+//       lon2: number
+//     ) => {
+//       const R = 6371; // Rayon de la Terre en km
+//       const dLat = ((lat2 - lat1) * Math.PI) / 180;
+//       const dLon = ((lon2 - lon1) * Math.PI) / 180;
+//       const a =
+//         Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+//         Math.cos((lat1 * Math.PI) / 180) *
+//         Math.cos((lat2 * Math.PI) / 180) *
+//         Math.sin(dLon / 2) *
+//         Math.sin(dLon / 2);
+//       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+//       return R * c;
+//     };
 
-    return allLacs
-      .map((lac) => ({
-        ...lac,
-        distance: haversineDistance(
-          args.latitude,
-          args.longitude,
-          lac.coordonnees.latitude,
-          lac.coordonnees.longitude
-        ),
-      }))
-      .filter((lac) => lac.distance <= args.radiusKm)
-      .sort((a, b) => a.distance - b.distance);
-  },
-});
+//     return allLacs
+//       .map((lac) => ({
+//         ...lac,
+//         distance: haversineDistance(
+//           args.latitude,
+//           args.longitude,
+//           lac.coordonnees.latitude,
+//           lac.coordonnees.longitude
+//         ),
+//       }))
+//       .filter((lac) => lac.distance <= args.radiusKm)
+//       .sort((a, b) => a.distance - b.distance);
+//   },
+// });
 
 // Obtenir tous les campings
 export const getAllCampings = query({
@@ -390,24 +391,24 @@ export const getAllEspeces = query({
 });
 
 // Obtenir les campings d'un lac spécifique
-export const getCampingsForLac = query({
-  args: { lacId: v.id("lacs") },
-  handler: async (ctx, args) => {
-    const lac = await ctx.db.get(args.lacId);
-    if (!lac) return [];
+// export const getCampingsForLac = query({
+//   args: { lacId: v.id("lacs") },
+//   handler: async (ctx, args) => {
+//     const lac = await ctx.db.get(args.lacId);
+//     if (!lac) return [];
 
-    return Promise.all(
-      lac.hebergements.map(async (h) => {
-        const camping = await ctx.db.get(h.campingId);
-        return {
-          ...camping,
-          distanceDepuisAcceuil: h.distanceDepuisAcceuil,
-          distanceDepuisLac: h.distanceDepuisLac,
-        };
-      })
-    );
-  },
-});
+//     return Promise.all(
+//       lac.hebergements.map(async (h) => {
+//         const camping = await ctx.db.get(h.campingId);
+//         return {
+//           ...camping,
+//           distanceDepuisAcceuil: h.distanceDepuisAcceuil,
+//           distanceDepuisLac: h.distanceDepuisLac,
+//         };
+//       })
+//     );
+//   },
+// });
 
 // ============================================
 // MUTATIONS CONVEX
@@ -617,28 +618,28 @@ export const addEspece = mutation({
   },
 });
 
-export const addEspeceToLac = mutation({
-  args: {
-    lacId: v.id("lacs"),
-    especeId: v.id("especes"),
-  },
-  handler: async (ctx, args) => {
-    checkReadOnlyModeConvex()
+// export const addEspeceToLac = mutation({
+//   args: {
+//     lacId: v.id("lacs"),
+//     especeId: v.id("especes"),
+//   },
+//   handler: async (ctx, args) => {
+//     checkReadOnlyModeConvex()
 
-    const lac = await ctx.db.get(args.lacId);
-    if (!lac) throw new Error("Lac non trouvé");
+//     const lac = await ctx.db.get(args.lacId);
+//     if (!lac) throw new Error("Lac non trouvé");
 
-    // Vérifier si l'espèce n'est pas déjà liée
-    if (lac.especeIds.includes(args.especeId)) {
-      throw new Error("Cette espèce est déjà liée à ce lac");
-    }
+//     // Vérifier si l'espèce n'est pas déjà liée
+//     if (lac.especeIds.includes(args.especeId)) {
+//       throw new Error("Cette espèce est déjà liée à ce lac");
+//     }
 
-    return await ctx.db.patch(args.lacId, {
-      especeIds: [...lac.especeIds, args.especeId],
-      updatedAt: Date.now(),
-    });
-  },
-});
+//     return await ctx.db.patch(args.lacId, {
+//       especeIds: [...lac.especeIds, args.especeId],
+//       updatedAt: Date.now(),
+//     });
+//   },
+// });
 
 // 🆕 NOUVELLE MUTATION À AJOUTER
 export const toggleChoixInteressant = mutation({
@@ -673,37 +674,42 @@ export const getLacsSortedOptimized = query({
     // Récupérer tous les lacs
     const allLacs = await ctx.db.query("lacs").collect();
 
-    // Enrichir avec les données liées
-    const enrichedLacs = await Promise.all(
-      allLacs.map(async (lac) => {
-        // Récupérer les espèces
-        const especes = await Promise.all(
-          lac.especeIds.map((id) => ctx.db.get(id))
-        );
+    // Collecter TOUS les IDs en une seule passe
+    const allEspeceIds = [...new Set(allLacs.flatMap((lac) => lac.especeIds ?? []))];
+    const allCampingIds = [...new Set(allLacs.flatMap((lac) => lac.hebergements?.map((h) => h.campingId) ?? []))];
 
-        // Récupérer les campings avec leurs infos
-        const hebergements = await Promise.all(
-          lac.hebergements.map(async (h) => {
-            const camping = await ctx.db.get(h.campingId);
-            return {
-              ...camping,
-              distanceDepuisAcceuil: h.distanceDepuisAcceuil,
-              distanceDepuisLac: h.distanceDepuisLac,
-            };
-          })
-        );
+    // Charger TOUT en parallèle (2 Promise.all au lieu de N*M)
+    const [allEspeces, allCampings] = await Promise.all([
+      Promise.all(allEspeceIds.map((id) => ctx.db.get(id))),
+      Promise.all(allCampingIds.map((id) => ctx.db.get(id))),
+    ]);
 
-        return {
-          ...lac,
-          especes: especes.filter((e) => e !== null),
-          hebergements,
-        };
-      })
+    // Construire des maps pour lookup O(1)
+    const especesMap = new Map(
+      allEspeceIds.map((id, i) => [id, allEspeces[i]])
+    );
+    const campingsMap = new Map(
+      allCampingIds.map((id, i) => [id, allCampings[i]])
     );
 
-    // 🎯 Tri modifié: Motorisation EN PREMIER, puis nombre d'hébergements
+    // Enrichir sans aucune requête DB supplémentaire
+    const enrichedLacs = allLacs.map((lac) => {
+      const especes = (lac.especeIds ?? [])
+        .map((id) => especesMap.get(id))
+        .filter((e) => e != null);
+
+      const hebergements = (lac.hebergements ?? []).map((h) => ({
+        ...campingsMap.get(h.campingId),
+        distanceDepuisAcceuil: h.distanceDepuisAcceuil,
+        distanceDepuisLac: h.distanceDepuisLac,
+      }));
+
+      return { ...lac, especes, hebergements };
+    });
+
+    // Tri
     return enrichedLacs.sort((a, b) => {
-      // Priorité 1: Motorisation (électrique > essence > autre)
+      // Priorité 1: Motorisation
       const motorA = a.embarcation?.motorisation?.necessaire;
       const motorB = b.embarcation?.motorisation?.necessaire;
       const priorityA = motorA === 'electrique' ? 1 : motorA === 'essence' ? 2 : 3;
@@ -714,7 +720,19 @@ export const getLacsSortedOptimized = query({
       // Priorité 2: Nombre d'hébergements (décroissant)
       const countA = a.hebergements?.length || 0;
       const countB = b.hebergements?.length || 0;
-      return countB - countA;
+
+      if (countA !== countB) return countB - countA;
+
+      // Priorité 3: Temps minimum parmi les hébergements (croissant)
+      const minTempsA = Math.min(
+        ...(a.hebergements?.map((h) => h.distanceDepuisLac?.temps ?? Infinity) ?? [Infinity])
+      );
+      const minTempsB = Math.min(
+        ...(b.hebergements?.map((h) => h.distanceDepuisLac?.temps ?? Infinity) ?? [Infinity])
+      );
+
+      
+      return minTempsA - minTempsB;
     });
   },
 });

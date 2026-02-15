@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState } from 'react';
 import { Acces } from '../types/lake';
-import { LacWithDetails, EspeceDoc, CampingDoc } from '../types/schema.types';
+import { LacWithDetails, EspeceDoc } from '../types/schema.types';
 import { Id } from "../../convex/_generated/dataModel";
 import {
     Box,
@@ -51,6 +51,7 @@ type Filters = {
 export default function LakesSearchCards() {
     // Utilisation de la query Convex triée
     const queryResult = useQuery(api.lacs.getLacsSortedOptimized);
+    // console.log("Query result:", queryResult);
     const loading = queryResult === undefined;
 
     // Mémoiser les données de la requête
@@ -234,7 +235,6 @@ export default function LakesSearchCards() {
             recommendation: 'Dangereux — ne pas naviguer avec moteur électrique'
         };
     };
-
 
     const getHebergement = (
         acces: Acces | undefined,

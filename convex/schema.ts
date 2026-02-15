@@ -192,27 +192,27 @@ export default defineSchema({
   // TABLE: hebergement_lacs (table de jonction)
   // Alternative pour des requêtes plus flexibles
   // ============================================
-  hebergement_lacs: defineTable({
-    lacId: v.id("lacs"),
-    campingId: v.id("campings"),
-    distanceDepuisAcceuil: v.optional(
-      v.union(
-        v.object({
-          temps: v.number(),
-          kilometrage: v.number(),
-        })
-      )
-    ),
-    distanceDepuisLac: v.optional(
-      v.union(
-        v.object({
-          temps: v.number(),
-          kilometrage: v.number(),
-        })
-      )
-    ),
-  })
-    .index("by_lac", ["lacId"])
-    .index("by_camping", ["campingId"])
-    .index("by_lac_camping", ["lacId", "campingId"]),
+  // hebergement_lacs: defineTable({
+  //   lacId: v.id("lacs"),
+  //   campingId: v.id("campings"),
+  //   distanceDepuisAcceuil: v.optional(
+  //     v.union(
+  //       v.object({
+  //         temps: v.number(),
+  //         kilometrage: v.number(),
+  //       })
+  //     )
+  //   ),
+  //   distanceDepuisLac: v.optional(
+  //     v.union(
+  //       v.object({
+  //         temps: v.number(),
+  //         kilometrage: v.number(),
+  //       })
+  //     )
+  //   ),
+  // })
+  //   .index("by_lac", ["lacId"])
+  //   .index("by_camping", ["campingId"])
+  //   .index("by_lac_camping", ["lacId", "campingId"]),
 });

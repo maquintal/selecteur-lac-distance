@@ -6,53 +6,32 @@ export type LacDoc = Doc<"lacs">;
 export type CampingDoc = Doc<"campings">;
 export type EspeceDoc = Doc<"especes">;
 // export type SiteDoc = Doc<"sites">;
-export type HebergementLacDoc = Doc<"hebergement_lacs">;
+// export type HebergementLacDoc = Doc<"hebergement_lacs">;
 
 // Types pour les nouveaux documents (sans les champs système)
 export type NewLacInput = Omit<LacDoc, "_id" | "_creationTime" | "createdAt" | "updatedAt">;
 export type NewCampingInput = Omit<CampingDoc, "_id" | "_creationTime">;
 export type NewEspeceInput = Omit<EspeceDoc, "_id" | "_creationTime">;
 // export type NewSiteInput = Omit<SiteDoc, "_id" | "_creationTime">;
-export type NewHebergementLacInput = Omit<HebergementLacDoc, "_id" | "_creationTime">;
+// export type NewHebergementLacInput = Omit<HebergementLacDoc, "_id" | "_creationTime">;
 
 // Type pour les relations d'hébergement dans un lac
-export type HebergementLac = {
-  campingId?: Id<"campings">;
-  distanceDepuisAcceuil?: {
-    temps: number;
-    kilometrage: number;
-  };
-  distanceDepuisLac?: {
-    temps: number;
-    kilometrage: number;
-  };
-};
+// export type HebergementLac = {
+//   campingId?: Id<"campings">;
+//   distanceDepuisAcceuil?: {
+//     temps: number;
+//     kilometrage: number;
+//   };
+//   distanceDepuisLac?: {
+//     temps: number;
+//     kilometrage: number;
+//   };
+// };
 
 // Type enrichi pour un lac avec ses relations
 export interface LacWithDetails extends Omit<LacDoc, "hebergements"> {
   especes: EspeceDoc[];
-  hebergements: {
-    distanceDepuisAcceuil?: {
-      temps: number;
-      kilometrage: number;
-    };
-    distanceDepuisLac?: {
-      temps: number;
-      kilometrage: number;
-    };
-    _id?: Id<"campings">;
-    nom?: string;
-    organisme?: "privé" | "SEPAQ" | "Camping" | "Pourvoirie";
-    coordonnees?: {
-      latitude: number;
-      longitude: number;
-    };
-    commodites?: {
-      eau: boolean;
-      electricite: boolean;
-    };
-    regionAdministrative?: string;
-  }[];
+  hebergements: CampingDoc[]
 };
 
 // Valeurs par défaut pour les nouveaux documents
@@ -109,10 +88,3 @@ export const defaultEspeceInput: NewEspeceInput = {
   // aliases: [],
   categorie: undefined,
 };
-
-// export const defaultSiteInput: NewSiteInput = {
-//   nom: "",
-//   organisme: "",
-//   type: "gouvernemental",
-//   regionAdministrative: "",
-// };

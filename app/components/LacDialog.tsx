@@ -436,47 +436,6 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
             />
           </Box>
 
-          {/* <Typography variant="h6" sx={{ mt: 1 }}>Embarcation</Typography>
-          <Box sx={{ display: 'flex', gap: 2 }}>
-            <Autocomplete
-              fullWidth
-              options={typeEmbarcationOptions}
-              value={formData.embarcation.type}
-              onChange={(_, newValue) => handleInputChange('embarcation', { type: newValue || '' })}
-              renderInput={(params) => (
-                <TextField {...params} label="Type d'embarcation" />
-              )}
-              freeSolo={false}
-            />
-
-            <Autocomplete
-              fullWidth
-              options={motorisationOptions}
-              value={motorisationOptions.find(opt => opt.value === formData.embarcation.motorisation.necessaire) || null}
-              onChange={(_, newValue) => handleInputChange('embarcation', {
-                motorisation: { necessaire: newValue?.value || '' }
-              })}
-              getOptionLabel={(option) => option.label}
-              renderInput={(params) => (
-                <TextField {...params} label="Type de motorisation" />
-              )}
-              isOptionEqualToValue={(option, value) => option.value === value.value}
-              freeSolo={false}
-            />
-
-            {formData.embarcation.motorisation.necessaire === "essence" && (
-              <TextField
-                fullWidth
-                label="Puissance minimale (CV)"
-                type="number"
-                value={formData.embarcation.motorisation.puissance?.minimum || 0}
-                onChange={(e) => handleInputChange('embarcation', {
-                  motorisation: { puissance: { minimum: e.target.value ? parseInt(e.target.value) : 0 } }
-                })}
-              />
-            )}
-          </Box> */}
-
           <Typography variant="h6" sx={{ mt: 1 }}>Embarcation</Typography>
           <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
             <Box sx={{ flex: '1 1 300px' }}>
@@ -588,7 +547,12 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {lac.hebergements.map((h: { nom?: string; campingId?: Id<"campings">; _id?: Id<"campings">; distanceDepuisLac?: { temps: number; kilometrage: number } }, index) => {
+                    {lac.hebergements.map((h: {
+                      nom?: string;
+                      campingId?: Id<"campings">;
+                      _id?: Id<"campings">;
+                      distanceDepuisLac?: { temps: number; kilometrage: number }
+                    }, index) => {
                       // h contient déjà les données enrichies du camping (nom, organisme, etc.)
                       const campingNom = h.nom || 'N/A';
                       const campingId = h.campingId || h._id;
@@ -675,6 +639,19 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
                   })}
                   sx={{ width: '150px' }}
                 />
+                <Tooltip title="Copier les coordonnées">
+                  <IconButton
+                    onClick={() => {
+                      const lat = hebergement.coordonnees.latitude.toString().replace(',', '.');
+                      const lng = hebergement.coordonnees.longitude.toString().replace(',', '.');
+                      const coords = `${lat}, ${lng}`;
+                      navigator.clipboard.writeText(coords);
+                    }}
+                    color="primary"
+                  >
+                    <ContentCopyIcon />
+                  </IconButton>
+                </Tooltip>
                 <Tooltip title={"Ajouter l'hébergement"}>
                   <span>
                     <Button
