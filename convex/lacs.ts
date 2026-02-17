@@ -709,7 +709,28 @@ export const getLacsSortedOptimized = query({
 
     // Tri
     return enrichedLacs.sort((a, b) => {
-      // Priorité 1: Motorisation
+      // Priorité 0: Superficie (3-45 ha d'abord, puis < 3, puis > 45)
+      const hectaresA = a.superficie?.hectares ?? 0;
+      const hectaresB = b.superficie?.hectares ?? 0;
+
+      const getSuperficiePriority = (ha: number) => {
+        if (ha >= 3 && ha <= 30) return 1; // Idéal
+        if (ha < 3) return 2;               // Trop petit
+        return 3;                           // Trop grand
+      };
+
+      const supPriorityA = getSuperficiePriority(hectaresA);
+      const supPriorityB = getSuperficiePriority(hectaresB);
+
+      if (supPriorityA !== supPriorityB) return supPriorityA - supPriorityB;
+
+      // Priorité 1: Accessibilité
+      const accessibleA = a.acces?.accessible === "auto" || a.acces?.accessible === "véhicule utilitaire sport (VUS)";
+      const accessibleB = b.acces?.accessible === "auto" || b.acces?.accessible === "véhicule utilitaire sport (VUS)";
+
+      if (accessibleA !== accessibleB) return accessibleA ? -1 : 1;
+
+      // Priorité 2: Motorisation
       const motorA = a.embarcation?.motorisation?.necessaire;
       const motorB = b.embarcation?.motorisation?.necessaire;
       const priorityA = motorA === 'electrique' ? 1 : motorA === 'essence' ? 2 : 3;
@@ -717,13 +738,13 @@ export const getLacsSortedOptimized = query({
 
       if (priorityA !== priorityB) return priorityA - priorityB;
 
-      // Priorité 2: Nombre d'hébergements (décroissant)
+      // Priorité 3: Nombre d'hébergements (décroissant)
       const countA = a.hebergements?.length || 0;
       const countB = b.hebergements?.length || 0;
 
       if (countA !== countB) return countB - countA;
 
-      // Priorité 3: Temps minimum parmi les hébergements (croissant)
+      // Priorité 4: Temps minimum parmi les hébergements (croissant)
       const minTempsA = Math.min(
         ...(a.hebergements?.map((h) => h.distanceDepuisLac?.temps ?? Infinity) ?? [Infinity])
       );
@@ -731,7 +752,6 @@ export const getLacsSortedOptimized = query({
         ...(b.hebergements?.map((h) => h.distanceDepuisLac?.temps ?? Infinity) ?? [Infinity])
       );
 
-      
       return minTempsA - minTempsB;
     });
   },

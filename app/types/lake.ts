@@ -43,25 +43,25 @@ export interface Hebergement {
     }
 }
 
-export interface Lake {
-    _id: string;
-    nomDuLac: string;
-    regionAdministrativeQuebec: string;
-    juridiction: {
-        type: string;
-        organisme: string;
-        site: string;
-        zone: number;
-    };
-    reserveFaunique?: string;
-    acces: Acces | undefined;
-    embarcation: Embarcation;
-    especes: string[];
-    camping: boolean;
-    coordonnees: {
-        latitude: number;
-        longitude: number;
-    }
-    superficie: Superficie[] | null
-    hebergement: Hebergement[] | null
-}
+// export interface Lake {
+//     _id: string;
+//     nomDuLac: string;
+//     regionAdministrativeQuebec: string;
+//     juridiction: {
+//         type: string;
+//         organisme: string;
+//         site: string;
+//         zone: number;
+//     };
+//     reserveFaunique?: string;
+//     acces: Acces | undefined;
+//     embarcation: Embarcation;
+//     especes: string[];
+//     camping: boolean;
+//     coordonnees: {
+//         latitude: number;
+//         longitude: number;
+//     }
+//     superficie: Superficie[] | null
+//     hebergement: Hebergement[] | null
+// }

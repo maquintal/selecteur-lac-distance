@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
-import { NewLacInput, defaultLacInput, HebergementLac, LacWithDetails, LacDoc } from '../../app/types/schema.types';
+import { NewLacInput, defaultLacInput, LacWithDetails, LacDoc, HebergementLacInput } from '../../app/types/schema.types';
 import { Id } from "../../convex/_generated/dataModel";
 import { Embarcation, Acces } from "../types/lake";
 import { EMBARCATION_TYPES, MOTORISATION_TYPES, VEHICLE_TYPES } from "../constants/options";
@@ -121,7 +121,7 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
     }
   }, [open, mode, lac]);
 
-  const [hebergement, setHebergement] = useState<Omit<HebergementLac, 'campingId'> & { campingId: Id<"campings"> | null }>({
+  const [hebergement, setHebergement] = useState<HebergementLacInput>({
     campingId: null,
     distanceDepuisLac: {
       temps: 0,
@@ -205,7 +205,7 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
     });
   };
 
-  const handleHebergementChange = (field: keyof HebergementLac, value: Id<"campings"> | null | { temps?: number; kilometrage?: number }) => {
+  const handleHebergementChange = (field: keyof HebergementLacInput, value: Id<"campings"> | null | { temps?: number; kilometrage?: number }) => {
     if (field === 'distanceDepuisLac' && typeof value === 'object' && value !== null) {
       setHebergement((prev: Omit<HebergementLac, 'campingId'> & { campingId: Id<"campings"> | null }) => ({
         ...prev,

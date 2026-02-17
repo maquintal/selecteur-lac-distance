@@ -6,7 +6,6 @@ export type LacDoc = Doc<"lacs">;
 export type CampingDoc = Doc<"campings">;
 export type EspeceDoc = Doc<"especes">;
 // export type SiteDoc = Doc<"sites">;
-// export type HebergementLacDoc = Doc<"hebergement_lacs">;
 
 // Types pour les nouveaux documents (sans les champs système)
 export type NewLacInput = Omit<LacDoc, "_id" | "_creationTime" | "createdAt" | "updatedAt">;
@@ -14,6 +13,7 @@ export type NewCampingInput = Omit<CampingDoc, "_id" | "_creationTime">;
 export type NewEspeceInput = Omit<EspeceDoc, "_id" | "_creationTime">;
 // export type NewSiteInput = Omit<SiteDoc, "_id" | "_creationTime">;
 // export type NewHebergementLacInput = Omit<HebergementLacDoc, "_id" | "_creationTime">;
+export type HebergementLacInput = Omit<LacDoc, "_id" | "_creationTime"> & { campingId: Id<"campings"> };
 
 // Type pour les relations d'hébergement dans un lac
 // export type HebergementLac = {
