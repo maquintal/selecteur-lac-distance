@@ -714,9 +714,9 @@ export const getLacsSortedOptimized = query({
       const hectaresB = b.superficie?.hectares ?? 0;
 
       const getSuperficiePriority = (ha: number) => {
-        if (ha >= 3 && ha <= 30) return 1; // Idéal
-        if (ha < 3) return 2;               // Trop petit
-        return 3;                           // Trop grand
+        if (ha > 4 && ha <= 30) return 1; // Idéal
+        if (ha < 4) return 3;               // Trop petit
+        return 2;                           // Trop grand
       };
 
       const supPriorityA = getSuperficiePriority(hectaresA);
@@ -739,10 +739,10 @@ export const getLacsSortedOptimized = query({
       if (priorityA !== priorityB) return priorityA - priorityB;
 
       // Priorité 3: Nombre d'hébergements (décroissant)
-      const countA = a.hebergements?.length || 0;
-      const countB = b.hebergements?.length || 0;
+      // const countA = a.hebergements?.length || 0;
+      // const countB = b.hebergements?.length || 0;
 
-      if (countA !== countB) return countB - countA;
+      // if (countA !== countB) return countB - countA;
 
       // Priorité 4: Temps minimum parmi les hébergements (croissant)
       const minTempsA = Math.min(

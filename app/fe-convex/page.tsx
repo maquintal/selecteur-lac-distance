@@ -51,7 +51,7 @@ type Filters = {
 export default function LakesSearchCards() {
     // Utilisation de la query Convex triée
     const queryResult = useQuery(api.lacs.getLacsSortedOptimized);
-    // console.log("Query result:", queryResult);
+    console.log("Query result:", queryResult);
     const loading = queryResult === undefined;
 
     // Mémoiser les données de la requête
