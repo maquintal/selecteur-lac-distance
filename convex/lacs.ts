@@ -475,7 +475,10 @@ export const addLac = mutation({
         )
       }),
     }),
-
+    distanceMaisonLac: v.optional(v.object({
+      temps: v.number(),
+      kilometrage: v.number(),
+    }))
   },
   handler: async (ctx, args) => {
     checkReadOnlyModeConvex()
@@ -547,6 +550,10 @@ export const updateLac = mutation({
       })
     ),
     especeIds: v.optional(v.array(v.id("especes"))),
+    distanceMaisonLac: v.optional(v.object({
+      temps: v.number(),
+      kilometrage: v.number(),
+    }))
   },
   handler: async (ctx, args) => {
     checkReadOnlyModeConvex()
@@ -708,51 +715,108 @@ export const getLacsSortedOptimized = query({
     });
 
     // Tri
+    // return enrichedLacs.sort((a, b) => {
+
+
+    //   // Priorité 1: Accessibilité
+    //   const accessibleA = a.acces?.accessible === "auto" || a.acces?.accessible === "véhicule utilitaire sport (VUS)";
+    //   const accessibleB = b.acces?.accessible === "auto" || b.acces?.accessible === "véhicule utilitaire sport (VUS)";
+
+    //   if (accessibleA !== accessibleB) return accessibleA ? -1 : 1;
+
+    //   // Priorité 2: Motorisation
+    //   const motorA = a.embarcation?.motorisation?.necessaire;
+    //   const motorB = b.embarcation?.motorisation?.necessaire;
+    //   const priorityA = motorA === 'electrique' ? 1 : motorA === 'essence' ? 2 : 3;
+    //   const priorityB = motorB === 'electrique' ? 1 : motorB === 'essence' ? 2 : 3;
+
+    //   if (priorityA !== priorityB) return priorityA - priorityB;
+
+    //   // Priorité 0: Superficie (3-45 ha d'abord, puis < 3, puis > 45)
+    //   const hectaresA = a.superficie?.hectares ?? 0;
+    //   const hectaresB = b.superficie?.hectares ?? 0;
+
+    //   const getSuperficiePriority = (ha: number) => {
+    //     if (ha >= 4 && ha <= 30) return 1; // Idéal
+    //     if (ha <= 4 && ha <= 80) return 3;               // Trop petit
+    //     if (ha > 80) return 4;               // Trop grand
+    //     return 2;                           // grand
+    //   };
+
+    //   const supPriorityA = getSuperficiePriority(hectaresA);
+    //   const supPriorityB = getSuperficiePriority(hectaresB);
+
+    //   if (supPriorityA !== supPriorityB) return supPriorityA - supPriorityB;
+
+    //   // Priorité 3: Nombre d'hébergements (décroissant)
+    //   // const countA = a.hebergements?.length || 0;
+    //   // const countB = b.hebergements?.length || 0;
+
+    //   // if (countA !== countB) return countB - countA;
+
+    //   // Priorité 4: Temps minimum parmi les hébergements (croissant)
+    //   const minTempsA = Math.min(
+    //     ...(a.hebergements?.map((h) => h.distanceDepuisLac?.temps ?? Infinity) ?? [Infinity])
+    //   );
+    //   const minTempsB = Math.min(
+    //     ...(b.hebergements?.map((h) => h.distanceDepuisLac?.temps ?? Infinity) ?? [Infinity])
+    //   );
+
+    //   return minTempsA - minTempsB;
+    // });
+
     return enrichedLacs.sort((a, b) => {
-      // Priorité 0: Superficie (3-45 ha d'abord, puis < 3, puis > 45)
-      const hectaresA = a.superficie?.hectares ?? 0;
-      const hectaresB = b.superficie?.hectares ?? 0;
-
-      const getSuperficiePriority = (ha: number) => {
-        if (ha > 4 && ha <= 30) return 1; // Idéal
-        if (ha < 4) return 3;               // Trop petit
-        return 2;                           // Trop grand
-      };
-
-      const supPriorityA = getSuperficiePriority(hectaresA);
-      const supPriorityB = getSuperficiePriority(hectaresB);
-
-      if (supPriorityA !== supPriorityB) return supPriorityA - supPriorityB;
-
-      // Priorité 1: Accessibilité
-      const accessibleA = a.acces?.accessible === "auto" || a.acces?.accessible === "véhicule utilitaire sport (VUS)";
-      const accessibleB = b.acces?.accessible === "auto" || b.acces?.accessible === "véhicule utilitaire sport (VUS)";
-
-      if (accessibleA !== accessibleB) return accessibleA ? -1 : 1;
-
-      // Priorité 2: Motorisation
       const motorA = a.embarcation?.motorisation?.necessaire;
       const motorB = b.embarcation?.motorisation?.necessaire;
       const priorityA = motorA === 'electrique' ? 1 : motorA === 'essence' ? 2 : 3;
       const priorityB = motorB === 'electrique' ? 1 : motorB === 'essence' ? 2 : 3;
 
+      // 1. Tri par type de motorisation (électrique > essence > reste)
       if (priorityA !== priorityB) return priorityA - priorityB;
 
-      // Priorité 3: Nombre d'hébergements (décroissant)
-      // const countA = a.hebergements?.length || 0;
-      // const countB = b.hebergements?.length || 0;
+      // 2. Sous-tris uniquement dans le groupe électrique
+      if (motorA === 'electrique' && motorB === 'electrique') {
 
-      // if (countA !== countB) return countB - countA;
+        // 2a. Accessibilité (auto|VUS en premier)
+        const getAccessPriority = (accessible: string | undefined) => {
+          if (accessible === "auto" || accessible === "véhicule utilitaire sport (VUS)") return 1;
+          if (accessible === "camion 4x4") return 2;
+          return 3;
+        };
 
-      // Priorité 4: Temps minimum parmi les hébergements (croissant)
-      const minTempsA = Math.min(
-        ...(a.hebergements?.map((h) => h.distanceDepuisLac?.temps ?? Infinity) ?? [Infinity])
-      );
-      const minTempsB = Math.min(
-        ...(b.hebergements?.map((h) => h.distanceDepuisLac?.temps ?? Infinity) ?? [Infinity])
-      );
+        const accessSort = getAccessPriority(a.acces?.accessible) - getAccessPriority(b.acces?.accessible);
+        if (accessSort !== 0) return accessSort;
 
-      return minTempsA - minTempsB;
+        // 2b. Superficie (3-45 ha d'abord, puis < 3, puis > 45)
+        const hectaresA = a.superficie?.hectares ?? 0;
+        const hectaresB = b.superficie?.hectares ?? 0;
+
+        const getSuperficiePriority = (ha: number) => {
+          if (ha >= 4 && ha <= 30) return 1;  // Idéal
+          if (ha >= 30 && ha <= 80) return 2; // Grand
+          if (ha > 80) return 4;              // Trop grand
+          if (ha < 4) return 3                // Trop petit
+          return 5;                           // Non défini
+        };
+
+        const supPriorityA = getSuperficiePriority(hectaresA);
+        const supPriorityB = getSuperficiePriority(hectaresB);
+
+        if (supPriorityA !== supPriorityB) return supPriorityA - supPriorityB;
+
+        // 2c. Temps minimum depuis le lac (croissant), dans le sous-groupe auto|VUS
+        const minTempsA = Math.min(
+          ...(a.hebergements?.map((h) => h.distanceDepuisLac?.temps ?? Infinity) ?? [Infinity])
+        );
+        const minTempsB = Math.min(
+          ...(b.hebergements?.map((h) => h.distanceDepuisLac?.temps ?? Infinity) ?? [Infinity])
+        );
+
+        if (minTempsA !== minTempsB) return minTempsA - minTempsB;
+
+      }
+
+      return 0;
     });
   },
 });

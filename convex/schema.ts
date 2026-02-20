@@ -176,6 +176,15 @@ export default defineSchema({
     nbHebergements: v.optional(v.number()), // calculé lors de l'insertion/update
     isMoteurisationElectrique: v.optional(v.boolean()),
 
+    // distance depuis la maison
+    distanceMaisonLac: v.optional(v.union(
+      v.object({
+        temps: v.number(), // en minutes
+        kilometrage: v.number(),
+      }),
+      v.null()
+    )),
+
   })
     .index("by_region", ["regionAdministrativeQuebec"])
     .index("by_site", ["site"])

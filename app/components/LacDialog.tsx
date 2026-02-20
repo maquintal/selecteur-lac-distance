@@ -110,7 +110,9 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
           hebergements: hebergementsSimples,
           zone: lac.zone,
           site: lac.site,
-          superficie: lac.superficie || { hectares: 0, km2: 0 }
+          superficie: lac.superficie || { hectares: 0, km2: 0 },
+          distanceMaisonLac: lac.distanceMaisonLac || null
+
         };
 
         setFormData(newFormData);
@@ -244,7 +246,9 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
           superficie: formData.superficie,
           especeIds: formData.especeIds,
           acces: formData.acces,
-          embarcation: formData.embarcation
+          embarcation: formData.embarcation,
+          distanceMaisonLac: formData.distanceMaisonLac
+
         });
       } else if (mode === 'edit' && lac) {
         await updateLac({
@@ -258,6 +262,7 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
           site: formData.site,
           superficie: formData.superficie,
           especeIds: formData.especeIds,
+          distanceMaisonLac: formData.distanceMaisonLac
         });
       }
       onClose();
@@ -664,6 +669,22 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
                     </Button>
                   </span>
                 </Tooltip>
+              </Box>
+
+              <Typography variant="h6" sx={{ mt: 2 }}>Distance/Temps depuis Maison</Typography>
+              <Box sx={{ display: 'flex', gap: 2 }}>
+                <TextField
+                  fullWidth
+                  label="distance (km)"
+                  value={formData.distanceMaisonLac?.kilometrage || ''}
+                  onChange={(e) => handleInputChange('distanceMaisonLac', { kilometrage: parseFloat(e.target.value) || 0, temps: formData.distanceMaisonLac?.temps || 0 })}
+                />
+                <TextField
+                  fullWidth
+                  label="temps (min)"
+                  value={formData.distanceMaisonLac?.temps || ''}
+                  onChange={(e) => handleInputChange('distanceMaisonLac', { temps: parseFloat(e.target.value) || 0, kilometrage: formData.distanceMaisonLac?.kilometrage || 0 })}
+                />
               </Box>
             </>
           )}

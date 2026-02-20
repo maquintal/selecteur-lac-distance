@@ -68,6 +68,7 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
     'Tente-roulotte de moins de 6 mètres (20 pieds)',
     'Tente-roulotte de moins de 8 mètres (25 pieds)',
     'Roulotte de moins de 6 mètres (20 pieds)',
+    'Roulotte de moins de 8 mètres (25 pieds)'
   ];
 
   // devrait etre le schema...
