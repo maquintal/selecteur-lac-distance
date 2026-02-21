@@ -203,6 +203,14 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
           ...(value as Partial<Commodites>),
         }
       }));
+    } else if (field === 'distanceMaisonCamping') {
+      setFormData(prev => ({
+        ...prev,
+        distanceMaisonCamping: {
+          ...prev.distanceMaisonCamping,
+          ...(value as Partial<{ temps: number; kilometrage: number }>),
+        }
+      }));
     } else {
       setFormData(prev => ({
         ...prev,
@@ -220,6 +228,7 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
           coordonnees: formData.coordonnees,
           commodites: formData.commodites,
           regionAdministrative: formData.regionAdministrative,
+          distanceMaisonCamping: formData.distanceMaisonCamping,
           terrains: formData.terrains,
         });
       } else if (mode === 'edit' && camping) {
@@ -231,6 +240,7 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
           commodites: formData.commodites,
           regionAdministrative: formData.regionAdministrative,
           terrains: formData.terrains,
+          distanceMaisonCamping: formData.distanceMaisonCamping,
         });
       }
       onClose();
@@ -295,6 +305,7 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
               <MenuItem value="Mauricie">Mauricie</MenuItem>
               <MenuItem value="Outaouais">Outaouais</MenuItem>
               <MenuItem value="Portneuf">Portneuf</MenuItem>
+              <MenuItem value="Centre-du-Québec">Centre-du-Québec</MenuItem>
             </Select>
           </FormControl>
 
@@ -453,21 +464,6 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
             ))}
           </Box>
 
-          {/* <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
-            <TextField
-              type="number"
-              label="Latitude"
-              value={formData.coordonnees.latitude}
-              onChange={(e) => handleInputChange('coordonnees', { latitude: parseFloat(e.target.value) })}
-            />
-            <TextField
-              type="number"
-              label="Longitude"
-              value={formData.coordonnees.longitude}
-              onChange={(e) => handleInputChange('coordonnees', { longitude: parseFloat(e.target.value) })}
-            />
-          </Box> */}
-
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             {/* Champ de collage rapide */}
             <TextField
@@ -529,6 +525,23 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
               label="Électricité"
             />
           </Box>
+
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <Typography variant="subtitle1">Transport Maison Camping</Typography>
+            <TextField
+              type="number"
+              label="Distance (en km)"
+              value={formData.distanceMaisonCamping?.kilometrage}
+              onChange={(e) => handleInputChange('distanceMaisonCamping', { kilometrage: parseFloat(e.target.value) || 0 })}
+            />
+            <TextField
+              type="number"
+              label="Distance (en minutes)"
+              value={formData.distanceMaisonCamping?.temps || ''}
+              onChange={(e) => handleInputChange('distanceMaisonCamping', { temps: parseInt(e.target.value) || 0 })}
+            />
+          </Box>
+
         </Box>
       </DialogContent>
       <DialogActions>

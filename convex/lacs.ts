@@ -44,6 +44,12 @@ export const createCamping = mutation({
       electricite: v.boolean(),
     }),
     regionAdministrative: v.optional(v.string()),
+    distanceMaisonCamping: v.optional(
+      v.object({
+        temps: v.number(), // en minutes
+        kilometrage: v.number(),
+      }),
+    ),
   },
   handler: async (ctx, args) => {
     checkReadOnlyModeConvex()
@@ -84,6 +90,12 @@ export const updateCamping = mutation({
       electricite: v.boolean(),
     }),
     regionAdministrative: v.optional(v.string()),
+    distanceMaisonCamping: v.optional(
+      v.object({
+        temps: v.number(), // en minutes
+        kilometrage: v.number(),
+      }),
+    ),
   },
   handler: async (ctx, args) => {
     checkReadOnlyModeConvex()

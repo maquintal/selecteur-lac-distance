@@ -287,11 +287,8 @@ export default function LakesSearchCards() {
             <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <Box sx={{ flex: 1 }}>
                 <CardHeader
-                  title={
-                    <>
-                      {campingNom}{organisme === 'SEPAQ' && terrainsCount > 0 ? ` (${terrainsCount})` : ''}
-                    </>
-                  }
+                  title={<>{campingNom}{organisme === 'SEPAQ' && terrainsCount > 0 ? ` (${terrainsCount})` : ''}</>}
+                  subheader={h.distanceMaisonCamping ? `Maison -> Camping: ${formatTemps(h.distanceMaisonCamping.temps)}` : 'Distance maison inconnue'}
                   avatar={
                     organisme === 'SEPAQ' ? (
                       <Image src="/sepaq_logo2-transparent.png" alt="sepaq" width={15} height={15} />
@@ -311,7 +308,9 @@ export default function LakesSearchCards() {
               <Box sx={{ textAlign: 'right', minWidth: '150px' }}>
                 {h.distanceDepuisLac && (
                   <Typography variant="body2" color="primary.main" fontWeight="500">
-                    {h.distanceDepuisLac.kilometrage.toFixed(2)} km ({h.distanceDepuisLac.temps} min)
+                    {/* {h.distanceDepuisLac.kilometrage.toFixed(2)} km ( */}
+                    {`camping -> lac ${formatTemps(h.distanceDepuisLac.temps)}`}
+                    {/* ) */}
                   </Typography>
                 )}
                 {(h.commodites?.eau || h.commodites?.electricite) && (
@@ -333,6 +332,12 @@ export default function LakesSearchCards() {
     window.open(googleMapsUrl, '_blank', 'noopener,noreferrer');
   };
 
+  /*   const handleButtonClick2 = (e: React.MouseEvent, latitude: number, longitude: number) => {
+      e.preventDefault();
+      const googleMapsUrl = `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&accept-language=fr`;
+      window.open(googleMapsUrl, '_blank', 'noopener,noreferrer');
+    };
+   */
   if (loading) return <Box className="p-6"><CircularProgress /></Box>;
 
   const handleFlip = (id: string) => {
@@ -528,7 +533,7 @@ export default function LakesSearchCards() {
                           <Box mt={0.8}>
                             <Typography variant="body2" sx={{ fontSize: '0.78rem' }}><strong>Accès</strong></Typography>
                             <Typography variant="caption" color="textSecondary" sx={{ fontSize: '0.68rem' }}>
-                              {l.acces?.acceuil ? `Accueil: ${l.acces.acceuil}` : ''}
+                              {l.acces?.acceuil ? `Accueil: ${l.acces.acceuil}` : ''}<br />
                               {l.acces?.accessible ? `${l.acces.accessible}` : ''}<br />
                               {l.acces?.portage ? `${l.acces.portage}` : ''}
                             </Typography>
@@ -626,6 +631,10 @@ export default function LakesSearchCards() {
                       >
                         <Icon path={mdiMapSearchOutline} size={0.9} />
                       </IconButton>
+                      {/*                       <Button
+                        onClick={(e) => handleButtonClick2(e, getLatitude(l), getLongitude(l))}>
+                        Voir sur OpenStreetMap
+                      </Button> */}
                       <IconButton
                         aria-label="retour à la recherche"
                         onClick={() => handleFlip(l._id)}

@@ -35,7 +35,8 @@ const regionsOptions = [
   "Laurentides",
   "Mauricie",
   "Outaouais",
-  "Portneuf"
+  "Portneuf", // a supprimer
+  "Centre-du-Québec"
 ];
 
 const siteOptions = [

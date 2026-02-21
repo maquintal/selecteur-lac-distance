@@ -50,6 +50,12 @@ export default defineSchema({
       electricite: v.boolean(),
     }),
     regionAdministrative: v.optional(v.string()),
+    distanceMaisonCamping: v.optional(
+      v.object({
+        temps: v.number(), // en minutes
+        kilometrage: v.number(),
+      }),
+    ),
   })
     .index("by_nom", ["nom"])
     .searchIndex("search_nom", {
