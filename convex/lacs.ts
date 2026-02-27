@@ -495,7 +495,7 @@ export const addLac = mutation({
   handler: async (ctx, args) => {
     checkReadOnlyModeConvex()
 
-    console.log(checkReadOnlyModeConvex())
+    // console.log(checkReadOnlyModeConvex())
 
     return await ctx.db.insert("lacs", {
       ...args,
@@ -569,7 +569,7 @@ export const updateLac = mutation({
   },
   handler: async (ctx, args) => {
     checkReadOnlyModeConvex()
-    console.log(checkReadOnlyModeConvex())
+    // console.log(checkReadOnlyModeConvex())
     const { lacId, ...updateData } = args;
 
     await ctx.db.patch(lacId, {
@@ -693,9 +693,15 @@ export const getLacsSortedOptimized = query({
     // Récupérer tous les lacs
     const allLacs = await ctx.db.query("lacs").collect();
 
+    // const filteredLacs = allLacs.filter(lac => lac.site === "Papineau-Labelle"); //.filter(lac => lac.hebergements.length <= 0);
+    // const filteredLacs = allLacs.filter(lac => lac.site === "Mastigouche"); //.filter(lac => lac.hebergements.length <= 0);
+    // const filteredLacs = allLacs.filter(lac => lac.site === "Portneuf"); //.filter(lac => lac.hebergements.length <= 0);
+    // const filteredLacs = allLacs.filter(lac => lac.site === "Rouge-Matawin"); //.filter(lac => lac.hebergements.length <= 0);
+    const filteredLacs = allLacs.filter(lac => lac.embarcation.motorisation.necessaire === "electrique"); //.filter(lac => lac.hebergements.length <= 0);
+
     // Collecter TOUS les IDs en une seule passe
-    const allEspeceIds = [...new Set(allLacs.flatMap((lac) => lac.especeIds ?? []))];
-    const allCampingIds = [...new Set(allLacs.flatMap((lac) => lac.hebergements?.map((h) => h.campingId) ?? []))];
+    const allEspeceIds = [...new Set(filteredLacs.flatMap((lac) => lac.especeIds ?? []))];
+    const allCampingIds = [...new Set(filteredLacs.flatMap((lac) => lac.hebergements?.map((h) => h.campingId) ?? []))];
 
     // Charger TOUT en parallèle (2 Promise.all au lieu de N*M)
     const [allEspeces, allCampings] = await Promise.all([
@@ -712,7 +718,7 @@ export const getLacsSortedOptimized = query({
     );
 
     // Enrichir sans aucune requête DB supplémentaire
-    const enrichedLacs = allLacs.map((lac) => {
+    const enrichedLacs = filteredLacs.map((lac) => {
       const especes = (lac.especeIds ?? [])
         .map((id) => especesMap.get(id))
         .filter((e) => e != null);
@@ -726,107 +732,56 @@ export const getLacsSortedOptimized = query({
       return { ...lac, especes, hebergements };
     });
 
-    // Tri
-    // return enrichedLacs.sort((a, b) => {
-
-
-    //   // Priorité 1: Accessibilité
-    //   const accessibleA = a.acces?.accessible === "auto" || a.acces?.accessible === "véhicule utilitaire sport (VUS)";
-    //   const accessibleB = b.acces?.accessible === "auto" || b.acces?.accessible === "véhicule utilitaire sport (VUS)";
-
-    //   if (accessibleA !== accessibleB) return accessibleA ? -1 : 1;
-
-    //   // Priorité 2: Motorisation
-    //   const motorA = a.embarcation?.motorisation?.necessaire;
-    //   const motorB = b.embarcation?.motorisation?.necessaire;
-    //   const priorityA = motorA === 'electrique' ? 1 : motorA === 'essence' ? 2 : 3;
-    //   const priorityB = motorB === 'electrique' ? 1 : motorB === 'essence' ? 2 : 3;
-
-    //   if (priorityA !== priorityB) return priorityA - priorityB;
-
-    //   // Priorité 0: Superficie (3-45 ha d'abord, puis < 3, puis > 45)
-    //   const hectaresA = a.superficie?.hectares ?? 0;
-    //   const hectaresB = b.superficie?.hectares ?? 0;
-
-    //   const getSuperficiePriority = (ha: number) => {
-    //     if (ha >= 4 && ha <= 30) return 1; // Idéal
-    //     if (ha <= 4 && ha <= 80) return 3;               // Trop petit
-    //     if (ha > 80) return 4;               // Trop grand
-    //     return 2;                           // grand
-    //   };
-
-    //   const supPriorityA = getSuperficiePriority(hectaresA);
-    //   const supPriorityB = getSuperficiePriority(hectaresB);
-
-    //   if (supPriorityA !== supPriorityB) return supPriorityA - supPriorityB;
-
-    //   // Priorité 3: Nombre d'hébergements (décroissant)
-    //   // const countA = a.hebergements?.length || 0;
-    //   // const countB = b.hebergements?.length || 0;
-
-    //   // if (countA !== countB) return countB - countA;
-
-    //   // Priorité 4: Temps minimum parmi les hébergements (croissant)
-    //   const minTempsA = Math.min(
-    //     ...(a.hebergements?.map((h) => h.distanceDepuisLac?.temps ?? Infinity) ?? [Infinity])
-    //   );
-    //   const minTempsB = Math.min(
-    //     ...(b.hebergements?.map((h) => h.distanceDepuisLac?.temps ?? Infinity) ?? [Infinity])
-    //   );
-
-    //   return minTempsA - minTempsB;
-    // });
-
     return enrichedLacs.sort((a, b) => {
-      const motorA = a.embarcation?.motorisation?.necessaire;
-      const motorB = b.embarcation?.motorisation?.necessaire;
-      const priorityA = motorA === 'electrique' ? 1 : motorA === 'essence' ? 2 : 3;
-      const priorityB = motorB === 'electrique' ? 1 : motorB === 'essence' ? 2 : 3;
+      // const motorA = a.embarcation?.motorisation?.necessaire;
+      // const motorB = b.embarcation?.motorisation?.necessaire;
+      // const priorityA = motorA === 'electrique' ? 1 : motorA === 'essence' ? 2 : 3;
+      // const priorityB = motorB === 'electrique' ? 1 : motorB === 'essence' ? 2 : 3;
 
       // 1. Tri par type de motorisation (électrique > essence > reste)
-      if (priorityA !== priorityB) return priorityA - priorityB;
+      // if (priorityA !== priorityB) return priorityA - priorityB;
 
       // 2. Sous-tris uniquement dans le groupe électrique
-      if (motorA === 'electrique' && motorB === 'electrique') {
+      // if (motorA === 'electrique' && motorB === 'electrique') {
 
-        // 2a. Accessibilité (auto|VUS en premier)
-        const getAccessPriority = (accessible: string | undefined) => {
-          if (accessible === "auto" || accessible === "véhicule utilitaire sport (VUS)") return 1;
-          if (accessible === "camion 4x4") return 2;
-          return 3;
-        };
+      // 2a. Accessibilité (auto|VUS en premier)
+      const getAccessPriority = (accessible: string | undefined) => {
+        if (accessible === "auto" || accessible === "véhicule utilitaire sport (VUS)") return 1;
+        if (accessible === "camion 4x4") return 2;
+        return 3;
+      };
 
-        const accessSort = getAccessPriority(a.acces?.accessible) - getAccessPriority(b.acces?.accessible);
-        if (accessSort !== 0) return accessSort;
+      const accessSort = getAccessPriority(a.acces?.accessible) - getAccessPriority(b.acces?.accessible);
+      if (accessSort !== 0) return accessSort;
 
-        // 2b. Superficie (3-45 ha d'abord, puis < 3, puis > 45)
-        const hectaresA = a.superficie?.hectares ?? 0;
-        const hectaresB = b.superficie?.hectares ?? 0;
+      // 2b. Superficie (3-45 ha d'abord, puis < 3, puis > 45)
+      const hectaresA = a.superficie?.hectares ?? 0;
+      const hectaresB = b.superficie?.hectares ?? 0;
 
-        const getSuperficiePriority = (ha: number) => {
-          if (ha >= 4 && ha <= 30) return 1;  // Idéal
-          if (ha >= 30 && ha <= 80) return 2; // Grand
-          if (ha > 80) return 4;              // Trop grand
-          if (ha < 4) return 3                // Trop petit
-          return 5;                           // Non défini
-        };
+      const getSuperficiePriority = (ha: number) => {
+        if (ha >= 4 && ha <= 30) return 1;  // Idéal
+        if (ha >= 30 && ha <= 80) return 2; // Grand
+        if (ha > 80) return 4;              // Trop grand
+        if (ha < 4) return 3                // Trop petit
+        return 5;                           // Non défini
+      };
 
-        const supPriorityA = getSuperficiePriority(hectaresA);
-        const supPriorityB = getSuperficiePriority(hectaresB);
+      const supPriorityA = getSuperficiePriority(hectaresA);
+      const supPriorityB = getSuperficiePriority(hectaresB);
 
-        if (supPriorityA !== supPriorityB) return supPriorityA - supPriorityB;
+      if (supPriorityA !== supPriorityB) return supPriorityA - supPriorityB;
 
-        // 2c. Temps minimum depuis le lac (croissant), dans le sous-groupe auto|VUS
-        const minTempsA = Math.min(
-          ...(a.hebergements?.map((h) => h.distanceDepuisLac?.temps ?? Infinity) ?? [Infinity])
-        );
-        const minTempsB = Math.min(
-          ...(b.hebergements?.map((h) => h.distanceDepuisLac?.temps ?? Infinity) ?? [Infinity])
-        );
+      // 2c. Temps minimum depuis le lac (croissant), dans le sous-groupe auto|VUS
+      const minTempsA = Math.min(
+        ...(a.hebergements?.map((h) => h.distanceDepuisLac?.temps ?? Infinity) ?? [Infinity])
+      );
+      const minTempsB = Math.min(
+        ...(b.hebergements?.map((h) => h.distanceDepuisLac?.temps ?? Infinity) ?? [Infinity])
+      );
 
-        if (minTempsA !== minTempsB) return minTempsA - minTempsB;
+      if (minTempsA !== minTempsB) return minTempsA - minTempsB;
 
-      }
+      // }
 
       return 0;
     });

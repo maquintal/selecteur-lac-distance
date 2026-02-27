@@ -42,6 +42,7 @@ import { useMobileDetect } from '../hooks/useMobileDetect';
 import { formatTemps } from '../utils/utils.util';
 import OtherHousesIcon from '@mui/icons-material/OtherHouses';
 import WaterIcon from '@mui/icons-material/Water';
+import DangerousOutlinedIcon from '@mui/icons-material/DangerousOutlined';
 
 type Filters = {
   region: string;
@@ -54,7 +55,7 @@ type Filters = {
 export default function LakesSearchCards() {
   // Utilisation de la query Convex triée
   const queryResult = useQuery(api.lacs.getLacsSortedOptimized);
-  console.log("Query result:", queryResult);
+  // console.log("Query result:", queryResult);
   const loading = queryResult === undefined;
 
   // Mémoiser les données de la requête
@@ -146,6 +147,99 @@ export default function LakesSearchCards() {
     hectares: number;
   }
 
+  // const getLakeSizeCategory = (superficie: Superficie | null) => {
+  //   if (!superficie || !superficie.hectares) {
+  //     return {
+  //       label: 'Superficie inconnue',
+  //       level: 0,
+  //       icon: null,
+  //       recommendation: 'Données manquantes'
+  //     };
+  //   }
+
+  //   const superficieHa = Number(superficie.hectares);
+
+  //   // if (superficieHa < 3) return {
+  //   //   label: 'Micro-lac',
+  //   //   level: 1,
+  //   //   icon: (
+  //   //     <>
+  //   //       <WaterDropOutlinedIcon sx={{ fontSize: 18, color: 'success.main' }} />
+  //   //     </>
+  //   //   ),
+  //   //   recommendation: 'Parfait pour exploration tranquille'
+  //   // };
+
+  //   // if (superficieHa < 15) return {
+  //   //   label: 'Petit lac',
+  //   //   level: 2,
+  //   //   icon: (
+  //   //     <>
+  //   //       <WaterDropOutlinedIcon sx={{ fontSize: 18, color: 'success.main' }} />
+  //   //       <WaterDropOutlinedIcon sx={{ fontSize: 22, color: 'success.main' }} />
+  //   //     </>
+  //   //   ),
+  //   //   recommendation: 'Très bon pour pêche et navigation'
+  //   // };
+
+  //   // if (superficieHa < 30) return {
+  //   //   label: 'Lac modeste',
+  //   //   level: 3,
+  //   //   icon: (
+  //   //     <>
+  //   //       <WaterDropOutlinedIcon sx={{ fontSize: 22, color: 'success.main' }} />
+  //   //       <WaterDropOutlinedIcon sx={{ fontSize: 26, color: 'success.main' }} />
+  //   //     </>
+  //   //   ),
+  //   //   recommendation: 'Navigable avec autonomie raisonnable'
+  //   // };
+
+  //   // if (superficieHa < 45) return {
+  //   //   label: 'Lac étendu',
+  //   //   level: 4,
+  //   //   icon: (
+  //   //     <>
+  //   //       <WarningAmberOutlinedIcon sx={{ fontSize: 22, color: 'warning.main' }} />
+  //   //     </>
+  //   //   ),
+  //   //   recommendation: 'Faisable avec prudence (vent, retour anticipé)'
+  //   // };
+
+  //   // if (superficieHa < 80) return {
+  //   //   label: 'Lac large',
+  //   //   level: 5,
+  //   //   icon: (
+  //   //     <>
+  //   //       <WarningAmberOutlinedIcon sx={{ fontSize: 24, color: 'warning.main' }} />
+  //   //       <WarningAmberOutlinedIcon sx={{ fontSize: 20, color: 'warning.main' }} />
+  //   //     </>
+  //   //   ),
+  //   //   recommendation: 'Limite atteinte — attention à l’autonomie'
+  //   // };
+
+  //   // if (superficieHa < 300) return {
+  //   //   label: 'Grand lac',
+  //   //   level: 6,
+  //   //   icon: (
+  //   //     <>
+  //   //       <DoNotDisturbAltOutlinedIcon sx={{ fontSize: 24, color: 'error.main' }} />
+  //   //     </>
+  //   //   ),
+  //   //   recommendation: 'À éviter — trop vaste pour ton moteur'
+  //   // };
+
+  //   return {
+  //     label: 'Très grand lac / réservoir',
+  //     level: 7,
+  //     icon: (
+  //       <>
+  //         <ReportProblemOutlinedIcon sx={{ fontSize: 26, color: 'error.main' }} />
+  //       </>
+  //     ),
+  //     recommendation: 'Dangereux — ne pas naviguer avec moteur électrique'
+  //   };
+  // };
+
   const getLakeSizeCategory = (superficie: Superficie | null) => {
     if (!superficie || !superficie.hectares) {
       return {
@@ -158,17 +252,17 @@ export default function LakesSearchCards() {
 
     const superficieHa = superficie.hectares;
 
+    // 1️⃣ Micro-lac
     if (superficieHa < 3) return {
       label: 'Micro-lac',
       level: 1,
       icon: (
-        <>
-          <WaterDropOutlinedIcon sx={{ fontSize: 18, color: 'success.main' }} />
-        </>
+        <WaterDropOutlinedIcon sx={{ fontSize: 18, color: 'success.main' }} />
       ),
       recommendation: 'Parfait pour exploration tranquille'
     };
 
+    // 2️⃣ Petit lac
     if (superficieHa < 15) return {
       label: 'Petit lac',
       level: 2,
@@ -181,6 +275,7 @@ export default function LakesSearchCards() {
       recommendation: 'Très bon pour pêche et navigation'
     };
 
+    // 3️⃣ Lac modeste (seuil critique < 30 ha)
     if (superficieHa < 30) return {
       label: 'Lac modeste',
       level: 3,
@@ -190,52 +285,50 @@ export default function LakesSearchCards() {
           <WaterDropOutlinedIcon sx={{ fontSize: 26, color: 'success.main' }} />
         </>
       ),
-      recommendation: 'Navigable avec autonomie raisonnable'
+      recommendation: 'Adapté à un moteur électrique modeste (conditions normales)'
     };
 
-    if (superficieHa < 45) return {
-      label: 'Lac étendu',
+    // 4️⃣ Lac ouvert
+    if (superficieHa < 60) return {
+      label: 'Lac ouvert',
       level: 4,
       icon: (
-        <>
-          <WarningAmberOutlinedIcon sx={{ fontSize: 22, color: 'warning.main' }} />
-        </>
+        <WarningAmberOutlinedIcon sx={{ fontSize: 22, color: 'warning.main' }} />
       ),
-      recommendation: 'Faisable avec prudence (vent, retour anticipé)'
+      recommendation: 'Prudence recommandée — vent et retour à anticiper'
     };
 
-    if (superficieHa < 80) return {
-      label: 'Lac large',
+    // 5️⃣ Lac exposé
+    if (superficieHa < 100) return {
+      label: 'Lac exposé',
       level: 5,
       icon: (
         <>
-          <WarningAmberOutlinedIcon sx={{ fontSize: 24, color: 'warning.main' }} />
-          <WarningAmberOutlinedIcon sx={{ fontSize: 20, color: 'warning.main' }} />
+          <WarningAmberOutlinedIcon sx={{ fontSize: 22, color: 'warning.main' }} />
+          <WarningAmberOutlinedIcon sx={{ fontSize: 26, color: 'warning.main' }} />
         </>
       ),
-      recommendation: 'Limite atteinte — attention à l’autonomie'
+      recommendation: 'Limite atteinte — moteur électrique sous-dimensionné'
     };
 
+    // 6️⃣ Grand lac
     if (superficieHa < 300) return {
       label: 'Grand lac',
       level: 6,
       icon: (
-        <>
-          <DoNotDisturbAltOutlinedIcon sx={{ fontSize: 24, color: 'error.main' }} />
-        </>
+        <DoNotDisturbAltOutlinedIcon sx={{ fontSize: 26, color: 'error.main' }} />
       ),
-      recommendation: 'À éviter — trop vaste pour ton moteur'
+      recommendation: 'À éviter — marge de sécurité insuffisante'
     };
 
+    // 7️⃣ Très grand lac / réservoir
     return {
       label: 'Très grand lac / réservoir',
       level: 7,
       icon: (
-        <>
-          <ReportProblemOutlinedIcon sx={{ fontSize: 26, color: 'error.main' }} />
-        </>
+        <DangerousOutlinedIcon sx={{ fontSize: 28, color: 'error.main' }} />
       ),
-      recommendation: 'Dangereux — ne pas naviguer avec moteur électrique'
+      recommendation: 'Dangereux — ne pas naviguer avec petit moteur électrique'
     };
   };
 
@@ -332,12 +425,12 @@ export default function LakesSearchCards() {
     window.open(googleMapsUrl, '_blank', 'noopener,noreferrer');
   };
 
-  /*   const handleButtonClick2 = (e: React.MouseEvent, latitude: number, longitude: number) => {
-      e.preventDefault();
-      const googleMapsUrl = `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&accept-language=fr`;
-      window.open(googleMapsUrl, '_blank', 'noopener,noreferrer');
-    };
-   */
+  const handleButtonClick2 = (e: React.MouseEvent, latitude: number, longitude: number) => {
+    e.preventDefault();
+    const googleMapsUrl = `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&accept-language=fr`;
+    window.open(googleMapsUrl, '_blank', 'noopener,noreferrer');
+  };
+
   if (loading) return <Box className="p-6"><CircularProgress /></Box>;
 
   const handleFlip = (id: string) => {
@@ -440,7 +533,10 @@ export default function LakesSearchCards() {
               <CardHeader
                 avatar={
                   l.site ? (
-                    <Image src="/sepaq_logo2-transparent.png" alt="sepaq" width={isMobile ? 28 : 40} height={isMobile ? 28 : 40} />
+                    <Image
+                      src="/sepaq_logo2-transparent.png"
+                      alt="sepaq" width={isMobile ? 28 : 40} height={isMobile ? 28 : 40}
+                      />
                   ) : undefined
                 }
                 title={l.nomDuLac}
@@ -513,7 +609,8 @@ export default function LakesSearchCards() {
                   ...(highlightedLacId === l._id && {
                     transform: 'scale(1.02)',
                     boxShadow: '0 0 20px rgba(25, 118, 210, 0.5)',
-                    borderRadius: 1
+                    borderRadius: 1,
+                    backgroundColor: 'rgba(25, 118, 210, 0.1)',
                   })
                 }}
               >
@@ -631,7 +728,7 @@ export default function LakesSearchCards() {
                       >
                         <Icon path={mdiMapSearchOutline} size={0.9} />
                       </IconButton>
-                      {/*                       <Button
+                      {/* <Button
                         onClick={(e) => handleButtonClick2(e, getLatitude(l), getLongitude(l))}>
                         Voir sur OpenStreetMap
                       </Button> */}

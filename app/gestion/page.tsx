@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import {
@@ -41,14 +41,23 @@ export default function GestionLacs() {
     setSelectedLac(undefined);
   };
 
-  /* const handleDialogSuccess = (message: string) => {
-    setSnackbar({ open: true, message, severity: 'success' });
-    handleCloseDialog();
-  }; */
+  const handleButtonClick2 = (e: React.MouseEvent, latitude: number, longitude: number, index: number) => {
+    e.preventDefault();
+    const googleMapsUrl = `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&accept-language=fr`;
+    window.open(googleMapsUrl, '_blank', 'noopener,noreferrer');
 
-  /* const handleDialogError = (message: string) => {
-    setSnackbar({ open: true, message, severity: 'error' });
-  }; */
+    const button = buttonRefs.current[index];
+
+    // Exemples d'actions sur CE bouton spécifiquement
+    button?.setAttribute("disabled", "true");
+    button?.classList.add("active");
+
+    // Ou via l'event directement (plus simple)
+    const target = e.currentTarget as HTMLButtonElement;
+    target.textContent = "Chargement...";
+  };
+
+  const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   return (
     <>
@@ -86,7 +95,7 @@ export default function GestionLacs() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {lacs.map((lac: LacDoc) => (
+                {lacs.map((lac: LacDoc, index: number) => (
                   <TableRow key={lac._id} hover>
                     <TableCell>{lac.nomDuLac}</TableCell>
                     <TableCell>{lac.regionAdministrativeQuebec}</TableCell>
@@ -94,6 +103,14 @@ export default function GestionLacs() {
                       {lac.coordonnees.latitude.toFixed(4)}, {lac.coordonnees.longitude.toFixed(4)}
                     </TableCell>
                     <TableCell>{lac.superficie?.hectares || 'N/A'}</TableCell>
+                    <TableCell>
+                      <Button
+                        ref={(el) => (buttonRefs.current[index] = el)}
+                        onClick={(e) => handleButtonClick2(e, lac.coordonnees.latitude, lac.coordonnees.longitude, index)}
+                      >
+                        Voir sur OpenStreetMap
+                      </Button>
+                    </TableCell>
                     <TableCell align="center">
                       <IconButton
                         size="small"

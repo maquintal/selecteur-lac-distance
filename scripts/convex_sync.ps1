@@ -29,14 +29,14 @@ EXAMPLE
 
 param(
     [string]$DevDeployment = "festive-porpoise-323",
-    [string]$ProdDeployment = "glorious-wren-203",
+    #[string]$ProdDeployment = "glorious-wren-203",
     [string]$DevBackup = "dev-backup.zip",
     [string]$ProdBackup = "prod-backup.zip",
     [string]$BackupDir = "C:\temp\convex_backups",
     [switch]$IncludeStorage,
-    [switch]$AutoConfirm = $true,
-    [switch]$AutoDeploy = $true,
-    [switch]$ReplaceAll = $true,
+    [switch]$AutoConfirm = $false,
+    [switch]$AutoDeploy = $false,
+    [switch]$ReplaceAll = $false,
     [switch]$RemoveLocal = $false
 )
 
@@ -94,8 +94,8 @@ try {
     Run-ConvexExport -deployment $DevDeployment -path $devExportPath
 
     # 2) Backup prod
-    $prodExportPath = if ($BackupDir -ne "") { Join-Path $BackupDir $ProdBackup } else { $ProdBackup }
-    Run-ConvexExport -deployment $ProdDeployment -path $prodExportPath
+    #$prodExportPath = if ($BackupDir -ne "") { Join-Path $BackupDir $ProdBackup } else { $ProdBackup }
+    #Run-ConvexExport -deployment $ProdDeployment -path $prodExportPath
 
     # 3) Vérifier les archives
     $devExtract = "dev-backup"

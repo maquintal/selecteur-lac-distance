@@ -7,7 +7,7 @@ import {
   Box, Container, Typography, Paper, Button,
   IconButton, Table, TableBody, TableCell,
   TableContainer, TableHead, TableRow,
-  Snackbar, Alert, Card, CardContent
+  Snackbar, Alert, Card, CardContent, CircularProgress, Icon
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
@@ -18,12 +18,16 @@ import { useMobileDetect } from '@/app/hooks/useMobileDetect';
 import { isReadOnlyConvex } from '@/convex/checkReadOnlyMode';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { formatTemps } from '@/app/utils/utils.util';
+import { mdiMapMarkerDistance } from '@mdi/js';
+
 
 export default function GestionCampings() {
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedCamping, setSelectedCamping] = useState<CampingDoc | undefined>(undefined);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
   const [dialogMode, setDialogMode] = useState<'create' | 'edit'>('create');
+  const [distanceInfo, setDistanceInfo] = useState<Record<string, { km: string, min: number }>>({});
+  const [loadingDistance, setLoadingDistance] = useState<Record<string, boolean>>({});
 
   const { isMobile, isLoaded } = useMobileDetect();
 
@@ -40,10 +44,6 @@ export default function GestionCampings() {
     setOpenDialog(false);
     setSelectedCamping(undefined);
   };
-
-  /* const handleSnackbar = (message: string, severity: 'success' | 'error') => {
-    setSnackbar({ open: true, message, severity });
-  }; */
 
   const handleButtonClick2 = (e: React.MouseEvent, latitude: number, longitude: number, index: number) => {
     e.preventDefault();
@@ -62,6 +62,24 @@ export default function GestionCampings() {
   };
 
   const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  const handleDistanceOSRM = async (e: React.MouseEvent, lat: number, lng: number, id: string) => {
+    const key = id.toString();
+    setLoadingDistance(prev => ({ ...prev, [key]: true }));
+    try {
+      const response = await fetch(
+        `http://router.project-osrm.org/route/v1/driving/-73.30700043313838,45.633966537594674;${lng},${lat}?overview=false`
+      );
+      const data = await response.json();
+      const km = (data.routes[0].distance / 1000).toFixed(1);
+      const min = Math.round(data.routes[0].duration / 60);
+      setDistanceInfo(prev => ({ ...prev, [key]: { km, min } }));
+    } catch (error) {
+      console.error("Erreur OSRM", error);
+    } finally {
+      setLoadingDistance(prev => ({ ...prev, [key]: false }));
+    }
+  };
 
   return (
     <>
@@ -98,6 +116,7 @@ export default function GestionCampings() {
                     <TableCell><strong>Distance & Temps</strong></TableCell>
                     <TableCell><strong>Coordonées Géographique</strong></TableCell>
                     {/* <TableCell><strong>map</strong></TableCell> */}
+                    {/* <TableCell>osm test</TableCell> */}
                     <TableCell align="center"><strong>Actions</strong></TableCell>
                   </TableRow>
                 </TableHead>
@@ -113,7 +132,7 @@ export default function GestionCampings() {
                       </TableCell>
                       <TableCell>
                         {camping.distanceMaisonCamping
-                          ? `${camping.distanceMaisonCamping.kilometrage} km / ${formatTemps(camping.distanceMaisonCamping.temps)}`
+                          ? `${camping.distanceMaisonCamping.kilometrage} km · ${formatTemps(camping.distanceMaisonCamping.temps)}`
                           : 'N/A'}
                       </TableCell>
 
@@ -138,6 +157,27 @@ export default function GestionCampings() {
                           Voir sur OpenStreetMap
                         </Button>
                       </TableCell> */}
+
+                      {/* <TableCell>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <IconButton
+                            aria-label="calculer la distance"
+                            onClick={(e) => handleDistanceOSRM(e, camping.coordonnees.latitude, camping.coordonnees.longitude, camping._id)}
+                            size="small"
+                            // disabled={!!loadingDistance[camping._id.toString()]}
+                          >
+                            {loadingDistance[camping._id.toString()]
+                              ? <CircularProgress size={18} />
+                              : <Icon path={mdiMapMarkerDistance} size={0.9} />}
+                          </IconButton>
+                          {distanceInfo[camping._id.toString()] && (
+                            <Typography variant="caption" sx={{ whiteSpace: 'nowrap' }}>
+                              {distanceInfo[camping._id.toString()].km} km · {formatTemps(distanceInfo[camping._id.toString()].min)}
+                            </Typography>
+                          )}
+                        </Box>
+                      </TableCell> */}
+
                       <TableCell align="center">
                         <IconButton
                           size="small"

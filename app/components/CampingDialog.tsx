@@ -304,7 +304,6 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
               <MenuItem value="Laurentides">Laurentides</MenuItem>
               <MenuItem value="Mauricie">Mauricie</MenuItem>
               <MenuItem value="Outaouais">Outaouais</MenuItem>
-              <MenuItem value="Portneuf">Portneuf</MenuItem>
               <MenuItem value="Centre-du-Québec">Centre-du-Québec</MenuItem>
             </Select>
           </FormControl>

@@ -35,7 +35,6 @@ const regionsOptions = [
   "Laurentides",
   "Mauricie",
   "Outaouais",
-  "Portneuf", // a supprimer
   "Centre-du-Québec"
 ];
 
@@ -44,8 +43,8 @@ const siteOptions = [
   "Rouge-Matawin",
   "Papineau-Labelle",
   "Saint-Maurice",
-  "Portneuf",
-  "Jacques-Cartier"
+  "Jacques-Cartier",
+  "Parc national du Mont-Tremblant",
 ];
 
 const accessibleOptions = [
@@ -645,19 +644,6 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
                   })}
                   sx={{ width: '150px' }}
                 />
-                <Tooltip title="Copier les coordonnées">
-                  <IconButton
-                    onClick={() => {
-                      const lat = hebergement.coordonnees.latitude.toString().replace(',', '.');
-                      const lng = hebergement.coordonnees.longitude.toString().replace(',', '.');
-                      const coords = `${lat}, ${lng}`;
-                      navigator.clipboard.writeText(coords);
-                    }}
-                    color="primary"
-                  >
-                    <ContentCopyIcon />
-                  </IconButton>
-                </Tooltip>
                 <Tooltip title={"Ajouter l'hébergement"}>
                   <span>
                     <Button
