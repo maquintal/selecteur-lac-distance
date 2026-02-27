@@ -536,7 +536,7 @@ export default function LakesSearchCards() {
                     <Image
                       src="/sepaq_logo2-transparent.png"
                       alt="sepaq" width={isMobile ? 28 : 40} height={isMobile ? 28 : 40}
-                      />
+                    />
                   ) : undefined
                 }
                 title={l.nomDuLac}
@@ -545,6 +545,9 @@ export default function LakesSearchCards() {
                 subheader={
                   <Box display="flex" flexDirection="column">
                     <Typography variant="subtitle2" color="text.secondary">
+                      {l.site}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
                       {l.regionAdministrativeQuebec}
                     </Typography>
                     {/* <Typography variant="caption" color="text.secondary">

@@ -732,7 +732,7 @@ export const getLacsSortedOptimized = query({
       return { ...lac, especes, hebergements };
     });
 
-    return enrichedLacs.sort((a, b) => {
+    const sejour = enrichedLacs.sort((a, b) => {
       // const motorA = a.embarcation?.motorisation?.necessaire;
       // const motorB = b.embarcation?.motorisation?.necessaire;
       // const priorityA = motorA === 'electrique' ? 1 : motorA === 'essence' ? 2 : 3;
@@ -785,6 +785,35 @@ export const getLacsSortedOptimized = query({
 
       return 0;
     });
+
+
+    let journeeEnrichedLacs = enrichedLacs.filter((lac) => {
+      return (
+        lac.embarcation.type === "Embarcation Sépaq fournie" &&
+        lac?.superficie?.hectares <= 30 &&
+        lac.acces?.accessible !== "camion 4x4"
+      )
+    })
+
+    journeeEnrichedLacs = journeeEnrichedLacs.sort((a, b) => {
+
+      // Temps minimum depuis le lac (croissant)
+      const minTempsA = Math.min(
+        ...(a.distanceMaisonLac ? [a.distanceMaisonLac.temps] : [Infinity])
+      );
+      const minTempsB = Math.min(
+        ...(b.distanceMaisonLac ? [b.distanceMaisonLac.temps] : [Infinity])
+      );
+
+      if (minTempsA !== minTempsB) return minTempsA - minTempsB;
+
+      return 0;
+    });
+
+    // return sejour
+
+    return journeeEnrichedLacs;
+
   },
 });
 

@@ -149,14 +149,14 @@ export default function GestionCampings() {
                           <ContentCopyIcon />
                         </IconButton>
                       </TableCell>
-                      {/* <TableCell>
+                      <TableCell>
                         <Button
                           ref={(el) => (buttonRefs.current[index] = el)}
                           onClick={(e) => handleButtonClick2(e, camping.coordonnees.latitude, camping.coordonnees.longitude, index)}
                         >
                           Voir sur OpenStreetMap
                         </Button>
-                      </TableCell> */}
+                      </TableCell>
 
                       {/* <TableCell>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
