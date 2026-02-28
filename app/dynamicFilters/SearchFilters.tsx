@@ -224,7 +224,7 @@ const SearchFilters = () => {
         </Box>
       ) : (
         // todo ajuster le type des données passées à LakesSearchCards
-        <LakesSearchCards data={results} scenario />
+        <LakesSearchCards data={results} scenario={scenario} />
       )}
 
     </Box>

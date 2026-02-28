@@ -543,6 +543,7 @@ const LakesSearchCards = ({ data, scenario }: { data: LacWithDetails[] }) => {
                   <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', py: 0.4, px: 0.6, border: '1px solid #eaeaea' }}>
                     {cardHeader}
                     <CardContent sx={{ flexGrow: 1, py: 0.6 }}>
+                      {console.log(scenario)}
                       {getHebergement(scenario === "sejour2" ? l.hebergementsNonSepaq : l.hebergements)}
                     </CardContent>
                     <CardActions sx={{ justifyContent: 'space-between', py: 0.25 }}>
