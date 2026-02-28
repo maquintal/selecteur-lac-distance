@@ -13,52 +13,71 @@ import {
   FormControl,
   InputLabel,
   Button,
-  Typography,
-  Card,
-  CardContent,
   Stack,
   Chip,
   CircularProgress,
   SelectChangeEvent,
 } from "@mui/material";
 import FilterListOffIcon from "@mui/icons-material/FilterListOff";
-import { siteOptions } from "../components/LacDialog"; // todo mettre dans un fichier de constantes partagé
+import { siteOptions } from "../components/LacDialog"; // todo ces valeurs devraient venir de la definition du schema convex
+import LakesSearchCards from "./LakesSearchCards";
 
-const MOTORISATION_OPTIONS = [
+const MOTORISATION_OPTIONS = [ // ces valeurs devraient venir de la definition du schema convex
   { label: "Toutes motorisations", value: "" },
   { label: "Électrique seulement", value: "electrique" },
   { label: "Essence seulement", value: "essence" },
   { label: "Aucune motorisation", value: "aucune" },
 ];
 
-const TYPE_EMBARCATION_OPTIONS = [
+const TYPE_EMBARCATION_OPTIONS = [ // ces valeurs devraient venir de la definition du schema convex
   { label: "Tous les types", value: "" },
   { label: "Embarcation Sépaq fournie", value: "Embarcation Sépaq fournie" },
   { label: "Embarcation personnelle", value: "Embarcation personnelle" },
   { label: "Location", value: "Location" },
 ];
 
-const SearchFilter = () => {
-  const [search, setSearch] = useState("");
-  const [motorisation, setMotorisation] = useState("");
-  const [typeEmbarcation, setTypeEmbarcation] = useState("");
-  const [site, setSite] = useState("");
+const SearchFiltersBar = () => {
+  const [nomLac, setNomLac] = useState("");
+  // setter defini, en attendant, mais devrait prevoir dans la query en amont
+  const [motorisation, setMotorisation] = useState("electrique");
+  const [typeEmbarcation, setTypeEmbarcation] = useState("Embarcation Sépaq fournie");
+  const [site, setSite] = useState("Mastigouche");
+  const [superficieMin, setSuperficieMin] = useState<number | "">(4);
+  const [superficieMax, setSuperficieMax] = useState<number | "">(30);
+  const [accessible, setAccessible] = useState("auto_vus");
+  const [scenario, setScenario] = useState("");
 
-  const [debouncedSearch] = useDebounce(search, 300);
+  const [debouncedSearch] = useDebounce(nomLac, 300);
 
-  const results = useQuery(api.lacsCopy.getAllLacsDynamicFilters, {
-    search: debouncedSearch,
+  const results = useQuery(api.lacsDynamicFilters.getAllLacsDynamicFilters, {
+    nomLac: debouncedSearch,
     motorisation,
     typeEmbarcation,
     site,
+    superficieMin: superficieMin === "" ? undefined : superficieMin,
+    superficieMax: superficieMax === "" ? undefined : superficieMax,
+    accessible,
+    scenario,
   });
 
-  const hasActiveFilters = search || motorisation || typeEmbarcation;
+  const isLoading = results === undefined;
+  const hasActiveFilters = nomLac ||
+    motorisation ||
+    typeEmbarcation ||
+    site ||
+    superficieMax ||
+    accessible ||
+    scenario;
 
   const handleReset = () => {
-    setSearch("");
+    setNomLac("");
     setMotorisation("");
     setTypeEmbarcation("");
+    setSite("");
+    setSuperficieMin("");
+    setSuperficieMax("");
+    setAccessible("");
+    setScenario("");
   };
 
   return (
@@ -71,10 +90,70 @@ const SearchFilter = () => {
           label="Rechercher un lac"
           variant="outlined"
           size="small"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          value={nomLac}
+          onChange={(e) => setNomLac(e.target.value)}
           sx={{ width: 250 }}
         />
+
+        <FormControl size="small" sx={{ width: 220 }}>
+          <InputLabel>Scénario</InputLabel>
+          <Select
+            value={scenario}
+            label="Scénario"
+            onChange={(e: SelectChangeEvent) => setScenario(e.target.value)}
+          >
+            <MenuItem value="">Tous les scénarios</MenuItem>
+            <MenuItem value="journee">Pêche d'un jour</MenuItem>
+            <MenuItem value="sejour">Séjour de Pêche</MenuItem>
+          </Select>
+        </FormControl>
+
+        <FormControl size="small" sx={{ width: 220 }}>
+          <InputLabel>Site</InputLabel>
+          <Select
+            value={site}
+            label="Site"
+            onChange={(e: SelectChangeEvent) => setSite(e.target.value)}
+          >
+            {siteOptions.map((opt) => (
+              <MenuItem key={opt} value={opt}>
+                {opt}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        <FormControl size="small" sx={{ width: 220 }}>
+          <InputLabel>Superficie max</InputLabel>
+          <Select
+            value={superficieMin} // todo ajuster le type pour permettre "" ou number
+            label="Superficie min"
+            onChange={(e: SelectChangeEvent) => setSuperficieMin(e.target.value as number | "")}
+          >
+            <MenuItem value="">Tous les supercifies</MenuItem>
+            <MenuItem value={4}>≥ 4 ha</MenuItem>
+            <MenuItem value={10}>≥ 10 ha</MenuItem>
+            <MenuItem value={30}>≥ 30 ha</MenuItem>
+            <MenuItem value={50}>≥ 50 ha</MenuItem>
+            <MenuItem value={100}>≥ 100 ha</MenuItem>
+          </Select>
+        </FormControl>
+
+        <FormControl size="small" sx={{ width: 220 }}>
+          <InputLabel>Superficie max</InputLabel>
+          <Select
+            value={superficieMax} // todo ajuster le type pour permettre "" ou number
+            label="Superficie max"
+            onChange={(e: SelectChangeEvent) => setSuperficieMax(e.target.value as number | "")}
+          >
+            <MenuItem value="">Tous les supercifies</MenuItem>
+            <MenuItem value={4}>≤ 4 ha</MenuItem>
+            <MenuItem value={10}>≤ 10 ha</MenuItem>
+            <MenuItem value={30}>≤ 30 ha</MenuItem>
+            <MenuItem value={50}>≤ 50 ha</MenuItem>
+            <MenuItem value={100}>≤ 100 ha</MenuItem>
+          </Select>
+        </FormControl>
 
         <FormControl size="small" sx={{ width: 220 }}>
           <InputLabel>Motorisation</InputLabel>
@@ -91,6 +170,19 @@ const SearchFilter = () => {
           </Select>
         </FormControl>
 
+        <FormControl size="small" sx={{ width: 220 }}>
+          <InputLabel>Accessibilité</InputLabel>
+          <Select
+            value={accessible}
+            label="Accessibilité"
+            onChange={(e: SelectChangeEvent) => setAccessible(e.target.value)}
+          >
+            <MenuItem value="">Tous</MenuItem>
+            <MenuItem value="auto_vus">Auto / VUS</MenuItem>
+            <MenuItem value="camion 4x4">Camion 4x4</MenuItem>
+          </Select>
+        </FormControl>
+
         <FormControl size="small" sx={{ width: 250 }}>
           <InputLabel>Type d'embarcation</InputLabel>
           <Select
@@ -101,21 +193,6 @@ const SearchFilter = () => {
             {TYPE_EMBARCATION_OPTIONS.map((opt) => (
               <MenuItem key={opt.value} value={opt.value}>
                 {opt.label}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        <FormControl size="small" sx={{ width: 220 }}>
-          <InputLabel>Site</InputLabel>
-          <Select
-            value={site}
-            label="Site"
-            onChange={(e: SelectChangeEvent) => setSite(e.target.value)}
-          >
-            {siteOptions.map((opt) => (
-              <MenuItem key={opt} value={opt}>
-                {opt}
               </MenuItem>
             ))}
           </Select>
@@ -137,10 +214,18 @@ const SearchFilter = () => {
       {/* Chips des filtres actifs */}
       {hasActiveFilters && (
         <Stack direction="row" flexWrap="wrap" gap={1}>
-          {search && (
+          {scenario && (
             <Chip
-              label={`Nom : ${search}`}
-              onDelete={() => setSearch("")}
+              label={`Scénario : ${scenario === "journee" ? "Pêche d'un jour" : "Séjour de Pêche"}`}
+              onDelete={() => setScenario("")}
+              size="small"
+              color="primary"
+            />
+          )}
+          {nomLac && (
+            <Chip
+              label={`Nom : ${nomLac}`}
+              onDelete={() => setNomLac("")}
               size="small"
               color="primary"
               variant="outlined"
@@ -167,37 +252,18 @@ const SearchFilter = () => {
         </Stack>
       )}
 
-      {/* Compteur de résultats */}
-      <Typography variant="body2" color="text.secondary">
-        {results === undefined ? (
-          <CircularProgress size={14} sx={{ mr: 1 }} />
-        ) : (
-          `${results.length} lac(s) trouvé(s)`
-        )}
-      </Typography>
-
-      {/* Liste des résultats */}
-      <Stack gap={2}>
-        {results?.map((lac) => (
-          <Card key={lac._id} variant="outlined">
-            <CardContent>
-              <Typography variant="h6">{lac.nomDuLac}</Typography>
-              <Typography variant="body2" color="text.secondary">
-                {lac.embarcation.motorisation.necessaire}
-              </Typography>
-            </CardContent>
-          </Card>
-        ))}
-
-        {results?.length === 0 && (
-          <Typography variant="body2" color="text.secondary" textAlign="center">
-            Aucun lac ne correspond à vos critères.
-          </Typography>
-        )}
-      </Stack>
+      {/* Résultats ou spinner centré */}
+      {isLoading ? (
+        <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
+          <CircularProgress />
+        </Box>
+      ) : (
+        // todo ajuster le type des données passées à LakesSearchCards
+        <LakesSearchCards data={results} />
+      )}
 
     </Box>
   );
 }
 
-export default SearchFilter;
+export default SearchFiltersBar;

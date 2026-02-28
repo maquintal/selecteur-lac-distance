@@ -47,7 +47,7 @@ export const siteOptions: string[] = [
   "Parc national du Mont-Tremblant",
 ];
 
-const accessibleOptions = [
+export const accessibleOptions = [
   "véhicule utilitaire sport (VUS)",
   "auto",
   "camion 4x4"
