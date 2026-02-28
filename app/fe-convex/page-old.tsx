@@ -1,4 +1,7 @@
+'use client';
+
 import React, { useMemo, useState } from 'react';
+import { Acces } from '../types/lake';
 import { LacWithDetails, EspeceDoc } from '../types/schema.types';
 import { Id } from "../../convex/_generated/dataModel";
 import {
@@ -41,8 +44,29 @@ import OtherHousesIcon from '@mui/icons-material/OtherHouses';
 import WaterIcon from '@mui/icons-material/Water';
 import DangerousOutlinedIcon from '@mui/icons-material/DangerousOutlined';
 
-const LakesSearchCards = ({ data }: { data: LacWithDetails[] }) => {
+type Filters = {
+  region: string;
+  reserve: string;
+  organisme: string;
+  nom: string;
+  motorisation: string;
+};
 
+export default function LakesSearchCards() {
+  // Utilisation de la query Convex triée
+  const queryResult = useQuery(api.lacs.getLacsSortedOptimized);
+  // console.log("Query result:", queryResult);
+  const loading = queryResult === undefined;
+
+  // Mémoiser les données de la requête
+  const data = useMemo(() => {
+    if (queryResult === undefined) return [];
+    return queryResult;
+  }, [queryResult]);
+
+  const toggleChoixInteressant = useMutation(api.lacs.toggleChoixInteressant);
+
+  const [filters, setFilters] = useState<Filters>({ region: '', reserve: '', organisme: '', nom: '', motorisation: '' });
   const [flippedCards, setFlippedCards] = useState<{ [key: string]: boolean }>({});
   const [highlightedLacId, setHighlightedLacId] = useState<string | null>(null);
 
@@ -52,14 +76,33 @@ const LakesSearchCards = ({ data }: { data: LacWithDetails[] }) => {
 
   const { isMobile } = useMobileDetect();
 
-  /* const handleToggleInteressant = async (lacId: Id<"lacs">, e: React.MouseEvent) => {
+  const filtered = useMemo(() => {
+    if (!data) return [];
+    return data.filter(l => {
+      const regionMatch = filters.region
+        ? (l.regionAdministrativeQuebec || '').toLowerCase().includes(filters.region.toLowerCase())
+        : true;
+      const reserveSite = l.site || '';
+      const reserveMatch = filters.reserve ? reserveSite.toLowerCase().includes(filters.reserve.toLowerCase()) : true;
+      const organismeActuel = l.site ? 'SEPAQ' : 'privé';
+      const organismeMatch = filters.organisme ? organismeActuel.toLowerCase().includes(filters.organisme.toLowerCase()) : true;
+      const nomMatch = filters.nom ? (l.nomDuLac || '').toLowerCase().includes(filters.nom.toLowerCase()) : true;
+      const motorisationType = l.embarcation?.motorisation?.necessaire || '';
+      const motorisationMatch = filters.motorisation
+        ? motorisationType.toLowerCase().includes(filters.motorisation.toLowerCase())
+        : true;
+      return regionMatch && organismeMatch && reserveMatch && nomMatch && motorisationMatch;
+    });
+  }, [data, filters]);
+
+  const handleToggleInteressant = async (lacId: Id<"lacs">, e: React.MouseEvent) => {
     e.stopPropagation();
     try {
       await toggleChoixInteressant({ lacId });
     } catch (error) {
       console.error("Erreur lors du toggle:", error);
     }
-  }; */
+  };
 
   // Fonction pour ouvrir le dialog d'édition
   const handleOpenEditDialog = (lac: LacWithDetails) => {
@@ -100,10 +143,102 @@ const LakesSearchCards = ({ data }: { data: LacWithDetails[] }) => {
     );
   };
 
-  // todo devrait etre defini dans le schema convex
   interface Superficie {
     hectares: number;
   }
+
+  // const getLakeSizeCategory = (superficie: Superficie | null) => {
+  //   if (!superficie || !superficie.hectares) {
+  //     return {
+  //       label: 'Superficie inconnue',
+  //       level: 0,
+  //       icon: null,
+  //       recommendation: 'Données manquantes'
+  //     };
+  //   }
+
+  //   const superficieHa = Number(superficie.hectares);
+
+  //   // if (superficieHa < 3) return {
+  //   //   label: 'Micro-lac',
+  //   //   level: 1,
+  //   //   icon: (
+  //   //     <>
+  //   //       <WaterDropOutlinedIcon sx={{ fontSize: 18, color: 'success.main' }} />
+  //   //     </>
+  //   //   ),
+  //   //   recommendation: 'Parfait pour exploration tranquille'
+  //   // };
+
+  //   // if (superficieHa < 15) return {
+  //   //   label: 'Petit lac',
+  //   //   level: 2,
+  //   //   icon: (
+  //   //     <>
+  //   //       <WaterDropOutlinedIcon sx={{ fontSize: 18, color: 'success.main' }} />
+  //   //       <WaterDropOutlinedIcon sx={{ fontSize: 22, color: 'success.main' }} />
+  //   //     </>
+  //   //   ),
+  //   //   recommendation: 'Très bon pour pêche et navigation'
+  //   // };
+
+  //   // if (superficieHa < 30) return {
+  //   //   label: 'Lac modeste',
+  //   //   level: 3,
+  //   //   icon: (
+  //   //     <>
+  //   //       <WaterDropOutlinedIcon sx={{ fontSize: 22, color: 'success.main' }} />
+  //   //       <WaterDropOutlinedIcon sx={{ fontSize: 26, color: 'success.main' }} />
+  //   //     </>
+  //   //   ),
+  //   //   recommendation: 'Navigable avec autonomie raisonnable'
+  //   // };
+
+  //   // if (superficieHa < 45) return {
+  //   //   label: 'Lac étendu',
+  //   //   level: 4,
+  //   //   icon: (
+  //   //     <>
+  //   //       <WarningAmberOutlinedIcon sx={{ fontSize: 22, color: 'warning.main' }} />
+  //   //     </>
+  //   //   ),
+  //   //   recommendation: 'Faisable avec prudence (vent, retour anticipé)'
+  //   // };
+
+  //   // if (superficieHa < 80) return {
+  //   //   label: 'Lac large',
+  //   //   level: 5,
+  //   //   icon: (
+  //   //     <>
+  //   //       <WarningAmberOutlinedIcon sx={{ fontSize: 24, color: 'warning.main' }} />
+  //   //       <WarningAmberOutlinedIcon sx={{ fontSize: 20, color: 'warning.main' }} />
+  //   //     </>
+  //   //   ),
+  //   //   recommendation: 'Limite atteinte — attention à l’autonomie'
+  //   // };
+
+  //   // if (superficieHa < 300) return {
+  //   //   label: 'Grand lac',
+  //   //   level: 6,
+  //   //   icon: (
+  //   //     <>
+  //   //       <DoNotDisturbAltOutlinedIcon sx={{ fontSize: 24, color: 'error.main' }} />
+  //   //     </>
+  //   //   ),
+  //   //   recommendation: 'À éviter — trop vaste pour ton moteur'
+  //   // };
+
+  //   return {
+  //     label: 'Très grand lac / réservoir',
+  //     level: 7,
+  //     icon: (
+  //       <>
+  //         <ReportProblemOutlinedIcon sx={{ fontSize: 26, color: 'error.main' }} />
+  //       </>
+  //     ),
+  //     recommendation: 'Dangereux — ne pas naviguer avec moteur électrique'
+  //   };
+  // };
 
   const getLakeSizeCategory = (superficie: Superficie | null) => {
     if (!superficie || !superficie.hectares) {
@@ -197,9 +332,8 @@ const LakesSearchCards = ({ data }: { data: LacWithDetails[] }) => {
     };
   };
 
-  // todo type devrait venir du schema convex
   const getHebergement = (
-    // acces: Acces | undefined,
+    acces: Acces | undefined,
     hebergement: Array<{
       nom?: string;
       camping?: string;
@@ -221,7 +355,7 @@ const LakesSearchCards = ({ data }: { data: LacWithDetails[] }) => {
         equipementAdmissible?: string[];
       }>;
     }> | null) => {
-    if (!Array.isArray(hebergement) || hebergement.length === 0) {
+    if (!hebergement || hebergement.length === 0) {
       return <Typography variant="body2" color="text.secondary">—</Typography>;
     }
 
@@ -267,7 +401,9 @@ const LakesSearchCards = ({ data }: { data: LacWithDetails[] }) => {
               <Box sx={{ textAlign: 'right', minWidth: '150px' }}>
                 {h.distanceDepuisLac && (
                   <Typography variant="body2" color="primary.main" fontWeight="500">
+                    {/* {h.distanceDepuisLac.kilometrage.toFixed(2)} km ( */}
                     {`camping -> lac ${formatTemps(h.distanceDepuisLac.temps)}`}
+                    {/* ) */}
                   </Typography>
                 )}
                 {(h.commodites?.eau || h.commodites?.electricite) && (
@@ -295,34 +431,84 @@ const LakesSearchCards = ({ data }: { data: LacWithDetails[] }) => {
     window.open(googleMapsUrl, '_blank', 'noopener,noreferrer');
   };
 
+  if (loading) return <Box className="p-6"><CircularProgress /></Box>;
+
   const handleFlip = (id: string) => {
     setFlippedCards(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
-  // const handleRandomInteressant = () => {
-  //   const interessants = filtered.filter((l) => l.isChoixInteressant);
-  //   if (interessants.length === 0) {
-  //     alert('Aucun lac marqué comme intéressant trouvé!');
-  //     return;
-  //   }
-  //   const randomLac = interessants[Math.floor(Math.random() * interessants.length)];
-  //   setHighlightedLacId(randomLac._id);
+  const handleRandomInteressant = () => {
+    const interessants = filtered.filter((l) => l.isChoixInteressant);
+    if (interessants.length === 0) {
+      alert('Aucun lac marqué comme intéressant trouvé!');
+      return;
+    }
+    const randomLac = interessants[Math.floor(Math.random() * interessants.length)];
+    setHighlightedLacId(randomLac._id);
 
-  //   // Scroll vers la carte
-  //   setTimeout(() => {
-  //     const element = document.getElementById(`lac-card-${randomLac._id}`);
-  //     if (element) {
-  //       element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  //     }
-  //   }, 100);
+    // Scroll vers la carte
+    setTimeout(() => {
+      const element = document.getElementById(`lac-card-${randomLac._id}`);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
 
-  //   // Retirer le highlight après 3 secondes
-  //   setTimeout(() => setHighlightedLacId(null), 3000);
-  // };
+    // Retirer le highlight après 3 secondes
+    setTimeout(() => setHighlightedLacId(null), 3000);
+  };
 
   return (
     <>
       <Box className="p-3 bg-white rounded-lg shadow-sm">
+        <Box display="flex" gap={1} mb={2} alignItems="center" sx={{ flexDirection: { xs: 'column', sm: 'row' }, alignItems: { xs: 'stretch', sm: 'center' } }}>
+          <Button
+            variant="contained"
+            startIcon={<ShuffleIcon />}
+            onClick={handleRandomInteressant}
+            sx={{ minWidth: isMobile ? 120 : 200, mb: { xs: 1, sm: 0 } }}
+          >
+            Lac au hasard
+          </Button>
+          <Box sx={{ display: 'grid', gap: { xs: 1, sm: 2 }, flex: 1, gridTemplateColumns: { xs: '1fr', sm: 'repeat(2,1fr)', md: 'repeat(5,1fr)' } }}>
+            <TextField
+              label="Région"
+              size="small"
+              fullWidth
+              value={filters.region}
+              onChange={e => setFilters(f => ({ ...f, region: e.target.value }))}
+            />
+            <TextField
+              label="Réserve / Site (SEPAQ)"
+              size="small"
+              fullWidth
+              value={filters.reserve}
+              onChange={e => setFilters(f => ({ ...f, reserve: e.target.value }))}
+            />
+            <TextField
+              label="Organisme"
+              size="small"
+              fullWidth
+              value={filters.organisme}
+              onChange={e => setFilters(f => ({ ...f, organisme: e.target.value }))}
+            />
+            <TextField
+              label="Nom du lac"
+              size="small"
+              fullWidth
+              value={filters.nom}
+              onChange={e => setFilters(f => ({ ...f, nom: e.target.value }))}
+            />
+            <TextField
+              label="Motorisation"
+              size="small"
+              fullWidth
+              value={filters.motorisation}
+              onChange={e => setFilters(f => ({ ...f, motorisation: e.target.value }))}
+            />
+          </Box>
+        </Box>
+
         <Box
           sx={{
             display: 'grid',
@@ -334,13 +520,13 @@ const LakesSearchCards = ({ data }: { data: LacWithDetails[] }) => {
             },
           }}
         >
-          {data.length === 0 && (
+          {filtered.length === 0 && (
             <Box>
               <Typography>Aucun résultat</Typography>
             </Box>
           )}
 
-          {data.map((l) => {
+          {filtered.map((l) => {
             const { icon } = getLakeSizeCategory(l.superficie || null);
 
             const cardHeader = (
@@ -364,11 +550,14 @@ const LakesSearchCards = ({ data }: { data: LacWithDetails[] }) => {
                     <Typography variant="caption" color="text.secondary">
                       {l.regionAdministrativeQuebec}
                     </Typography>
+                    {/* <Typography variant="caption" color="text.secondary">
+                      {l.site || 'privé'} • {l.distanceMaisonLac?.kilometrage ? `${l.distanceMaisonLac.kilometrage.toFixed(2)} km` : 'Distance maison inconnue'} • {l.acces?.accessible || 'Accessibilité inconnue'}
+                    </Typography> */}
                   </Box>
                 }
                 action={
                   <Box sx={{ display: 'flex', gap: 0.5 }}>
-                    {/* <Tooltip title={l.isChoixInteressant ? "Retirer des favoris" : "Marquer comme intéressant"}>
+                    <Tooltip title={l.isChoixInteressant ? "Retirer des favoris" : "Marquer comme intéressant"}>
                       <IconButton
                         size="small"
                         onClick={(e) => handleToggleInteressant(l._id, e)}
@@ -381,7 +570,7 @@ const LakesSearchCards = ({ data }: { data: LacWithDetails[] }) => {
                       >
                         {l.isChoixInteressant ? <StarIcon /> : <StarBorderIcon />}
                       </IconButton>
-                    </Tooltip> */}
+                    </Tooltip>
                     <Tooltip title="Copier les coordonnées">
                       <IconButton
                         onClick={() => {
@@ -532,7 +721,7 @@ const LakesSearchCards = ({ data }: { data: LacWithDetails[] }) => {
                   <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', py: 0.4, px: 0.6, border: '1px solid #eaeaea' }}>
                     {cardHeader}
                     <CardContent sx={{ flexGrow: 1, py: 0.6 }}>
-                      {getHebergement(/*l.acces,*/ l.hebergements)}
+                      {getHebergement(l.acces, l.hebergements)}
                     </CardContent>
                     <CardActions sx={{ justifyContent: 'space-between', py: 0.25 }}>
                       <IconButton
@@ -572,5 +761,3 @@ const LakesSearchCards = ({ data }: { data: LacWithDetails[] }) => {
     </>
   );
 }
-
-export default LakesSearchCards;

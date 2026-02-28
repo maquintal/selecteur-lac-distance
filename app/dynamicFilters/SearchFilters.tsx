@@ -1,5 +1,3 @@
-'use client';
-
 import { useState } from "react";
 
 import { useQuery } from "convex/react";
@@ -36,7 +34,7 @@ const TYPE_EMBARCATION_OPTIONS = [ // ces valeurs devraient venir de la definiti
   { label: "Location", value: "Location" },
 ];
 
-const SearchFiltersBar = () => {
+const SearchFilters = () => {
   const [nomLac, setNomLac] = useState("");
   // setter defini, en attendant, mais devrait prevoir dans la query en amont
   const [motorisation, setMotorisation] = useState("electrique");
@@ -266,4 +264,4 @@ const SearchFiltersBar = () => {
   );
 }
 
-export default SearchFiltersBar;
+export default SearchFilters;
