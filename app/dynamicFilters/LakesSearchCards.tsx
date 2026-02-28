@@ -41,7 +41,7 @@ import OtherHousesIcon from '@mui/icons-material/OtherHouses';
 import WaterIcon from '@mui/icons-material/Water';
 import DangerousOutlinedIcon from '@mui/icons-material/DangerousOutlined';
 
-const LakesSearchCards = ({ data }: { data: LacWithDetails[] }) => {
+const LakesSearchCards = ({ data, scenario }: { data: LacWithDetails[] }) => {
 
   const [flippedCards, setFlippedCards] = useState<{ [key: string]: boolean }>({});
   const [highlightedLacId, setHighlightedLacId] = useState<string | null>(null);
@@ -227,13 +227,16 @@ const LakesSearchCards = ({ data }: { data: LacWithDetails[] }) => {
       return <Typography variant="body2" color="text.secondary">—</Typography>;
     }
 
-    const sortedHebergement = [...hebergement].sort((a, b) => {
+    // const sortedHebergement = [...hebergement].sort((a, b) => {
 
-      const timeA = a.distanceDepuisLac?.temps ?? Infinity;
-      const timeB = b.distanceDepuisLac?.temps ?? Infinity;
+    //   const timeA = a.distanceDepuisLac?.temps ?? Infinity;
+    //   const timeB = b.distanceDepuisLac?.temps ?? Infinity;
 
-      return timeA - timeB;
-    });
+    //   return timeA - timeB;
+
+    const sortedHebergement = hebergement
+
+    //});
 
     return (
       <Box sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -463,8 +466,6 @@ const LakesSearchCards = ({ data }: { data: LacWithDetails[] }) => {
                             <Typography variant="body2" sx={{ fontSize: '0.78rem', mt: 0.5 }}><strong>Distances & Temps</strong></Typography>
                             <Box sx={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '1px 8px', alignItems: 'center' }}>
                               {
-
-
                                 [
                                   { label: <><OtherHousesIcon sx={iconSx} />→<WaterIcon sx={iconSx} /></>, key: 'maison-lac', data: l.distanceMaisonLac },
                                   // { label: <><HomeIcon sx={iconSx} />→<HolidayVillageIcon sx={iconSx} /></>, key: 'maison-camping', data: l.distanceMaisonCamping },
@@ -536,14 +537,13 @@ const LakesSearchCards = ({ data }: { data: LacWithDetails[] }) => {
                     <Box sx={{ p: 0.6 }}>
                       <Typography variant="caption" color="textSecondary" sx={{ fontSize: '0.62rem' }}>Lat: {getLatitude(l) ?? '—'} • Lon: {getLongitude(l) ?? '—'}</Typography>
                     </Box>
-
                   </Card>
 
                   {/* BACK */}
                   <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', py: 0.4, px: 0.6, border: '1px solid #eaeaea' }}>
                     {cardHeader}
                     <CardContent sx={{ flexGrow: 1, py: 0.6 }}>
-                      {getHebergement(/*l.acces,*/ l.hebergements)}
+                      {getHebergement(scenario === "sejour2" ? l.hebergementsNonSepaq : l.hebergements)}
                     </CardContent>
                     <CardActions sx={{ justifyContent: 'space-between', py: 0.25 }}>
                       <IconButton
@@ -557,6 +557,8 @@ const LakesSearchCards = ({ data }: { data: LacWithDetails[] }) => {
                         onClick={(e) => handleButtonClick2(e, getLatitude(l), getLongitude(l))}>
                         Voir sur OpenStreetMap
                       </Button> */}
+                      {console.log(l.hebergementsNonSepaq)}
+
                       <IconButton
                         aria-label="retour à la recherche"
                         onClick={() => handleFlip(l._id)}

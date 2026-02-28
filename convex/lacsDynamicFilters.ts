@@ -1,3 +1,4 @@
+import { HebergementLacInput } from "@/app/types/schema.types";
 import { query } from "./_generated/server";
 import { v } from "convex/values";
 
@@ -42,13 +43,17 @@ export const getAllLacsDynamicFilters = query({
         .map((id) => especesMap.get(id))
         .filter((e) => e != null);
 
-      const hebergements = (lac.hebergements ?? []).map((h) => ({
-        ...campingsMap.get(h.campingId),
-        distanceDepuisAcceuil: h.distanceDepuisAcceuil,
-        distanceDepuisLac: h.distanceDepuisLac,
-      }));
+      const hebergements = (lac.hebergements ?? [])
+        .map((h) => ({
+          ...campingsMap.get(h.campingId),
+          distanceDepuisAcceuil: h.distanceDepuisAcceuil,
+          distanceDepuisLac: h.distanceDepuisLac,
+        }))
+        .sort((a, b) => (a.distanceDepuisLac?.temps ?? Infinity) - (b.distanceDepuisLac?.temps ?? Infinity));
 
-      return { ...lac, especes, hebergements };
+      const hebergementsNonSepaq = hebergements.filter((h) => h.organisme !== "SEPAQ");
+
+      return { ...lac, especes, hebergements, hebergementsNonSepaq };
     });
 
     const filteredLacs = enrichedLacs.filter((lac) => {
@@ -100,41 +105,52 @@ export const getAllLacsDynamicFilters = query({
         }
       }
 
+      if (scenario === "sejour2") {
+        return lac.hebergements.map((h) => {
+          if (h.organisme === "SEPAQ") //&& (h.distanceDepuisLac?.temps ?? Infinity) <= 65;
+          return false
+        })
+      }
+
       return true;
     });
 
-    const sortedLacs = filteredLacs.sort((a, b) => {
+    // Helper
+    // todo type devrait venir du schema convex
+    type HebergementEnrichi = (typeof enrichedLacs)[number]["hebergements"][number];
+
+    const tempsMin = (hebergements: HebergementEnrichi[] | undefined, filtre?: (h: HebergementEnrichi) => boolean) =>
+      (filtre ? hebergements?.filter(filtre) : hebergements)
+        ?.reduce((min, h) => Math.min(min, h.distanceDepuisLac?.temps ?? Infinity), Infinity) ?? Infinity;
+
+    const countHebergements = (hebergements: HebergementEnrichi[] | undefined, maxTemps: number, filtre?: (h: HebergementEnrichi) => boolean) =>
+      (filtre ? hebergements?.filter(filtre) : hebergements)
+        ?.filter(h => (h.distanceDepuisLac?.temps ?? Infinity) <= maxTemps).length ?? 0;
+
+    // Sort
+    const sortedLacs = [...filteredLacs].sort((a, b) => {
+
       if (scenario === "journee") {
-        const tempsA = a.distanceMaisonLac?.temps ?? Infinity;
-        const tempsB = b.distanceMaisonLac?.temps ?? Infinity;
-        return tempsA - tempsB;
+        return (a.distanceMaisonLac?.temps ?? Infinity) - (b.distanceMaisonLac?.temps ?? Infinity);
       }
 
       if (scenario === "sejour") {
-        // Niveau 1 : nombre d'hébergements à moins de 35 min (plus = mieux)
-        const count35A = a.hebergements?.filter(h => (h.distanceDepuisLac?.temps ?? Infinity) <= 35).length ?? 0;
-        const count35B = b.hebergements?.filter(h => (h.distanceDepuisLac?.temps ?? Infinity) <= 35).length ?? 0;
-        if (count35B !== count35A) return count35B - count35A;
+        // N1 : nb hébergements <= 35 min
+        // const diff35 = countHebergements(b.hebergements, 35) - countHebergements(a.hebergements, 35);
+        // if (diff35 !== 0) return diff35;
 
-        // Niveau 2 : nombre d'hébergements à moins de 65 min (plus = mieux)
-        const count65A = a.hebergements?.filter(h => (h.distanceDepuisLac?.temps ?? Infinity) <= 65).length ?? 0;
-        const count65B = b.hebergements?.filter(h => (h.distanceDepuisLac?.temps ?? Infinity) <= 65).length ?? 0;
-        if (count65B !== count65A) return count65B - count65A;
+        // // N2 : nb hébergements <= 65 min
+        // const diff65 = countHebergements(b.hebergements, 65) - countHebergements(a.hebergements, 65);
+        // if (diff65 !== 0) return diff65;
 
-        // Niveau 3 : temps du plus proche hébergement
-        const tempsA = a.hebergements?.reduce(
-          (min, h) => Math.min(min, h.distanceDepuisLac?.temps ?? Infinity), Infinity
-        ) ?? Infinity;
-        const tempsB = b.hebergements?.reduce(
-          (min, h) => Math.min(min, h.distanceDepuisLac?.temps ?? Infinity), Infinity
-        ) ?? Infinity;
-
-        return tempsA - tempsB;
+        // N3 : temps du camping le plus proche
+        return tempsMin(a.hebergements) - tempsMin(b.hebergements);
       }
 
       return 0;
     });
 
     return sortedLacs;
+
   },
 });
