@@ -38,7 +38,7 @@ const regionsOptions = [
   "Centre-du-Québec"
 ];
 
-const siteOptions = [
+export const siteOptions: string[] = [
   "Mastigouche",
   "Rouge-Matawin",
   "Papineau-Labelle",

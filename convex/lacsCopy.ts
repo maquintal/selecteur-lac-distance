@@ -1,17 +1,15 @@
-// ============================================
-// QUERIES CONVEX
-// ============================================
-
-// convex/lacs.ts
 import { query } from "./_generated/server";
 import { v } from "convex/values";
-// import { paginationOptsValidator } from "convex/server";
 
 export const getAllLacsDynamicFilters = query({
   args: {
     search: v.string(),
+    motorisation: v.optional(v.string()),
+    typeEmbarcation: v.optional(v.string()),
+    site: v.optional(v.string()),
   },
-  handler: async (ctx, { search }) => {  // ✅ ajout de { search }
+
+  handler: async (ctx, { search, motorisation, typeEmbarcation, site }) => {
 
     const allLacs = await ctx.db.query("lacs").collect();
 
@@ -23,12 +21,8 @@ export const getAllLacsDynamicFilters = query({
       Promise.all(allCampingIds.map((id) => ctx.db.get(id))),
     ]);
 
-    const especesMap = new Map(
-      allEspeceIds.map((id, i) => [id, allEspeces[i]])
-    );
-    const campingsMap = new Map(
-      allCampingIds.map((id, i) => [id, allCampings[i]])
-    );
+    const especesMap = new Map(allEspeceIds.map((id, i) => [id, allEspeces[i]]));
+    const campingsMap = new Map(allCampingIds.map((id, i) => [id, allCampings[i]]));
 
     const enrichedLacs = allLacs.map((lac) => {
       const especes = (lac.especeIds ?? [])
@@ -44,12 +38,28 @@ export const getAllLacsDynamicFilters = query({
       return { ...lac, especes, hebergements };
     });
 
-    const filtered = search.trim()
-      ? enrichedLacs.filter((lac) =>
-        lac.nomDuLac?.toLowerCase().includes(search.toLowerCase())
-      )
-      : enrichedLacs;
+    return enrichedLacs.filter((lac) => {
+      // Filtre texte sur le nom
+      if (search.trim() && !lac.nomDuLac?.toLowerCase().includes(search.toLowerCase())) {
+        return false;
+      }
 
-    return filtered;
+      // Filtre motorisation (objet, pas tableau)
+      if (motorisation && lac.embarcation?.motorisation?.necessaire !== motorisation) {
+        return false;
+      }
+
+      // Filtre type d'embarcation (objet, pas tableau)
+      if (typeEmbarcation && lac.embarcation?.type !== typeEmbarcation) {
+        return false;
+      }
+
+      // Filtre site
+      if (site && lac.site !== site) {
+        return false;
+      }
+
+      return true;
+    });
   },
 });
