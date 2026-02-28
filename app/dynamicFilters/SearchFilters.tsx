@@ -20,14 +20,14 @@ import FilterListOffIcon from "@mui/icons-material/FilterListOff";
 import { siteOptions } from "../components/LacDialog"; // todo ces valeurs devraient venir de la definition du schema convex
 import LakesSearchCards from "./LakesSearchCards";
 
-const MOTORISATION_OPTIONS = [ // ces valeurs devraient venir de la definition du schema convex
+const MOTORISATION_OPTIONS = [ // todoces valeurs devraient venir de la definition du schema convex
   { label: "Toutes motorisations", value: "" },
   { label: "Électrique seulement", value: "electrique" },
   { label: "Essence seulement", value: "essence" },
   { label: "Aucune motorisation", value: "aucune" },
 ];
 
-const TYPE_EMBARCATION_OPTIONS = [ // ces valeurs devraient venir de la definition du schema convex
+const TYPE_EMBARCATION_OPTIONS = [ // todo ces valeurs devraient venir de la definition du schema convex
   { label: "Tous les types", value: "" },
   { label: "Embarcation Sépaq fournie", value: "Embarcation Sépaq fournie" },
   { label: "Embarcation personnelle", value: "Embarcation personnelle" },
@@ -113,6 +113,8 @@ const SearchFilters = () => {
             label="Site"
             onChange={(e: SelectChangeEvent) => setSite(e.target.value)}
           >
+            <MenuItem value="">Tous les Sites</MenuItem>
+            <MenuItem value="__aucun__">Sans site assigné</MenuItem>
             {siteOptions.map((opt) => (
               <MenuItem key={opt} value={opt}>
                 {opt}
@@ -122,7 +124,7 @@ const SearchFilters = () => {
         </FormControl>
 
         <FormControl size="small" sx={{ width: 220 }}>
-          <InputLabel>Superficie max</InputLabel>
+          <InputLabel>Superficie minimum</InputLabel>
           <Select
             value={superficieMin} // todo ajuster le type pour permettre "" ou number
             label="Superficie min"
@@ -138,7 +140,7 @@ const SearchFilters = () => {
         </FormControl>
 
         <FormControl size="small" sx={{ width: 220 }}>
-          <InputLabel>Superficie max</InputLabel>
+          <InputLabel>Superficie maximum</InputLabel>
           <Select
             value={superficieMax} // todo ajuster le type pour permettre "" ou number
             label="Superficie max"
@@ -197,58 +199,21 @@ const SearchFilters = () => {
         </FormControl>
 
         {hasActiveFilters && (
-          <Button
-            variant="text"
-            color="error"
-            size="small"
-            startIcon={<FilterListOffIcon />}
-            onClick={handleReset}
-          >
-            Réinitialiser
-          </Button>
+          <>
+            <Button
+              variant="text"
+              color="error"
+              size="small"
+              startIcon={<FilterListOffIcon />}
+              onClick={handleReset}
+            >
+              Réinitialiser
+            </Button>
+            {results?.length} {results?.length === 1 ? 'résultat' : 'résultats'}
+          </>
+
         )}
       </Stack>
-
-      {/* Chips des filtres actifs */}
-      {hasActiveFilters && (
-        <Stack direction="row" flexWrap="wrap" gap={1}>
-          {scenario && (
-            <Chip
-              label={`Scénario : ${scenario === "journee" ? "Pêche d'un jour" : "Séjour de Pêche"}`}
-              onDelete={() => setScenario("")}
-              size="small"
-              color="primary"
-            />
-          )}
-          {nomLac && (
-            <Chip
-              label={`Nom : ${nomLac}`}
-              onDelete={() => setNomLac("")}
-              size="small"
-              color="primary"
-              variant="outlined"
-            />
-          )}
-          {motorisation && (
-            <Chip
-              label={`Motorisation : ${motorisation}`}
-              onDelete={() => setMotorisation("")}
-              size="small"
-              color="primary"
-              variant="outlined"
-            />
-          )}
-          {typeEmbarcation && (
-            <Chip
-              label={`Type : ${typeEmbarcation}`}
-              onDelete={() => setTypeEmbarcation("")}
-              size="small"
-              color="primary"
-              variant="outlined"
-            />
-          )}
-        </Stack>
-      )}
 
       {/* Résultats ou spinner centré */}
       {isLoading ? (

@@ -1,3 +1,4 @@
+// todo doublon avec le schema convex, revoir les types pour les rendre plus stricts et éviter les erreurs de saisie
 export interface Acces {
     portage: string,
     acceuil: string,
@@ -8,6 +9,7 @@ export interface Acces {
     accessible: "auto" | "véhicule utilitaire sport (VUS)" | "camion 4x4"
 }
 
+// todo : revoir les types pour les rendre plus stricts et éviter les erreurs de saisie
 export interface Embarcation {
     type: "Embarcation personnelle" | "Embarcation Sépaq fournie" | "Embarcation Pourvoirie fournie" | "Location";
     motorisation: {

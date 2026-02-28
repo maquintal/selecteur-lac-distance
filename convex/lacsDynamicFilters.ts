@@ -69,8 +69,12 @@ export const getAllLacsDynamicFilters = query({
       }
 
       // Filtre site
-      if (site && lac.site !== site) {
-        return false;
+      if (site) {
+        if (site === "__aucun__") {
+          if (lac.site && lac.site.trim() !== "") return false;
+        } else {
+          if (lac.site !== site) return false;
+        }
       }
 
       // Filtre superficie min
@@ -107,14 +111,24 @@ export const getAllLacsDynamicFilters = query({
       }
 
       if (scenario === "sejour") {
+        // Niveau 1 : nombre d'hébergements à moins de 35 min (plus = mieux)
+        const count35A = a.hebergements?.filter(h => (h.distanceDepuisLac?.temps ?? Infinity) <= 35).length ?? 0;
+        const count35B = b.hebergements?.filter(h => (h.distanceDepuisLac?.temps ?? Infinity) <= 35).length ?? 0;
+        if (count35B !== count35A) return count35B - count35A;
+
+        // Niveau 2 : nombre d'hébergements à moins de 65 min (plus = mieux)
+        const count65A = a.hebergements?.filter(h => (h.distanceDepuisLac?.temps ?? Infinity) <= 65).length ?? 0;
+        const count65B = b.hebergements?.filter(h => (h.distanceDepuisLac?.temps ?? Infinity) <= 65).length ?? 0;
+        if (count65B !== count65A) return count65B - count65A;
+
+        // Niveau 3 : temps du plus proche hébergement
         const tempsA = a.hebergements?.reduce(
-          (min, h) => Math.min(min, h.distanceDepuisLac?.temps ?? Infinity),
-          Infinity
+          (min, h) => Math.min(min, h.distanceDepuisLac?.temps ?? Infinity), Infinity
         ) ?? Infinity;
         const tempsB = b.hebergements?.reduce(
-          (min, h) => Math.min(min, h.distanceDepuisLac?.temps ?? Infinity),
-          Infinity
+          (min, h) => Math.min(min, h.distanceDepuisLac?.temps ?? Infinity), Infinity
         ) ?? Infinity;
+
         return tempsA - tempsB;
       }
 

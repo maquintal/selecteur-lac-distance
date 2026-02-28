@@ -1,4 +1,4 @@
-export const EMBARCATION_TYPES = [
+export const EMBARCATION_TYPES = [ //todo doublon, + devrait etre defini par convex
   "Embarcation personnelle",
   "Embarcation Sépaq fournie",
   "Embarcation Pourvoirie fournie",

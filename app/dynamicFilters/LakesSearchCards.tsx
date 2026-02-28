@@ -52,14 +52,16 @@ const LakesSearchCards = ({ data }: { data: LacWithDetails[] }) => {
 
   const { isMobile } = useMobileDetect();
 
-  /* const handleToggleInteressant = async (lacId: Id<"lacs">, e: React.MouseEvent) => {
+  const toggleChoixInteressant = useMutation(api.lacs.toggleChoixInteressant);
+
+  const handleToggleInteressant = async (lacId: Id<"lacs">, e: React.MouseEvent) => {
     e.stopPropagation();
     try {
       await toggleChoixInteressant({ lacId });
     } catch (error) {
       console.error("Erreur lors du toggle:", error);
     }
-  }; */
+  };
 
   // Fonction pour ouvrir le dialog d'édition
   const handleOpenEditDialog = (lac: LacWithDetails) => {
@@ -285,7 +287,8 @@ const LakesSearchCards = ({ data }: { data: LacWithDetails[] }) => {
 
   const handleButtonClick = (e: React.MouseEvent, latitude: number, longitude: number) => {
     e.preventDefault();
-    const googleMapsUrl = `https://www.google.com/maps/search/camping/@${latitude},${longitude},13z`;
+    // const googleMapsUrl = `https://www.google.com/maps/search/camping/@${latitude},${longitude},13z`;
+    const googleMapsUrl = `https://www.google.com/maps/search/Terrains+de+camping/@${latitude},${longitude},13z`;
     window.open(googleMapsUrl, '_blank', 'noopener,noreferrer');
   };
 
@@ -299,30 +302,38 @@ const LakesSearchCards = ({ data }: { data: LacWithDetails[] }) => {
     setFlippedCards(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
-  // const handleRandomInteressant = () => {
-  //   const interessants = filtered.filter((l) => l.isChoixInteressant);
-  //   if (interessants.length === 0) {
-  //     alert('Aucun lac marqué comme intéressant trouvé!');
-  //     return;
-  //   }
-  //   const randomLac = interessants[Math.floor(Math.random() * interessants.length)];
-  //   setHighlightedLacId(randomLac._id);
+  const handleRandomInteressant = () => {
+    const interessants = data.filter((l) => l.isChoixInteressant);
+    if (interessants.length === 0) {
+      alert('Aucun lac marqué comme intéressant trouvé!');
+      return;
+    }
+    const randomLac = interessants[Math.floor(Math.random() * interessants.length)];
+    setHighlightedLacId(randomLac._id);
 
-  //   // Scroll vers la carte
-  //   setTimeout(() => {
-  //     const element = document.getElementById(`lac-card-${randomLac._id}`);
-  //     if (element) {
-  //       element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  //     }
-  //   }, 100);
+    // Scroll vers la carte
+    setTimeout(() => {
+      const element = document.getElementById(`lac-card-${randomLac._id}`);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
 
-  //   // Retirer le highlight après 3 secondes
-  //   setTimeout(() => setHighlightedLacId(null), 3000);
-  // };
+    // Retirer le highlight après 3 secondes
+    setTimeout(() => setHighlightedLacId(null), 3000);
+  };
 
   return (
     <>
       <Box className="p-3 bg-white rounded-lg shadow-sm">
+        <Button
+          variant="contained"
+          startIcon={<ShuffleIcon />}
+          onClick={handleRandomInteressant}
+          sx={{ minWidth: isMobile ? 120 : 200, mb: { xs: 1, sm: 0 } }}
+        >
+          Lac au hasard
+        </Button>
         <Box
           sx={{
             display: 'grid',
@@ -359,7 +370,7 @@ const LakesSearchCards = ({ data }: { data: LacWithDetails[] }) => {
                 subheader={
                   <Box display="flex" flexDirection="column">
                     <Typography variant="subtitle2" color="text.secondary">
-                      {l.site}
+                      {l.site || l.acces.acceuil}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
                       {l.regionAdministrativeQuebec}
@@ -368,7 +379,7 @@ const LakesSearchCards = ({ data }: { data: LacWithDetails[] }) => {
                 }
                 action={
                   <Box sx={{ display: 'flex', gap: 0.5 }}>
-                    {/* <Tooltip title={l.isChoixInteressant ? "Retirer des favoris" : "Marquer comme intéressant"}>
+                    <Tooltip title={l.isChoixInteressant ? "Retirer des favoris" : "Marquer comme intéressant"}>
                       <IconButton
                         size="small"
                         onClick={(e) => handleToggleInteressant(l._id, e)}
@@ -381,7 +392,7 @@ const LakesSearchCards = ({ data }: { data: LacWithDetails[] }) => {
                       >
                         {l.isChoixInteressant ? <StarIcon /> : <StarBorderIcon />}
                       </IconButton>
-                    </Tooltip> */}
+                    </Tooltip>
                     <Tooltip title="Copier les coordonnées">
                       <IconButton
                         onClick={() => {

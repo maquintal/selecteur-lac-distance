@@ -38,8 +38,10 @@ const regionsOptions = [
   "Centre-du-Québec"
 ];
 
+// todo ces valeurs devraient venir de la definition du schema convex
 export const siteOptions: string[] = [
   "Mastigouche",
+  "Portneuf",
   "Rouge-Matawin",
   "Papineau-Labelle",
   "Saint-Maurice",
