@@ -32,7 +32,7 @@ export default function GestionCampings() {
   const { isMobile, isLoaded } = useMobileDetect();
 
   // Queries Convex
-  const campings = useQuery(api.lacs.getAllCampings) || [];
+  const campings = useQuery(api.heberements.getAllCampings) || [];
 
   const handleOpenDialog = (mode: 'create' | 'edit', camping?: CampingDoc) => {
     setDialogMode(mode);

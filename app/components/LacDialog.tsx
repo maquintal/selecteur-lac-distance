@@ -136,9 +136,9 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
   const addLac = useMutation(api.lacs.addLac);
   const updateLac = useMutation(api.lacs.updateLac);
   const addHebergement = useMutation(api.lacs.addCampingToLac);
-  const campings = useQuery(api.lacs.getAllCampings);
+  const campings = useQuery(api.heberements.getAllCampings);
   const removeCampingFromLac = useMutation(api.lacs.removeCampingFromLac);
-  const especes = useQuery(api.lacs.getAllEspeces);
+  const especes = useQuery(api.especes.getAllEspeces);
 
   const handleInputChange = (
     field: keyof NewLacInput,

@@ -468,7 +468,6 @@ const LakesSearchCards = ({ data, scenario }: { data: LacWithDetails[] }) => {
                               {
                                 [
                                   { label: <><OtherHousesIcon sx={iconSx} />→<WaterIcon sx={iconSx} /></>, key: 'maison-lac', data: l.distanceMaisonLac },
-                                  // { label: <><HomeIcon sx={iconSx} />→<HolidayVillageIcon sx={iconSx} /></>, key: 'maison-camping', data: l.distanceMaisonCamping },
                                 ].map(({ label, key, data }) =>
                                   data?.kilometrage && data?.temps ? (
                                     <React.Fragment key={key}>
@@ -521,10 +520,14 @@ const LakesSearchCards = ({ data, scenario }: { data: LacWithDetails[] }) => {
                                   </Typography>
                                   <KeyboardArrowRightIcon fontSize="small" />
                                   <Typography variant="caption" color="textSecondary" display="block" sx={{ fontSize: '0.68rem' }}>
-                                    {l.hebergements.filter(h => h.distanceDepuisLac?.temps && h.distanceDepuisLac?.temps >= 0 && h.distanceDepuisLac?.temps <= 35).length} hébergements à moins de 30 min
+                                    {(scenario === "sejour2" ? l.hebergementsNonSepaq : l.hebergements)
+                                      .filter(h => (h.distanceDepuisLac?.temps ?? Infinity) <= 35).length
+                                    } hébergements à moins de 30 min
                                   </Typography>
                                   <Typography variant="caption" color="textSecondary" display="block" sx={{ fontSize: '0.68rem' }}>
-                                    {l.hebergements.filter(h => h.distanceDepuisLac?.temps && h.distanceDepuisLac?.temps >= 30 && h.distanceDepuisLac?.temps <= 65).length} hébergements à moins de 1h
+                                    {(scenario === "sejour2" ? l.hebergementsNonSepaq : l.hebergements)
+                                      .filter(h => (h.distanceDepuisLac?.temps ?? Infinity) <= 65).length
+                                    } hébergements à moins de 1h
                                   </Typography>
                                 </Box>
                               </ButtonBase>
@@ -543,7 +546,6 @@ const LakesSearchCards = ({ data, scenario }: { data: LacWithDetails[] }) => {
                   <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', py: 0.4, px: 0.6, border: '1px solid #eaeaea' }}>
                     {cardHeader}
                     <CardContent sx={{ flexGrow: 1, py: 0.6 }}>
-                      {console.log(scenario)}
                       {getHebergement(scenario === "sejour2" ? l.hebergementsNonSepaq : l.hebergements)}
                     </CardContent>
                     <CardActions sx={{ justifyContent: 'space-between', py: 0.25 }}>
@@ -558,8 +560,6 @@ const LakesSearchCards = ({ data, scenario }: { data: LacWithDetails[] }) => {
                         onClick={(e) => handleButtonClick2(e, getLatitude(l), getLongitude(l))}>
                         Voir sur OpenStreetMap
                       </Button> */}
-                      {console.log(l.hebergementsNonSepaq)}
-
                       <IconButton
                         aria-label="retour à la recherche"
                         onClick={() => handleFlip(l._id)}

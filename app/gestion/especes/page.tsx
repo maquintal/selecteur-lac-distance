@@ -27,7 +27,7 @@ export default function GestionEspeces() {
   const { isMobile, isLoaded } = useMobileDetect();
 
   // Queries Convex
-  const especes = useQuery(api.lacs.getAllEspeces) || [];
+  const especes = useQuery(api.especes.getAllEspeces) || [];
 
   const handleOpenDialog = (mode: 'create' | 'edit', espece?: EspeceDoc) => {
     setDialogMode(mode);

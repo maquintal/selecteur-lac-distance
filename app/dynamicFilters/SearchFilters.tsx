@@ -47,7 +47,7 @@ const SearchFilters = () => {
 
   const [debouncedSearch] = useDebounce(nomLac, 300);
 
-  const results = useQuery(api.lacsDynamicFilters.getAllLacsDynamicFilters, {
+  const results = useQuery(api.lacs.getAllLacsDynamicFilters, {
     nomLac: debouncedSearch,
     motorisation,
     typeEmbarcation,
@@ -102,9 +102,8 @@ const SearchFilters = () => {
           >
             <MenuItem value="">Tous les scénarios</MenuItem>
             <MenuItem value="journee">Pêche d'un jour</MenuItem>
-            <MenuItem value="sejour">Hebergement Croissant</MenuItem>
-            <MenuItem value="sejour2">beta</MenuItem>
-            {/* <MenuItem value="sejour2">Séjour hors Sépaq</MenuItem> */}
+            <MenuItem value="sejour">Séjour de Pêche</MenuItem>
+            <MenuItem value="sejour2">Séjour de Pêche non Sepaq</MenuItem>
           </Select>
         </FormControl>
 

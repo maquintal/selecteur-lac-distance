@@ -192,10 +192,10 @@ export default defineSchema({
     )),
 
   })
-    .index("by_region", ["regionAdministrativeQuebec"])
+    // .index("by_region", ["regionAdministrativeQuebec"])
     .index("by_site", ["site"])
-    .index("by_zone", ["zone"])
-    .index("by_coordonnees", ["coordonnees.latitude", "coordonnees.longitude"])
+    // .index("by_zone", ["zone"])
+    // .index("by_coordonnees", ["coordonnees.latitude", "coordonnees.longitude"])
     .index("by_hebergements_electrique", ["nbHebergements", "isMoteurisationElectrique"])
     .index("by_choix_interessant", ["isChoixInteressant"])
     .searchIndex("search_nom", {

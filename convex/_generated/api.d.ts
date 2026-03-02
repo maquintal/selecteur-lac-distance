@@ -14,8 +14,9 @@ import type {
   FunctionReference,
 } from "convex/server";
 import type * as checkReadOnlyMode from "../checkReadOnlyMode.js";
+import type * as especes from "../especes.js";
+import type * as heberements from "../heberements.js";
 import type * as lacs from "../lacs.js";
-import type * as lacsDynamicFilters from "../lacsDynamicFilters.js";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -27,8 +28,9 @@ import type * as lacsDynamicFilters from "../lacsDynamicFilters.js";
  */
 declare const fullApi: ApiFromModules<{
   checkReadOnlyMode: typeof checkReadOnlyMode;
+  especes: typeof especes;
+  heberements: typeof heberements;
   lacs: typeof lacs;
-  lacsDynamicFilters: typeof lacsDynamicFilters;
 }>;
 export declare const api: FilterApi<
   typeof fullApi,
