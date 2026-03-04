@@ -28,7 +28,7 @@ export default function GestionLacs() {
 
   // Queries Convex
   // const lacs = useQuery(api.lacs.getAllLacs) || [];
-  const lacs = useQuery(api.lacs.getAllLacsSorted) || [];
+  const lacs = useQuery(api.lacs.getAllLacs) || [];
 
   const handleOpenDialog = (mode: 'create' | 'edit', lac?: LacDoc | LacWithDetails) => {
     setDialogMode(mode);

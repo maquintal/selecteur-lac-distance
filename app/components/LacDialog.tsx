@@ -27,7 +27,7 @@ type LacDialogProps = {
   mode: 'create' | 'edit';
 };
 
-// Options pour les autocomplete
+// todo doublons, devrait defini par schema convex Options pour les autocomplete
 const regionsOptions = [
   "Capitale-Nationale",
   "Chaudière-Appalaches",
@@ -35,7 +35,8 @@ const regionsOptions = [
   "Laurentides",
   "Mauricie",
   "Outaouais",
-  "Centre-du-Québec"
+  "Centre-du-Québec",
+  "Monteregie",
 ];
 
 // todo ces valeurs devraient venir de la definition du schema convex

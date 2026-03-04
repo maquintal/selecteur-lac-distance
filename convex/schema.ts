@@ -2,6 +2,7 @@
 // Schéma optimisé pour tes données de lacs du Québec
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
+import { especesSchema } from "@/convex/schemas/especes.schema";
 
 export default defineSchema({
   // ============================================
@@ -56,6 +57,7 @@ export default defineSchema({
         kilometrage: v.number(),
       }),
     ),
+    inactif: v.optional(v.boolean())
   })
     .index("by_nom", ["nom"])
     .searchIndex("search_nom", {
@@ -66,16 +68,10 @@ export default defineSchema({
   // TABLE: especes
   // Normalise les noms d'espèces
   // ============================================
-  especes: defineTable({
-    nomCommun: v.string(),
-    nomScientifique: v.optional(v.string()),
-    categorie: v.optional(
-      v.union(
-        v.literal("salmonidés"),
-        v.literal("carnassiers"),
-      )
-    ),
-  })
+
+
+
+  especes: defineTable(especesSchema)
     .index("by_nom", ["nomCommun"])
     .index("by_categorie", ["categorie"])
     .searchIndex("search_espece", {
@@ -122,6 +118,7 @@ export default defineSchema({
         v.literal("Embarcation Sépaq fournie"),
         v.literal("Embarcation Pourvoirie fournie"),
         v.literal("Location"),
+        v.literal("À Gué")
       ),
       motorisation: v.object({
         puissance: v.optional(
@@ -135,6 +132,7 @@ export default defineSchema({
             v.literal("electrique"),
             v.literal("essence"),
             v.literal("a determiner"),
+            v.literal("à gué")
           )
         )
       }),
@@ -179,8 +177,8 @@ export default defineSchema({
     isChoixInteressant: v.optional(v.boolean()),
 
     // Champs calculés pour optimiser les requêtes
-    nbHebergements: v.optional(v.number()), // calculé lors de l'insertion/update
-    isMoteurisationElectrique: v.optional(v.boolean()),
+    // nbHebergements: v.optional(v.number()), // calculé lors de l'insertion/update
+    // isMoteurisationElectrique: v.optional(v.boolean()),
 
     // distance depuis la maison
     distanceMaisonLac: v.optional(v.union(
@@ -196,12 +194,12 @@ export default defineSchema({
     .index("by_site", ["site"])
     // .index("by_zone", ["zone"])
     // .index("by_coordonnees", ["coordonnees.latitude", "coordonnees.longitude"])
-    .index("by_hebergements_electrique", ["nbHebergements", "isMoteurisationElectrique"])
+    // .index("by_hebergements_electrique", ["nbHebergements", "isMoteurisationElectrique"])
     .index("by_choix_interessant", ["isChoixInteressant"])
-    .searchIndex("search_nom", {
-      searchField: "nomDuLac",
-      filterFields: ["regionAdministrativeQuebec", "site"],
-    }),
+  // .searchIndex("search_nom", {
+  //   searchField: "nomDuLac",
+  //   // filterFields: ["regionAdministrativeQuebec", "site"],
+  // }),
 
   // ============================================
   // TABLE: hebergement_lacs (table de jonction)

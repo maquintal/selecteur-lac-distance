@@ -9,23 +9,33 @@ import { checkReadOnlyModeConvex } from "./checkReadOnlyMode";
 // QUERIES CONVEX
 // ============================================
 
-export const getAllLacsSorted = query({
+export const getAllLacs = query({
   handler: async (ctx) => {
     const lacs = await ctx.db
       .query("lacs")
-      .withIndex("by_hebergements_electrique")
-      .order("desc")
       .collect();
 
-    // Tri secondaire en JS seulement pour les lacs avec même nb d'hébergements
-    return lacs.sort((a, b) => {
-      if (a.nbHebergements === b.nbHebergements) {
-        return (b.isMoteurisationElectrique ? 1 : 0) - (a.isMoteurisationElectrique ? 1 : 0);
-      }
-      return 0; // Déjà trié par l'index
-    });
-  },
-});
+    return lacs
+  }
+})
+
+// export const getAllLacsSorted = query({
+//   handler: async (ctx) => {
+//     const lacs = await ctx.db
+//       .query("lacs")
+//       .withIndex("by_hebergements_electrique")
+//       .order("desc")
+//       .collect();
+
+//     // Tri secondaire en JS seulement pour les lacs avec même nb d'hébergements
+//     return lacs.sort((a, b) => {
+//       if (a.nbHebergements === b.nbHebergements) {
+//         return (b.isMoteurisationElectrique ? 1 : 0) - (a.isMoteurisationElectrique ? 1 : 0);
+//       }
+//       return 0; // Déjà trié par l'index
+//     });
+//   },
+// });
 
 // export const getLacsSortedOptimized = query({
 //   handler: async (ctx) => {
@@ -204,9 +214,15 @@ export const getAllLacsDynamicFilters = query({
           distanceDepuisAcceuil: h.distanceDepuisAcceuil,
           distanceDepuisLac: h.distanceDepuisLac,
         }))
+        .filter(h => !h.inactif)
         .sort((a, b) => (a.distanceDepuisLac?.temps ?? Infinity) - (b.distanceDepuisLac?.temps ?? Infinity));
 
-      const hebergementsNonSepaq = hebergements.filter((h) => h.organisme !== "SEPAQ");
+      const hebergementsNonSepaq = hebergements.filter((h) => {
+        return (
+          h.organisme !== "SEPAQ" &&
+          !h.inactif
+        )
+      });
 
       return { ...lac, especes, hebergements, hebergementsNonSepaq };
     });
@@ -596,7 +612,8 @@ export const addLac = mutation({
         v.literal("Embarcation Sépaq fournie"),
         v.literal("Embarcation Pourvoirie fournie"),
         v.literal("Location"),
-        v.literal("Embarcation personnelle")
+        v.literal("Embarcation personnelle"),
+        v.literal("À Gué")
       ),
       motorisation: v.object({
         puissance: v.optional(
@@ -610,6 +627,7 @@ export const addLac = mutation({
             v.literal("electrique"),
             v.literal("essence"),
             v.literal("a determiner"),
+            v.literal("à gué")
           )
         )
       }),
@@ -637,18 +655,18 @@ export const updateLac = mutation({
   args: {
     lacId: v.id("lacs"),
     nomDuLac: v.string(),
-    regionAdministrativeQuebec: v.string(),
+    regionAdministrativeQuebec: v.optional(v.string()),
     coordonnees: v.object({
-      latitude: v.number(),
-      longitude: v.number(),
+      latitude: v.optional(v.number()),
+      longitude: v.optional(v.number()),
     }),
     acces: v.object({
-      portage: v.string(),
-      acceuil: v.string(),
+      portage: v.optional(v.string()),
+      acceuil: v.optional(v.string()),
       distanceAcceuilLac: v.union(
         v.object({
-          temps: v.number(),
-          kilometrage: v.number(),
+          temps: v.optional(v.number()),
+          kilometrage: v.optional(v.number()),
         })
       ),
       accessible: v.union(
@@ -662,7 +680,8 @@ export const updateLac = mutation({
         v.literal("Embarcation Sépaq fournie"),
         v.literal("Embarcation Pourvoirie fournie"),
         v.literal("Location"),
-        v.literal("Embarcation personnelle")
+        v.literal("Embarcation personnelle"),
+        v.literal("À Gué")
       ),
       motorisation: v.object({
         puissance: v.optional(
@@ -676,6 +695,7 @@ export const updateLac = mutation({
             v.literal("electrique"),
             v.literal("essence"),
             v.literal("a determiner"),
+            v.literal("à gué")
           )
         )
       }),
@@ -690,8 +710,8 @@ export const updateLac = mutation({
     ),
     especeIds: v.optional(v.array(v.id("especes"))),
     distanceMaisonLac: v.optional(v.object({
-      temps: v.number(),
-      kilometrage: v.number(),
+      temps: v.optional(v.number()),
+      kilometrage: v.optional(v.number()),
     }))
   },
   handler: async (ctx, args) => {

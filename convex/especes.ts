@@ -1,6 +1,7 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 import { checkReadOnlyModeConvex } from "./checkReadOnlyMode";
+import { especesSchema } from "./schemas/especes.schema";
 
 // ============================================
 // QUERIES CONVEX
@@ -17,17 +18,7 @@ export const getAllEspeces = query({
 // ============================================
 
 export const addEspece = mutation({
-  args: {
-    nomCommun: v.string(),
-    nomScientifique: v.optional(v.string()),
-    // aliases: v.optional(v.array(v.string())),
-    categorie: v.optional(
-      v.union(
-        v.literal("salmonidés"),
-        v.literal("carnassiers"),
-      )
-    ),
-  },
+  args: especesSchema,
   handler: async (ctx, args) => {
     checkReadOnlyModeConvex()
 
@@ -38,15 +29,7 @@ export const addEspece = mutation({
 export const updateEspece = mutation({
   args: {
     id: v.id("especes"),
-    nomCommun: v.string(),
-    nomScientifique: v.optional(v.string()),
-    // aliases: v.optional(v.array(v.string())),
-    categorie: v.optional(
-      v.union(
-        v.literal("salmonidés"),
-        v.literal("carnassiers"),
-      )
-    ),
+    ...especesSchema
   },
   handler: async (ctx, args) => {
     checkReadOnlyModeConvex()

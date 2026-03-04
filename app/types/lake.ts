@@ -11,9 +11,9 @@ export interface Acces {
 
 // todo : revoir les types pour les rendre plus stricts et éviter les erreurs de saisie
 export interface Embarcation {
-    type: "Embarcation personnelle" | "Embarcation Sépaq fournie" | "Embarcation Pourvoirie fournie" | "Location";
+    type: "Embarcation personnelle" | "Embarcation Sépaq fournie" | "Embarcation Pourvoirie fournie" | "Location" | "À Gué";
     motorisation: {
-        necessaire: "electrique" | "essence" | "a determiner";
+        necessaire: "electrique" | "essence" | "a determiner" | "à gué";
         puissance?: {
             minimum?: number;
             maximum?: number;

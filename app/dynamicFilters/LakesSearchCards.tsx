@@ -458,7 +458,7 @@ const LakesSearchCards = ({ data, scenario }: { data: LacWithDetails[] }) => {
                           <Box mt={0.8}>
                             <Typography variant="body2" sx={{ fontSize: '0.78rem' }}><strong>Accès</strong></Typography>
                             <Typography variant="caption" color="textSecondary" sx={{ fontSize: '0.68rem' }}>
-                              {l.acces?.acceuil ? `Accueil: ${l.acces.acceuil}` : ''}<br />
+                              {l.acces?.acceuil ? `Accueil: ${l.acces.acceuil}` : ''}{` Distance ${l.acces.distanceAcceuilLac.kilometrage} km`}<br />
                               {l.acces?.accessible ? `${l.acces.accessible}` : ''}<br />
                               {l.acces?.portage ? `${l.acces.portage}` : ''}
                             </Typography>

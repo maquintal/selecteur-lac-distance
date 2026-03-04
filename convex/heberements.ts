@@ -54,6 +54,7 @@ export const createCamping = mutation({
         kilometrage: v.number(),
       }),
     ),
+    inactif: v.optional(v.boolean())
   },
   handler: async (ctx, args) => {
     checkReadOnlyModeConvex()
@@ -100,6 +101,7 @@ export const updateCamping = mutation({
         kilometrage: v.number(),
       }),
     ),
+    inactif: v.optional(v.boolean())
   },
   handler: async (ctx, args) => {
     checkReadOnlyModeConvex()

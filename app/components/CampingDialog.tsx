@@ -56,6 +56,7 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
     // 'Ombre partielle',
   ];
 
+  // todo devrait etre defini dans le schema convex
   const IMPORTANT_OPTIONS: readonly string[] = [
     // 'Sans fumée',
     // 'Animaux interdits',
@@ -63,6 +64,7 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
     // 'Zone calme',
   ];
 
+  // todo devrait etre defini dans le schema convex
   const EQUIPEMENT_ADMISSIBLE_OPTIONS: readonly string[] = [
     'Tous les types de tentes-roulottes',
     'Tente-roulotte de moins de 6 mètres (20 pieds)',
@@ -71,7 +73,7 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
     'Roulotte de moins de 8 mètres (25 pieds)'
   ];
 
-  // devrait etre le schema...
+  // todo devrait etre le schema convex...
   type TerrainInput = {
     nom: string;
     equipementAdmissible?: string[];
@@ -84,8 +86,8 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
   };
 
   // Mutations Convex
-  const createCamping = useMutation(api.lacs.createCamping);
-  const updateCamping = useMutation(api.lacs.updateCamping);
+  const createCamping = useMutation(api.heberements.createCamping);
+  const updateCamping = useMutation(api.heberements.updateCamping);
 
   // Synchroniser formData avec la prop camping
   useEffect(() => {
@@ -118,6 +120,7 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
     }
   }, [open, mode, camping]);
 
+  // todo devrait venir du schema convex
   type Coordonnees = {
     latitude: number;
     longitude: number;
@@ -230,6 +233,7 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
           regionAdministrative: formData.regionAdministrative,
           distanceMaisonCamping: formData.distanceMaisonCamping,
           terrains: formData.terrains,
+          inactif: formData.inactif,
         });
       } else if (mode === 'edit' && camping) {
         await updateCamping({
@@ -241,6 +245,7 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
           regionAdministrative: formData.regionAdministrative,
           terrains: formData.terrains,
           distanceMaisonCamping: formData.distanceMaisonCamping,
+          inactif: formData.inactif,
         });
       }
       onClose();
@@ -270,12 +275,23 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
       </DialogTitle>
       <DialogContent>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
-          <TextField
-            fullWidth
-            label="Nom du camping"
-            value={formData.nom}
-            onChange={(e) => handleInputChange('nom', e.target.value)}
-          />
+          <Box>
+            <TextField
+              fullWidth
+              label="Nom du camping"
+              value={formData.nom}
+              onChange={(e) => handleInputChange('nom', e.target.value)}
+            />
+            <FormControlLabel
+              label="Inactif"
+              control={
+                <Checkbox
+                  checked={!!formData.inactif}
+                  onChange={(e) => handleInputChange('inactif', e.target.checked)}
+                />
+              }
+            />
+          </Box>
 
           <FormControl fullWidth>
             <InputLabel>Organisme</InputLabel>

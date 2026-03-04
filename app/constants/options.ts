@@ -2,13 +2,15 @@ export const EMBARCATION_TYPES = [ //todo doublon, + devrait etre defini par con
   "Embarcation personnelle",
   "Embarcation Sépaq fournie",
   "Embarcation Pourvoirie fournie",
-  "Location"
+  "Location",
+  "À Gué",
 ] as const;
 
 export const MOTORISATION_TYPES = [
   "electrique",
   "essence",
-  "a determiner"
+  "a determiner",
+  "à gué",
 ] as const;
 
 export const VEHICLE_TYPES = [
