@@ -12,21 +12,22 @@ import {
   Tooltip
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { CampingDoc, NewCampingInput, defaultCampingInput } from '../types/schema.types';
+// import { CampingDoc, NewCampingInput, defaultCampingInput } from '../types/schema.types';
 import { isReadOnlyConvex } from '@/convex/checkReadOnlyMode';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import { defaultCampingInput, HebergementDoc, HebergementFormData, normalizeHebergement, TerrainInput } from '../types/hebergements.type';
 
 type CampingDialogProps = {
   open: boolean;
   onClose: () => void;
-  camping?: CampingDoc;
+  camping?: HebergementDoc | undefined;
   mode: 'create' | 'edit';
 };
 
 export default function CampingDialog({ open, onClose, camping, mode }: CampingDialogProps) {
-  const [formData, setFormData] = useState<NewCampingInput>(defaultCampingInput);
+  const [formData, setFormData] = useState<HebergementFormData>(defaultCampingInput);
   const [expandedSet, setExpandedSet] = useState<Record<number, boolean>>({});
 
   const ACCESS_OPTIONS: readonly string[] = [
@@ -56,7 +57,6 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
     // 'Ombre partielle',
   ];
 
-  // todo devrait etre defini dans le schema convex
   const IMPORTANT_OPTIONS: readonly string[] = [
     // 'Sans fumée',
     // 'Animaux interdits',
@@ -64,7 +64,6 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
     // 'Zone calme',
   ];
 
-  // todo devrait etre defini dans le schema convex
   const EQUIPEMENT_ADMISSIBLE_OPTIONS: readonly string[] = [
     'Tous les types de tentes-roulottes',
     'Tente-roulotte de moins de 6 mètres (20 pieds)',
@@ -73,58 +72,60 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
     'Roulotte de moins de 8 mètres (25 pieds)'
   ];
 
-  // todo devrait etre le schema convex...
-  type TerrainInput = {
-    nom: string;
-    equipementAdmissible?: string[];
-    services?: string[];
-    capaciteMaximale?: string;
-    acces?: string[];
-    selections?: string[];
-    description?: string[];
-    important?: string[];
-  };
+  // type TerrainInput = {
+  //   nom: string;
+  //   equipementAdmissible?: string[];
+  //   services?: string[];
+  //   capaciteMaximale?: string;
+  //   acces?: string[];
+  //   selections?: string[];
+  //   description?: string[];
+  //   important?: string[];
+  // };
 
   // Mutations Convex
   const createCamping = useMutation(api.heberements.createCamping);
   const updateCamping = useMutation(api.heberements.updateCamping);
 
   // Synchroniser formData avec la prop camping
-  useEffect(() => {
-    if (open) {
-      if (mode === 'edit' && camping) {
-        // Extraire seulement les champs modifiables (retirer champs système)
-        const { _id, _creationTime, ...rest } = camping;
-        const editableData = { ...(rest as unknown as NewCampingInput) };
-        // ensure terrains array exists
-        if (!editableData.terrains) editableData.terrains = [];
-        // normalize terrains fields to expected shapes (arrays, nested terrain fields)
-        editableData.terrains = (editableData.terrains || []).map((tr) => {
-          const t = tr as unknown as TerrainInput;
-          const legacy = tr as unknown as { description?: string | string[]; important?: string | string[] };
-          return {
-            nom: t.nom ?? '',
-            acces: Array.isArray(t?.acces) ? t.acces : (t?.acces ? [String(t.acces)] : []),
-            services: t?.services || [],
-            equipementAdmissible: t?.equipementAdmissible || [],
-            capaciteMaximale: t?.capaciteMaximale || '',
-            selections: Array.isArray(t?.selections) ? t.selections : (t?.selections ? [String(t.selections)] : []),
-            description: Array.isArray(t?.description) ? t.description : (legacy.description ? (Array.isArray(legacy.description) ? legacy.description : [legacy.description]) : []),
-            important: Array.isArray(t?.important) ? t.important : (legacy.important ? (Array.isArray(legacy.important) ? legacy.important : [legacy.important]) : []),
-          } as TerrainInput;
-        });
-        setFormData(editableData as NewCampingInput);
-      } else {
-        setFormData(defaultCampingInput);
-      }
-    }
-  }, [open, mode, camping]);
+  // useEffect(() => {
+  //   if (open) {
+  //     if (mode === 'edit' && camping) {
+  //       // Extraire seulement les champs modifiables (retirer champs système)
+  //       const { _id, _creationTime, ...rest } = camping;
+  //       const editableData = { ...(rest as unknown as HebergementFormData) };
+  //       // ensure terrains array exists
+  //       if (!editableData.terrains) editableData.terrains = [];
+  //       // normalize terrains fields to expected shapes (arrays, nested terrain fields)
+  //       editableData.terrains = (editableData.terrains || []).map((tr) => {
+  //         const t = tr as unknown as TerrainInput;
+  //         const legacy = tr as unknown as { description?: string | string[]; important?: string | string[] };
+  //         return {
+  //           nom: t.nom ?? '',
+  //           acces: Array.isArray(t?.acces) ? t.acces : (t?.acces ? [String(t.acces)] : []),
+  //           services: t?.services || [],
+  //           equipementAdmissible: t?.equipementAdmissible || [],
+  //           capaciteMaximale: t?.capaciteMaximale || '',
+  //           selections: Array.isArray(t?.selections) ? t.selections : (t?.selections ? [String(t.selections)] : []),
+  //           description: Array.isArray(t?.description) ? t.description : (legacy.description ? (Array.isArray(legacy.description) ? legacy.description : [legacy.description]) : []),
+  //           important: Array.isArray(t?.important) ? t.important : (legacy.important ? (Array.isArray(legacy.important) ? legacy.important : [legacy.important]) : []),
+  //         } as TerrainInput;
+  //       });
+  //       setFormData(editableData as HebergementFormData);
+  //     } else {
+  //       setFormData(defaultCampingInput);
+  //     }
+  //   }
+  // }, [open, mode, camping]);
 
-  // todo devrait venir du schema convex
-  type Coordonnees = {
-    latitude: number;
-    longitude: number;
-  };
+  useEffect(() => {
+    if (!open) return;
+    setFormData(
+      mode === 'edit' && camping
+        ? normalizeHebergement(camping)
+        : defaultCampingInput
+    );
+  }, [open, mode, camping]);
 
   // Terrains helpers (add / remove / update)
   const handleAddTerrain = () => {
@@ -184,69 +185,86 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
     setExpandedSet(prev => ({ ...prev, [index]: !prev[index] }));
   };
 
-  type Commodites = {
-    eau: boolean;
-    electricite: boolean;
+  // const handleInputChange = (field: keyof HebergementFormData, value: string | number | boolean | Partial<Coordonnees> | Partial<Commodites>) => {
+  //   if (field === 'coordonnees') {
+  //     setFormData(prev => ({
+  //       ...prev,
+  //       coordonnees: {
+  //         ...prev.coordonnees,
+  //         ...(value as Partial<Coordonnees>),
+  //       }
+  //     }));
+  //   } else if (field === 'commodites') {
+  //     setFormData(prev => ({
+  //       ...prev,
+  //       commodites: {
+  //         ...prev.commodites,
+  //         ...(value as Partial<Commodites>),
+  //       }
+  //     }));
+  //   } else if (field === 'distanceMaisonCamping') {
+  //     setFormData(prev => ({
+  //       ...prev,
+  //       distanceMaisonCamping: {
+  //         ...prev.distanceMaisonCamping,
+  //         ...(value as Partial<{ temps: number; kilometrage: number }>),
+  //       }
+  //     }));
+  //   } else {
+  //     setFormData(prev => ({
+  //       ...prev,
+  //       [field]: value
+  //     }));
+  //   }
+  // };
+
+  const handleInputChange = (field: keyof HebergementFormData, value: unknown) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value !== null && typeof value === 'object'
+        ? { ...(prev[field] as object), ...(value as object) }
+        : value,
+    }));
   };
 
-  const handleInputChange = (field: keyof NewCampingInput, value: string | number | boolean | Partial<Coordonnees> | Partial<Commodites>) => {
-    if (field === 'coordonnees') {
-      setFormData(prev => ({
-        ...prev,
-        coordonnees: {
-          ...prev.coordonnees,
-          ...(value as Partial<Coordonnees>),
-        }
-      }));
-    } else if (field === 'commodites') {
-      setFormData(prev => ({
-        ...prev,
-        commodites: {
-          ...prev.commodites,
-          ...(value as Partial<Commodites>),
-        }
-      }));
-    } else if (field === 'distanceMaisonCamping') {
-      setFormData(prev => ({
-        ...prev,
-        distanceMaisonCamping: {
-          ...prev.distanceMaisonCamping,
-          ...(value as Partial<{ temps: number; kilometrage: number }>),
-        }
-      }));
-    } else {
-      setFormData(prev => ({
-        ...prev,
-        [field]: value
-      }));
-    }
-  };
+  // const handleSubmit = async () => {
+  //   try {
+  //     if (mode === 'create') {
+  //       await createCamping({
+  //         nom: formData.nom,
+  //         organisme: formData.organisme,
+  //         coordonnees: formData.coordonnees,
+  //         commodites: formData.commodites,
+  //         regionAdministrative: formData.regionAdministrative,
+  //         distanceMaisonCamping: formData.distanceMaisonCamping,
+  //         terrains: formData.terrains,
+  //         inactif: formData.inactif,
+  //       });
+  //     } else if (mode === 'edit' && camping) {
+  //       await updateCamping({
+  //         id: camping._id,
+  //         nom: formData.nom,
+  //         organisme: formData.organisme,
+  //         coordonnees: formData.coordonnees,
+  //         commodites: formData.commodites,
+  //         regionAdministrative: formData.regionAdministrative,
+  //         terrains: formData.terrains,
+  //         distanceMaisonCamping: formData.distanceMaisonCamping,
+  //         inactif: formData.inactif,
+  //       });
+  //     }
+  //     onClose();
+  //   } catch (error) {
+  //     console.error('Erreur:', error);
+  //   }
+  // };
 
   const handleSubmit = async () => {
     try {
       if (mode === 'create') {
-        await createCamping({
-          nom: formData.nom,
-          organisme: formData.organisme,
-          coordonnees: formData.coordonnees,
-          commodites: formData.commodites,
-          regionAdministrative: formData.regionAdministrative,
-          distanceMaisonCamping: formData.distanceMaisonCamping,
-          terrains: formData.terrains,
-          inactif: formData.inactif,
-        });
+        await createCamping(formData);
       } else if (mode === 'edit' && camping) {
-        await updateCamping({
-          id: camping._id,
-          nom: formData.nom,
-          organisme: formData.organisme,
-          coordonnees: formData.coordonnees,
-          commodites: formData.commodites,
-          regionAdministrative: formData.regionAdministrative,
-          terrains: formData.terrains,
-          distanceMaisonCamping: formData.distanceMaisonCamping,
-          inactif: formData.inactif,
-        });
+        await updateCamping({ ...formData, id: camping._id });
       }
       onClose();
     } catch (error) {

@@ -1,9 +1,10 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 import { checkReadOnlyModeConvex } from "./checkReadOnlyMode";
+import { hebergementsSchema } from "./schemas/hebergements.schema";
 
 // ============================================
-// QUERIES CONVEX
+// QUERIES
 // ============================================
 
 export const getAllCampings = query({
@@ -17,7 +18,7 @@ export const getAllCampings = query({
 // ============================================
 
 export const createCamping = mutation({
-  args: {
+  args: hebergementsSchema, /* {
     nom: v.string(),
     organisme: v.union(
       v.literal("privé"),
@@ -55,7 +56,7 @@ export const createCamping = mutation({
       }),
     ),
     inactif: v.optional(v.boolean())
-  },
+  }, */
   handler: async (ctx, args) => {
     checkReadOnlyModeConvex()
     return await ctx.db.insert("campings", args);
@@ -65,43 +66,44 @@ export const createCamping = mutation({
 export const updateCamping = mutation({
   args: {
     id: v.id("campings"),
-    nom: v.string(),
-    organisme: v.union(
-      v.literal("privé"),
-      v.literal("SEPAQ"),
-      v.literal("Camping"),
-      v.literal("Pourvoirie")
-    ),
-    coordonnees: v.object({
-      latitude: v.number(),
-      longitude: v.number(),
-    }),
-    terrains: v.optional(
-      v.array(
-        v.object({
-          nom: v.string(),
-          equipementAdmissible: v.optional(v.array(v.string())),
-          services: v.optional(v.array(v.string())),
-          capaciteMaximale: v.optional(v.string()),
-          acces: v.optional(v.array(v.string())),
-          selections: v.optional(v.array(v.string())),
-          description: v.optional(v.array(v.string())),
-          important: v.optional(v.array(v.string())),
-        })
-      )
-    ),
-    commodites: v.object({
-      eau: v.boolean(),
-      electricite: v.boolean(),
-    }),
-    regionAdministrative: v.optional(v.string()),
-    distanceMaisonCamping: v.optional(
-      v.object({
-        temps: v.number(), // en minutes
-        kilometrage: v.number(),
-      }),
-    ),
-    inactif: v.optional(v.boolean())
+    ...hebergementsSchema
+    // nom: v.string(),
+    // organisme: v.union(
+    //   v.literal("privé"),
+    //   v.literal("SEPAQ"),
+    //   v.literal("Camping"),
+    //   v.literal("Pourvoirie")
+    // ),
+    // coordonnees: v.object({
+    //   latitude: v.number(),
+    //   longitude: v.number(),
+    // }),
+    // terrains: v.optional(
+    //   v.array(
+    //     v.object({
+    //       nom: v.string(),
+    //       equipementAdmissible: v.optional(v.array(v.string())),
+    //       services: v.optional(v.array(v.string())),
+    //       capaciteMaximale: v.optional(v.string()),
+    //       acces: v.optional(v.array(v.string())),
+    //       selections: v.optional(v.array(v.string())),
+    //       description: v.optional(v.array(v.string())),
+    //       important: v.optional(v.array(v.string())),
+    //     })
+    //   )
+    // ),
+    // commodites: v.object({
+    //   eau: v.boolean(),
+    //   electricite: v.boolean(),
+    // }),
+    // regionAdministrative: v.optional(v.string()),
+    // distanceMaisonCamping: v.optional(
+    //   v.object({
+    //     temps: v.number(), // en minutes
+    //     kilometrage: v.number(),
+    //   }),
+    // ),
+    // inactif: v.optional(v.boolean())
   },
   handler: async (ctx, args) => {
     checkReadOnlyModeConvex()

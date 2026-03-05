@@ -4,7 +4,7 @@ import { checkReadOnlyModeConvex } from "./checkReadOnlyMode";
 import { especesSchema } from "./schemas/especes.schema";
 
 // ============================================
-// QUERIES CONVEX
+// QUERIES
 // ============================================
 
 export const getAllEspeces = query({

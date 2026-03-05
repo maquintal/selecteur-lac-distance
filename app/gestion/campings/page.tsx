@@ -11,7 +11,10 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
-import { CampingDoc } from '@/app/types/schema.types';
+
+// import { CampingDoc } from '@/app/types/schema.types';
+import { HebergementDoc, HebergementFormData } from '@/app/types/hebergements.type';
+
 import CampingDialog from '@/app/components/CampingDialog';
 import GestionNavBar from '@/app/components/GestionNavBar';
 import { useMobileDetect } from '@/app/hooks/useMobileDetect';
@@ -23,7 +26,7 @@ import { mdiMapMarkerDistance } from '@mdi/js';
 
 export default function GestionCampings() {
   const [openDialog, setOpenDialog] = useState(false);
-  const [selectedCamping, setSelectedCamping] = useState<CampingDoc | undefined>(undefined);
+  const [selectedCamping, setSelectedCamping] = useState<HebergementDoc | undefined>(undefined);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
   const [dialogMode, setDialogMode] = useState<'create' | 'edit'>('create');
   const [distanceInfo, setDistanceInfo] = useState<Record<string, { km: string, min: number }>>({});
@@ -31,10 +34,9 @@ export default function GestionCampings() {
 
   const { isMobile, isLoaded } = useMobileDetect();
 
-  // Queries Convex
   const campings = useQuery(api.heberements.getAllCampings) || [];
 
-  const handleOpenDialog = (mode: 'create' | 'edit', camping?: CampingDoc) => {
+  const handleOpenDialog = (mode: 'create' | 'edit', camping?: HebergementDoc) => {
     setDialogMode(mode);
     setSelectedCamping(camping);
     setOpenDialog(true);

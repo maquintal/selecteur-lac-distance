@@ -3,62 +3,64 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 import { especesSchema } from "@/convex/schemas/especes.schema";
+import { hebergementsSchema } from "./schemas/hebergements.schema";
 
 export default defineSchema({
   // ============================================
   // TABLE: campings
   // Stocke tous les campings une seule fois
   // ============================================
-  campings: defineTable({
-    nom: v.string(),
-    organisme: v.union(
-      v.literal("privé"),
-      v.literal("SEPAQ"),
-      v.literal("Camping"),
-      v.literal("Pourvoirie")
-    ),
-    coordonnees: v.object({
-      latitude: v.number(),
-      longitude: v.number(),
-    }),
-    terrains: v.optional(
-      v.array(
-        v.object({
-          nom: v.string(),
-          equipementAdmissible: v.optional(v.array(v.string())),
-          services: v.optional(v.array(v.string())),
-          capaciteMaximale: v.optional(v.string()),
-          acces: v.optional(v.array(v.string())),
-          selections: v.optional(v.array(v.string())),
-          description: v.optional(v.array(v.string())),
-          important: v.optional(v.array(v.string())),
-        })
-      )
-    ),
-    // Allow legacy `typeEmplacement` (optional) so existing documents validate.
-    typeEmplacement: v.optional(
-      v.union(
-        v.literal("Tente-roulotte"),
-        v.literal("moins de 4,5 mètres (15 pieds)"),
-        v.literal("moins de 6 mètres (20 pieds)"),
-        v.literal("moins de 8 mètres (25 pieds)"),
-        v.literal("moins de 9 mètres (30 pieds)"),
-        v.literal("9 mètres (30 pieds) et plus")
-      )
-    ),
-    commodites: v.object({
-      eau: v.boolean(),
-      electricite: v.boolean(),
-    }),
-    regionAdministrative: v.optional(v.string()),
-    distanceMaisonCamping: v.optional(
-      v.object({
-        temps: v.number(), // en minutes
-        kilometrage: v.number(),
-      }),
-    ),
-    inactif: v.optional(v.boolean())
-  })
+  campings: defineTable(hebergementsSchema
+  //   {
+  //   nom: v.string(),
+  //   organisme: v.union(
+  //     v.literal("privé"),
+  //     v.literal("SEPAQ"),
+  //     v.literal("Camping"),
+  //     v.literal("Pourvoirie")
+  //   ),
+  //   coordonnees: v.object({
+  //     latitude: v.number(),
+  //     longitude: v.number(),
+  //   }),
+  //   terrains: v.optional(
+  //     v.array(
+  //       v.object({
+  //         nom: v.string(),
+  //         equipementAdmissible: v.optional(v.array(v.string())),
+  //         services: v.optional(v.array(v.string())),
+  //         capaciteMaximale: v.optional(v.string()),
+  //         acces: v.optional(v.array(v.string())),
+  //         selections: v.optional(v.array(v.string())),
+  //         description: v.optional(v.array(v.string())),
+  //         important: v.optional(v.array(v.string())),
+  //       })
+  //     )
+  //   ),
+  //   typeEmplacement: v.optional(
+  //     v.union(
+  //       v.literal("Tente-roulotte"),
+  //       v.literal("moins de 4,5 mètres (15 pieds)"),
+  //       v.literal("moins de 6 mètres (20 pieds)"),
+  //       v.literal("moins de 8 mètres (25 pieds)"),
+  //       v.literal("moins de 9 mètres (30 pieds)"),
+  //       v.literal("9 mètres (30 pieds) et plus")
+  //     )
+  //   ),
+  //   commodites: v.object({
+  //     eau: v.boolean(),
+  //     electricite: v.boolean(),
+  //   }),
+  //   regionAdministrative: v.optional(v.string()),
+  //   distanceMaisonCamping: v.optional(
+  //     v.object({
+  //       temps: v.number(), // en minutes
+  //       kilometrage: v.number(),
+  //     }),
+  //   ),
+  //   inactif: v.optional(v.boolean())
+  // }
+)
     .index("by_nom", ["nom"])
     .searchIndex("search_nom", {
       searchField: "nom",
@@ -68,8 +70,6 @@ export default defineSchema({
   // TABLE: especes
   // Normalise les noms d'espèces
   // ============================================
-
-
 
   especes: defineTable(especesSchema)
     .index("by_nom", ["nomCommun"])

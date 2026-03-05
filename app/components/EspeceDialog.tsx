@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 import { EspeceDoc, EspeceFormData, defaultEspeceInput } from '../types/especes.type';
 import { isReadOnlyConvex } from '@/convex/checkReadOnlyMode';
-import { CATEGORIES_ESPECES } from '@/convex/schemas/especes.schema';
+import { ESPECES_CATEGORIES } from '@/convex/schemas/especes.schema';
 
 type EspeceDialogProps = {
   open: boolean;
@@ -94,7 +94,7 @@ export default function EspeceDialog({ open, onClose, espece, mode }: EspeceDial
               value={formData.categorie ?? ''}
               onChange={(e) => handleInputChange('categorie', e.target.value)}
             >
-              {CATEGORIES_ESPECES.map((item) => (
+              {ESPECES_CATEGORIES.map((item) => (
                 <MenuItem key={item} value={item}>
                   {item}
                 </MenuItem>
