@@ -71,13 +71,13 @@ export const lacsSchema = {
         ))
     }),
   }),
-  zone: v.optional(v.number()),
+  zone: v.optional(v.union(v.number(), v.null())),
   site: v.optional(v.union(...ENUMS_LACS_SITE.map(item => v.literal(item)), v.null())),
   superficie: v.optional(
-    v.object({
+    v.union(v.object({
       hectares: v.number(),
       km2: v.number(),
-    })
+    }), v.null())
   ),
   especeIds: v.optional(v.array(v.id("especes"))),
 
@@ -107,7 +107,7 @@ export const lacsSchema = {
     temps: v.number(),
     kilometrage: v.number(),
   })),
-  createdAt: v.number(),
+  createdAt: v.optional(v.number()),
   updatedAt: v.optional(v.number()),
   isChoixInteressant: v.optional(v.boolean()),
 };

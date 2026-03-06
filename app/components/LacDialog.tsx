@@ -97,21 +97,31 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
 
   useEffect(() => {
     if (!open) return;
-
     if (mode === 'edit' && lac) {
-      setFormData({
-        ...lac,
-        especeIds: lac.especeIds ?? [],
-        hebergements: lac.hebergements?.map(h => ({
-          campingId: (h as any)._id ?? h.campingId,
-          distanceDepuisLac: h.distanceDepuisLac,
-          distanceDepuisAcceuil: h.distanceDepuisAcceuil,
-        })).filter(h => h.campingId) ?? [],
-      });
+
+      const { _id, _creationTime, createdAt, updatedAt, ...lacData } = lac as any;
+      const mappedHebergements = (lac.hebergements ?? []).map(h => {
+        const campingId = (h as any).campingId ?? (h as any)._id ?? null;
+        return { campingId, distanceDepuisLac: h.distanceDepuisLac, distanceDepuisAcceuil: h.distanceDepuisAcceuil };
+      }).filter(h => h.campingId != null);
+
+      setFormData({ ...lacData, especeIds: lac.especeIds ?? [], hebergements: mappedHebergements });
     } else {
       setFormData(defaultLacInput);
     }
   }, [open, mode, lac]);
+
+  // Ajoute un useEffect séparé pour sync les hebergements quand lac change
+  useEffect(() => {
+    if (!lac || !open) return;
+
+    const mappedHebergements = (lac.hebergements ?? []).map(h => {
+      const campingId = (h as any).campingId ?? (h as any)._id ?? null;
+      return { campingId, distanceDepuisLac: h.distanceDepuisLac, distanceDepuisAcceuil: h.distanceDepuisAcceuil };
+    }).filter(h => h.campingId != null);
+
+    setFormData(prev => ({ ...prev, hebergements: mappedHebergements }));
+  }, [lac?.hebergements]);
 
   const [hebergement, setHebergement] = useState<LacHebergementFormData>({
     campingId: null,
@@ -278,42 +288,68 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
     setFormData(prev => ({ ...prev, superficie: { hectares, km2: hectares / 100 } }));
   };
 
+  // const handleSubmit = async () => {
+  //   try {
+  //     if (mode === 'create') {
+  //       await addLac({
+  //         nomDuLac: formData.nomDuLac,
+  //         regionAdministrativeQuebec: formData.regionAdministrativeQuebec,
+  //         coordonnees: formData.coordonnees,
+  //         zone: formData.zone,
+  //         site: formData.site,
+  //         superficie: formData.superficie,
+  //         especeIds: formData.especeIds,
+  //         acces: formData.acces,
+  //         embarcation: formData.embarcation,
+  //         distanceMaisonLac: formData.distanceMaisonLac
+
+  //       });
+  //     } else if (mode === 'edit' && lac) {
+  //       await updateLac({
+  //         lacId: lac._id,
+  //         nomDuLac: formData.nomDuLac,
+  //         regionAdministrativeQuebec: formData.regionAdministrativeQuebec,
+  //         coordonnees: formData.coordonnees,
+  //         acces: formData.acces,
+  //         embarcation: formData.embarcation,
+  //         zone: formData.zone,
+  //         site: formData.site,
+  //         superficie: formData.superficie,
+  //         especeIds: formData.especeIds,
+  //         distanceMaisonLac: formData.distanceMaisonLac
+  //       });
+  //     }
+  //     onClose();
+  //   } catch (error) {
+  //     console.error('Erreur:', error);
+  //   }
+  // };
+
   const handleSubmit = async () => {
     try {
       if (mode === 'create') {
-        await addLac({
-          nomDuLac: formData.nomDuLac,
-          regionAdministrativeQuebec: formData.regionAdministrativeQuebec,
-          coordonnees: formData.coordonnees,
-          zone: formData.zone,
-          site: formData.site,
-          superficie: formData.superficie,
-          especeIds: formData.especeIds,
-          acces: formData.acces,
-          embarcation: formData.embarcation,
-          distanceMaisonLac: formData.distanceMaisonLac
-
-        });
+        await addLac(formData);
       } else if (mode === 'edit' && lac) {
-        await updateLac({
-          lacId: lac._id,
-          nomDuLac: formData.nomDuLac,
-          regionAdministrativeQuebec: formData.regionAdministrativeQuebec,
-          coordonnees: formData.coordonnees,
-          acces: formData.acces,
-          embarcation: formData.embarcation,
-          zone: formData.zone,
-          site: formData.site,
-          superficie: formData.superficie,
-          especeIds: formData.especeIds,
-          distanceMaisonLac: formData.distanceMaisonLac
-        });
+        const { _id, _creationTime, createdAt, updatedAt, ...cleanFormData } = formData as any;
+        await updateLac({ lacId: lac._id, ...cleanFormData });
       }
       onClose();
     } catch (error) {
       console.error('Erreur:', error);
     }
   };
+
+  // const handleRemoveHebergement = async (campingId: Id<"campings">) => {
+  //   if (!lac) return;
+  //   try {
+  //     await removeCampingFromLac({
+  //       lacId: lac._id,
+  //       campingId: campingId
+  //     });
+  //   } catch (error) {
+  //     console.error('Erreur lors de la suppression de l\'hébergement:', error);
+  //   }
+  // };
 
   const handleRemoveHebergement = async (campingId: Id<"campings">) => {
     if (!lac) return;
@@ -322,14 +358,42 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
         lacId: lac._id,
         campingId: campingId
       });
+
+      // ✅ Sync local state immédiatement
+      setFormData(prev => ({
+        ...prev,
+        hebergements: prev.hebergements.filter(h => h.campingId !== campingId)
+      }));
     } catch (error) {
       console.error('Erreur lors de la suppression de l\'hébergement:', error);
     }
   };
 
+  // const handleAddHebergement = async () => {
+  //   if (!lac || !hebergement.campingId) return;
+
+  //   try {
+  //     await addHebergement({
+  //       lacId: lac._id,
+  //       campingId: hebergement.campingId,
+  //       distanceDepuisLac: hebergement.distanceDepuisLac
+  //     });
+
+  //     // Réinitialiser le formulaire d'hébergement
+  //     setHebergement({
+  //       campingId: null,
+  //       distanceDepuisLac: {
+  //         kilometrage: 0,
+  //         temps: 0
+  //       }
+  //     });
+  //   } catch (error) {
+  //     console.error('Erreur lors de l\'ajout de l\'hébergement:', error);
+  //   }
+  // };
+
   const handleAddHebergement = async () => {
     if (!lac || !hebergement.campingId) return;
-
     try {
       await addHebergement({
         lacId: lac._id,
@@ -337,14 +401,16 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
         distanceDepuisLac: hebergement.distanceDepuisLac
       });
 
-      // Réinitialiser le formulaire d'hébergement
-      setHebergement({
-        campingId: null,
-        distanceDepuisLac: {
-          kilometrage: 0,
-          temps: 0
-        }
-      });
+      // ✅ Sync local state immédiatement
+      setFormData(prev => ({
+        ...prev,
+        hebergements: [...prev.hebergements, {
+          campingId: hebergement.campingId!,
+          distanceDepuisLac: hebergement.distanceDepuisLac,
+        }]
+      }));
+
+      setHebergement({ campingId: null, distanceDepuisLac: { kilometrage: 0, temps: 0 } });
     } catch (error) {
       console.error('Erreur lors de l\'ajout de l\'hébergement:', error);
     }
@@ -370,7 +436,7 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
             <Autocomplete
               fullWidth
               options={ENUMS_REGION_ADMINISTRATIVE}
-              value={formData.regionAdministrativeQuebec}
+              value={formData.regionAdministrativeQuebec ?? null}
               // onChange={(_, newValue) => handleInputChange('regionAdministrativeQuebec', newValue || '')}
               onChange={(_, val) => setField('regionAdministrativeQuebec', val)}
               disabled={isReadOnlyConvex()}
@@ -383,7 +449,7 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
             <Autocomplete
               fullWidth
               options={ENUMS_LACS_SITE}
-              value={formData.site}
+              value={formData.site ?? null}
               // onChange={(_, newValue) => handleInputChange('site', newValue || '')}
               onChange={(_, val) => setField('site', val)}
               disabled={isReadOnlyConvex()}
@@ -483,7 +549,7 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
             <Autocomplete
               fullWidth
               options={ENUMS_LACS_ACCESSIBLE}
-              value={formData.acces.accessible}
+              value={formData.acces.accessible ?? null}
               // onChange={(_, newValue) => {
               //   if (newValue && ENUMS_LACS_ACCESSIBLE.includes(newValue as typeof ENUMS_LACS_ACCESSIBLE[number])) {
               //     handleInputChange('acces', { accessible: newValue as typeof ENUMS_LACS_ACCESSIBLE[number] })
@@ -503,7 +569,7 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
               <Autocomplete
                 fullWidth
                 options={ENUMS_LACS_EMBARCATION}
-                value={formData.embarcation.type}
+                value={formData.embarcation.type ?? null}
                 // onChange={(_, newValue) => {
                 //   if (newValue && ENUMS_LACS_EMBARCATION.includes(newValue as typeof ENUMS_LACS_EMBARCATION[number])) {
                 //     handleInputChange('embarcation', { type: newValue as typeof ENUMS_LACS_EMBARCATION[number] })
@@ -521,7 +587,7 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
               <Autocomplete
                 fullWidth
                 options={ENUMS_LACS_EMBARCATION_MOTORISATION_NECESSAIRE}
-                value={formData.embarcation.motorisation.necessaire}
+                value={formData.embarcation.motorisation.necessaire ?? null}
                 // onChange={(_, newValue) => {
                 //   if (newValue && ENUMS_LACS_EMBARCATION_MOTORISATION_NECESSAIRE.includes(newValue as typeof ENUMS_LACS_EMBARCATION_MOTORISATION_NECESSAIRE[number])) {
                 //     const existingPuissance = formData.embarcation.motorisation.puissance;
@@ -613,29 +679,22 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
                       <TableCell>Actions</TableCell>
                     </TableRow>
                   </TableHead>
-                  <TableBody>
-                    {lac.hebergements.map((h: {
-                      nom?: string;
-                      campingId?: Id<"campings">;
-                      _id?: Id<"campings">;
-                      distanceDepuisLac?: { temps: number; kilometrage: number }
-                    }, index) => {
-                      // h contient déjà les données enrichies du camping (nom, organisme, etc.)
-                      const campingNom = h.nom || 'N/A';
-                      const campingId = h.campingId || h._id;
 
+                  <TableBody>
+                    {formData.hebergements.map((h, index) => {
+                      const camping = campings?.find(c => c._id === h.campingId);
                       return (
-                        <TableRow key={`${campingId}-${index}`}>
-                          <TableCell>{campingNom}</TableCell>
-                          <TableCell>{h.distanceDepuisLac?.kilometrage || 'N/A'}</TableCell>
-                          <TableCell>{h.distanceDepuisLac?.temps || 'N/A'}</TableCell>
+                        <TableRow key={`${h.campingId}-${index}`}>
+                          <TableCell>{camping?.nom ?? 'Chargement...'}</TableCell>
+                          <TableCell>{h.distanceDepuisLac?.kilometrage ?? 'N/A'}</TableCell>
+                          <TableCell>{h.distanceDepuisLac?.temps ?? 'N/A'}</TableCell>
                           <TableCell>
-                            <Tooltip title={"Supprimer"}>
+                            <Tooltip title="Supprimer">
                               <span>
                                 <IconButton
                                   size="small"
                                   color="error"
-                                  onClick={() => campingId && handleRemoveHebergement(campingId)}
+                                  onClick={() => h.campingId && handleRemoveHebergement(h.campingId)}
                                   disabled={isReadOnlyConvex()}
                                 >
                                   <DeleteIcon />

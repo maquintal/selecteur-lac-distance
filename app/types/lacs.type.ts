@@ -46,7 +46,7 @@ export const defaultLacInput: LacFormData = {
   },
   especeIds: [],
   hebergements: [],
-  zone: undefined,
-  site: "",
-  superficie: undefined,
+  zone: null,
+  site: null,
+  superficie: null,
 };
