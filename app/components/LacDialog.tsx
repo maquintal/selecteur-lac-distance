@@ -13,120 +13,107 @@ import {
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
-import { NewLacInput, defaultLacInput, LacWithDetails, LacDoc, HebergementLacInput } from '../../app/types/schema.types';
 import { Id } from "../../convex/_generated/dataModel";
-import { Embarcation, Acces } from "../types/lake";
-import { EMBARCATION_TYPES, MOTORISATION_TYPES, VEHICLE_TYPES } from "../constants/options";
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { isReadOnlyConvex } from '@/convex/checkReadOnlyMode';
+import { ENUMS_REGION_ADMINISTRATIVE } from '@/convex/schemas/enums';
+import { ENUMS_LACS_ACCESSIBLE, ENUMS_LACS_EMBARCATION, ENUMS_LACS_EMBARCATION_MOTORISATION_NECESSAIRE, ENUMS_LACS_SITE } from '@/convex/schemas/lacs.schema';
+import { defaultLacInput, LacAcces, LacDistance, LacDoc, LacEmbarcation, LacEnriched, LacFormData, LacHebergementFormData, LacMotorisation } from '../types/lacs.type';
 
 type LacDialogProps = {
   open: boolean;
   onClose: () => void;
-  lac?: LacDoc | LacWithDetails;
+  lac?: LacDoc | LacEnriched;
   mode: 'create' | 'edit';
 };
 
-// todo doublons, devrait defini par schema convex Options pour les autocomplete
-const regionsOptions = [
-  "Capitale-Nationale",
-  "Chaudière-Appalaches",
-  "Lanaudière",
-  "Laurentides",
-  "Mauricie",
-  "Outaouais",
-  "Centre-du-Québec",
-  "Monteregie",
-];
-
-// todo ces valeurs devraient venir de la definition du schema convex
-export const siteOptions: string[] = [
-  "Mastigouche",
-  "Portneuf",
-  "Rouge-Matawin",
-  "Papineau-Labelle",
-  "Saint-Maurice",
-  "Jacques-Cartier",
-  "Parc national du Mont-Tremblant",
-];
-
-export const accessibleOptions = [
-  "véhicule utilitaire sport (VUS)",
-  "auto",
-  "camion 4x4"
-];
-
-// Les options sont maintenant dans le fichier constants/options.ts
-
 export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) {
-  const [formData, setFormData] = useState<NewLacInput>(defaultLacInput);
+  const [formData, setFormData] = useState<LacFormData>(defaultLacInput);
 
   // ✅ Synchroniser formData avec le lac sélectionné
+  // useEffect(() => {
+  //   if (open) {
+  //     if (mode === 'edit' && lac) {
+  //       // Convertir les espèces enrichies en IDs si nécessaire
+  //       const especeIds = lac.especeIds || [];
+
+  //       // Convertir les hébergements enrichis en format simple pour formData
+  //       type HebergementWithRequired = {
+  //         campingId: Id<"campings">;
+  //         distanceDepuisLac: { temps: number; kilometrage: number; } | undefined;
+  //         distanceDepuisAcceuil: { temps: number; kilometrage: number; } | undefined;
+  //       };
+
+  //       type HebergementUnion = {
+  //         _id?: Id<"campings">;
+  //         campingId?: Id<"campings">;
+  //         distanceDepuisLac?: { temps: number; kilometrage: number };
+  //         distanceDepuisAcceuil?: { temps: number; kilometrage: number };
+  //       };
+
+  //       const hebergementsSimples = (lac.hebergements || []).map((h: HebergementUnion) => {
+  //         // Support both enriched hebergement objects (with _id) and simple ones (with campingId)
+  //         const campingId = h._id ?? h.campingId ?? null;
+  //         if (!campingId) return null;
+  //         return {
+  //           campingId,
+  //           distanceDepuisLac: h.distanceDepuisLac,
+  //           distanceDepuisAcceuil: h.distanceDepuisAcceuil,
+  //         };
+  //       }).filter((h): h is HebergementWithRequired => h !== null);
+
+  //       const newFormData: LacFormData = {
+  //         nomDuLac: lac.nomDuLac,
+  //         regionAdministrativeQuebec: lac.regionAdministrativeQuebec,
+  //         coordonnees: lac.coordonnees,
+  //         acces: {
+  //           portage: lac.acces?.portage ?? "",
+  //           acceuil: lac.acces?.acceuil ?? "",
+  //           distanceAcceuilLac: lac.acces?.distanceAcceuilLac ?? { temps: 0, kilometrage: 0 },
+  //           accessible: (lac.acces?.accessible ?? "auto") as "auto" | "véhicule utilitaire sport (VUS)" | "camion 4x4"
+  //         },
+  //         embarcation: {
+  //           type: (lac.embarcation?.type ?? "Embarcation personnelle") as "Embarcation personnelle" | "Embarcation Sépaq fournie" | "Embarcation Pourvoirie fournie" | "Location",
+  //           motorisation: {
+  //             necessaire: (lac.embarcation?.motorisation?.necessaire ?? "a determiner") as "electrique" | "essence" | "a determiner"
+  //           }
+  //         },
+  //         especeIds,
+  //         hebergements: hebergementsSimples,
+  //         zone: lac.zone,
+  //         site: lac.site,
+  //         superficie: lac.superficie || { hectares: 0, km2: 0 },
+  //         distanceMaisonLac: lac.distanceMaisonLac || null
+
+  //       };
+
+  //       setFormData(newFormData);
+  //     } else {
+  //       // Réinitialiser pour le mode création
+  //       setFormData(defaultLacInput);
+  //     }
+  //   }
+  // }, [open, mode, lac]);
+
   useEffect(() => {
-    if (open) {
-      if (mode === 'edit' && lac) {
-        // Convertir les espèces enrichies en IDs si nécessaire
-        const especeIds = lac.especeIds || [];
+    if (!open) return;
 
-        // Convertir les hébergements enrichis en format simple pour formData
-        type HebergementWithRequired = {
-          campingId: Id<"campings">;
-          distanceDepuisLac: { temps: number; kilometrage: number; } | undefined;
-          distanceDepuisAcceuil: { temps: number; kilometrage: number; } | undefined;
-        };
-
-        type HebergementUnion = {
-          _id?: Id<"campings">;
-          campingId?: Id<"campings">;
-          distanceDepuisLac?: { temps: number; kilometrage: number };
-          distanceDepuisAcceuil?: { temps: number; kilometrage: number };
-        };
-
-        const hebergementsSimples = (lac.hebergements || []).map((h: HebergementUnion) => {
-          // Support both enriched hebergement objects (with _id) and simple ones (with campingId)
-          const campingId = h._id ?? h.campingId ?? null;
-          if (!campingId) return null;
-          return {
-            campingId,
-            distanceDepuisLac: h.distanceDepuisLac,
-            distanceDepuisAcceuil: h.distanceDepuisAcceuil,
-          };
-        }).filter((h): h is HebergementWithRequired => h !== null);
-
-        const newFormData: NewLacInput = {
-          nomDuLac: lac.nomDuLac,
-          regionAdministrativeQuebec: lac.regionAdministrativeQuebec,
-          coordonnees: lac.coordonnees,
-          acces: {
-            portage: lac.acces?.portage ?? "",
-            acceuil: lac.acces?.acceuil ?? "",
-            distanceAcceuilLac: lac.acces?.distanceAcceuilLac ?? { temps: 0, kilometrage: 0 },
-            accessible: (lac.acces?.accessible ?? "auto") as "auto" | "véhicule utilitaire sport (VUS)" | "camion 4x4"
-          },
-          embarcation: {
-            type: (lac.embarcation?.type ?? "Embarcation personnelle") as "Embarcation personnelle" | "Embarcation Sépaq fournie" | "Embarcation Pourvoirie fournie" | "Location",
-            motorisation: {
-              necessaire: (lac.embarcation?.motorisation?.necessaire ?? "a determiner") as "electrique" | "essence" | "a determiner"
-            }
-          },
-          especeIds,
-          hebergements: hebergementsSimples,
-          zone: lac.zone,
-          site: lac.site,
-          superficie: lac.superficie || { hectares: 0, km2: 0 },
-          distanceMaisonLac: lac.distanceMaisonLac || null
-
-        };
-
-        setFormData(newFormData);
-      } else {
-        // Réinitialiser pour le mode création
-        setFormData(defaultLacInput);
-      }
+    if (mode === 'edit' && lac) {
+      setFormData({
+        ...lac,
+        especeIds: lac.especeIds ?? [],
+        hebergements: lac.hebergements?.map(h => ({
+          campingId: (h as any)._id ?? h.campingId,
+          distanceDepuisLac: h.distanceDepuisLac,
+          distanceDepuisAcceuil: h.distanceDepuisAcceuil,
+        })).filter(h => h.campingId) ?? [],
+      });
+    } else {
+      setFormData(defaultLacInput);
     }
   }, [open, mode, lac]);
 
-  const [hebergement, setHebergement] = useState<HebergementLacInput>({
+  const [hebergement, setHebergement] = useState<LacHebergementFormData>({
     campingId: null,
     distanceDepuisLac: {
       temps: 0,
@@ -141,100 +128,154 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
   const removeCampingFromLac = useMutation(api.lacs.removeCampingFromLac);
   const especes = useQuery(api.especes.getAllEspeces);
 
-  const handleInputChange = (
-    field: keyof NewLacInput,
-    value: string | number | Id<"especes">[] |
-      Partial<Embarcation> |
-      Partial<Acces>
-  ) => {
-    setFormData((prev: NewLacInput) => {
-      if (field === 'superficie') {
-        const superficieValue = typeof value === 'string' ? parseFloat(value) : (typeof value === 'number' ? value : 0);
-        return {
-          ...prev,
-          superficie: {
-            hectares: superficieValue,
-            km2: superficieValue / 100
-          }
-        };
-      }
+  // const handleInputChange = (
+  //   field: keyof LacFormData,
+  //   value: string | number | Id<"especes">[] |
+  //     Partial<LacEmbarcation> |
+  //     Partial<LacAcces>
+  // ) => {
+  //   setFormData((prev: LacFormData) => {
+  //     if (field === 'superficie') {
+  //       const superficieValue = typeof value === 'string' ? parseFloat(value) : (typeof value === 'number' ? value : 0);
+  //       return {
+  //         ...prev,
+  //         superficie: {
+  //           hectares: superficieValue,
+  //           km2: superficieValue / 100
+  //         }
+  //       };
+  //     }
 
-      if (field === 'acces' && typeof value === 'object' && value !== null) {
-        return {
-          ...prev,
-          acces: {
-            ...prev.acces,
-            ...value
-          }
-        };
-      }
+  //     if (field === 'acces' && typeof value === 'object' && value !== null) {
+  //       return {
+  //         ...prev,
+  //         acces: {
+  //           ...prev.acces,
+  //           ...value
+  //         }
+  //       };
+  //     }
 
-      if (field === 'embarcation' && typeof value === 'object' && value !== null) {
-        return {
-          ...prev,
-          embarcation: {
-            ...prev.embarcation,
-            ...value
-          }
-        };
-      }
+  //     if (field === 'embarcation' && typeof value === 'object' && value !== null) {
+  //       return {
+  //         ...prev,
+  //         embarcation: {
+  //           ...prev.embarcation,
+  //           ...value
+  //         }
+  //       };
+  //     }
 
-      if (field === 'especeIds') {
-        if (Array.isArray(value)) {
-          return {
-            ...prev,
-            especeIds: value as Id<"especes">[]
-          };
-        }
-        if (typeof value === 'string') {
-          return {
-            ...prev,
-            especeIds: [value] as Id<"especes">[]
-          };
-        }
-        return prev;
-      }
+  //     if (field === 'especeIds') {
+  //       if (Array.isArray(value)) {
+  //         return {
+  //           ...prev,
+  //           especeIds: value as Id<"especes">[]
+  //         };
+  //       }
+  //       if (typeof value === 'string') {
+  //         return {
+  //           ...prev,
+  //           especeIds: [value] as Id<"especes">[]
+  //         };
+  //       }
+  //       return prev;
+  //     }
 
-      if (field === 'zone') {
-        const zoneValue = typeof value === 'string' ? parseInt(value) : (typeof value === 'number' ? value : 0);
-        return {
-          ...prev,
-          zone: zoneValue || 0
-        };
-      }
+  //     if (field === 'zone') {
+  //       const zoneValue = typeof value === 'string' ? parseInt(value) : (typeof value === 'number' ? value : 0);
+  //       return {
+  //         ...prev,
+  //         zone: zoneValue || 0
+  //       };
+  //     }
 
-      return {
-        ...prev,
-        [field]: value
-      };
-    });
+  //     return {
+  //       ...prev,
+  //       [field]: value
+  //     };
+  //   });
+  // };
+
+  // const handleHebergementChange = (field: keyof HebergementLacInput, value: Id<"campings"> | null | { temps?: number; kilometrage?: number }) => {
+  // if (field === 'distanceDepuisLac' && typeof value === 'object' && value !== null) {
+  //   setHebergement((prev: Omit<HebergementLac, 'campingId'> & { campingId: Id<"campings"> | null }) => ({
+  //     ...prev,
+  //     distanceDepuisLac: {
+  //       temps: typeof value.temps === 'number' ? value.temps : (prev.distanceDepuisLac?.temps ?? 0),
+  //       kilometrage: typeof value.kilometrage === 'number' ? value.kilometrage : (prev.distanceDepuisLac?.kilometrage ?? 0)
+  //     }
+  //   }));
+  // } else {
+  //   setHebergement((prev: Omit<HebergementLac, 'campingId'> & { campingId: Id<"campings"> | null }) => ({
+  //     ...prev,
+  //     [field]: value
+  //   }));
+  // }
+
+  const setHebergementCamping = (campingId: Id<"campings"> | null) => {
+    setHebergement(prev => ({ ...prev, campingId }));
   };
 
-  const handleHebergementChange = (field: keyof HebergementLacInput, value: Id<"campings"> | null | { temps?: number; kilometrage?: number }) => {
-    if (field === 'distanceDepuisLac' && typeof value === 'object' && value !== null) {
-      setHebergement((prev: Omit<HebergementLac, 'campingId'> & { campingId: Id<"campings"> | null }) => ({
-        ...prev,
-        distanceDepuisLac: {
-          temps: typeof value.temps === 'number' ? value.temps : (prev.distanceDepuisLac?.temps ?? 0),
-          kilometrage: typeof value.kilometrage === 'number' ? value.kilometrage : (prev.distanceDepuisLac?.kilometrage ?? 0)
-        }
-      }));
-    } else {
-      setHebergement((prev: Omit<HebergementLac, 'campingId'> & { campingId: Id<"campings"> | null }) => ({
-        ...prev,
-        [field]: value
-      }));
-    }
-  };
-
-  const handleCoordChange = (field: 'latitude' | 'longitude', value: string) => {
-    setFormData((prev: NewLacInput) => ({
+  const setHebergementDistance = (partial: Partial<LacDistance>) => {
+    setHebergement(prev => ({
       ...prev,
-      coordonnees: {
-        ...prev.coordonnees,
-        [field]: value === '' ? 0 : parseFloat(value)
-      }
+      distanceDepuisLac: { temps: 0, kilometrage: 0, ...prev.distanceDepuisLac, ...partial }
     }));
+  };
+  // };
+
+  // const handleCoordChange = (field: 'latitude' | 'longitude', value: string) => {
+  //   setFormData((prev: NewLacInput) => ({
+  //     ...prev,
+  //     coordonnees: {
+  //       ...prev.coordonnees,
+  //       [field]: value === '' ? 0 : parseFloat(value)
+  //     }
+  //   }));
+  // };
+
+  // Champs plats
+  const setField = <K extends keyof LacFormData>(field: K, value: LacFormData[K]) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  // Sections imbriquées
+  const setAcces = (partial: Partial<LacAcces>) => {
+    setFormData(prev => ({ ...prev, acces: { ...prev.acces, ...partial } }));
+  };
+
+  const setEmbarcation = (partial: Partial<LacEmbarcation>) => {
+    setFormData(prev => ({ ...prev, embarcation: { ...prev.embarcation, ...partial } }));
+  };
+
+  const setMotorisation = (partial: Partial<LacMotorisation>) => {
+    setFormData(prev => ({
+      ...prev,
+      embarcation: { ...prev.embarcation, motorisation: { ...prev.embarcation.motorisation, ...partial } }
+    }));
+  };
+
+  const setCoord = (field: 'latitude' | 'longitude', value: number) => {
+    setFormData(prev => ({ ...prev, coordonnees: { ...prev.coordonnees, [field]: value } }));
+  };
+
+  const setDistanceAcceuilLac = (partial: Partial<LacDistance>) => {
+    setFormData(prev => ({
+      ...prev,
+      acces: { ...prev.acces, distanceAcceuilLac: { ...prev.acces.distanceAcceuilLac, ...partial } }
+    }));
+  };
+
+  const setDistanceMaisonLac = (partial: Partial<LacDistance>) => {
+    setFormData(prev => ({
+      ...prev,
+      distanceMaisonLac: { temps: 0, kilometrage: 0, ...prev.distanceMaisonLac, ...partial }
+    }));
+  };
+
+  const setSuperficie = (hectares: number) => {
+    setFormData(prev => ({ ...prev, superficie: { hectares, km2: hectares / 100 } }));
   };
 
   const handleSubmit = async () => {
@@ -320,16 +361,18 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
             fullWidth
             label="Nom du lac"
             value={formData.nomDuLac}
-            onChange={(e) => handleInputChange('nomDuLac', e.target.value)}
+            // onChange={(e) => handleInputChange('nomDuLac', e.target.value)}
+            onChange={(e) => setField('nomDuLac', e.target.value)}
             disabled={isReadOnlyConvex()}
           />
 
           <Box sx={{ display: 'flex', gap: 2 }}>
             <Autocomplete
               fullWidth
-              options={regionsOptions}
+              options={ENUMS_REGION_ADMINISTRATIVE}
               value={formData.regionAdministrativeQuebec}
-              onChange={(_, newValue) => handleInputChange('regionAdministrativeQuebec', newValue || '')}
+              // onChange={(_, newValue) => handleInputChange('regionAdministrativeQuebec', newValue || '')}
+              onChange={(_, val) => setField('regionAdministrativeQuebec', val)}
               disabled={isReadOnlyConvex()}
               renderInput={(params) => (
                 <TextField {...params} label="Région Administrative du Québec" />
@@ -339,9 +382,10 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
 
             <Autocomplete
               fullWidth
-              options={siteOptions}
+              options={ENUMS_LACS_SITE}
               value={formData.site}
-              onChange={(_, newValue) => handleInputChange('site', newValue || '')}
+              // onChange={(_, newValue) => handleInputChange('site', newValue || '')}
+              onChange={(_, val) => setField('site', val)}
               disabled={isReadOnlyConvex()}
               renderInput={(params) => (
                 <TextField {...params} label="Site" />
@@ -357,14 +401,16 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
                 type="number"
                 label="Latitude"
                 value={formData.coordonnees.latitude || ''}
-                onChange={(e) => handleCoordChange('latitude', e.target.value)}
+                // onChange={(e) => handleCoordChange('latitude', e.target.value)}
+                onChange={(e) => setCoord('latitude', parseFloat(e.target.value) || 0)}
                 disabled={isReadOnlyConvex()}
               />
               <TextField
                 type="number"
                 label="Longitude"
                 value={formData.coordonnees.longitude || ''}
-                onChange={(e) => handleCoordChange('longitude', e.target.value)}
+                // onChange={(e) => handleCoordChange('longitude', e.target.value)}
+                onChange={(e) => setCoord('longitude', parseFloat(e.target.value) || 0)}
                 disabled={isReadOnlyConvex()}
               />
               <Tooltip title="Copier les coordonnées">
@@ -389,14 +435,16 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
               type="number"
               label="Zone"
               value={formData.zone || ''}
-              onChange={(e) => handleInputChange('zone', e.target.value ? parseInt(e.target.value) : 0)}
+              // onChange={(e) => handleInputChange('zone', e.target.value ? parseInt(e.target.value) : 0)}
+              onChange={(e) => setField('zone', parseInt(e.target.value) || 0)}
             />
             <TextField
               fullWidth
               type="number"
               label="Superficie (hectares)"
               value={formData.superficie?.hectares || ''}
-              onChange={(e) => handleInputChange('superficie', e.target.value)}
+              // onChange={(e) => handleInputChange('superficie', e.target.value)}
+              onChange={(e) => setSuperficie(parseFloat(e.target.value) || 0)}
             />
           </Box>
 
@@ -406,37 +454,42 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
               fullWidth
               label="Portage"
               value={formData.acces.portage}
-              onChange={(e) => handleInputChange('acces', { portage: e.target.value })}
+              // onChange={(e) => handleInputChange('acces', { portage: e.target.value })}
+              onChange={(e) => setAcces({ portage: e.target.value })}
             />
             <TextField
               fullWidth
               label="Accueil"
               value={formData.acces.acceuil}
-              onChange={(e) => handleInputChange('acces', { acceuil: e.target.value })}
+              // onChange={(e) => handleInputChange('acces', { acceuil: e.target.value })}
+              onChange={(e) => setAcces({ acceuil: e.target.value })}
             />
             <TextField
               fullWidth
               label="Distance d'accueil au lac (m)"
               type="number"
               value={formData.acces.distanceAcceuilLac.kilometrage || 0}
-              onChange={(e) => handleInputChange('acces', { distanceAcceuilLac: { kilometrage: e.target.value ? parseInt(e.target.value) : 0, temps: formData.acces.distanceAcceuilLac.temps } })}
+              // onChange={(e) => handleInputChange('acces', { distanceAcceuilLac: { kilometrage: e.target.value ? parseInt(e.target.value) : 0, temps: formData.acces.distanceAcceuilLac.temps } })}
+              onChange={(e) => setDistanceAcceuilLac({ kilometrage: parseInt(e.target.value) || 0 })}
             />
             <TextField
               fullWidth
               label="Temps d'accueil au lac (min)"
               type="number"
               value={formData.acces.distanceAcceuilLac.temps || 0}
-              onChange={(e) => handleInputChange('acces', { distanceAcceuilLac: { kilometrage: formData.acces.distanceAcceuilLac.kilometrage, temps: e.target.value ? parseInt(e.target.value) : 0 } })}
+              // onChange={(e) => handleInputChange('acces', { distanceAcceuilLac: { kilometrage: formData.acces.distanceAcceuilLac.kilometrage, temps: e.target.value ? parseInt(e.target.value) : 0 } })}
+              onChange={(e) => setDistanceAcceuilLac({ temps: parseInt(e.target.value) || 0 })}
             />
             <Autocomplete
               fullWidth
-              options={accessibleOptions}
+              options={ENUMS_LACS_ACCESSIBLE}
               value={formData.acces.accessible}
-              onChange={(_, newValue) => {
-                if (newValue && VEHICLE_TYPES.includes(newValue as typeof VEHICLE_TYPES[number])) {
-                  handleInputChange('acces', { accessible: newValue as typeof VEHICLE_TYPES[number] })
-                }
-              }}
+              // onChange={(_, newValue) => {
+              //   if (newValue && ENUMS_LACS_ACCESSIBLE.includes(newValue as typeof ENUMS_LACS_ACCESSIBLE[number])) {
+              //     handleInputChange('acces', { accessible: newValue as typeof ENUMS_LACS_ACCESSIBLE[number] })
+              //   }
+              // }}
+              onChange={(_, val) => setAcces({ accessible: val })}
               renderInput={(params) => (
                 <TextField {...params} label="Accessible" />
               )}
@@ -449,13 +502,14 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
             <Box sx={{ flex: '1 1 300px' }}>
               <Autocomplete
                 fullWidth
-                options={EMBARCATION_TYPES}
+                options={ENUMS_LACS_EMBARCATION}
                 value={formData.embarcation.type}
-                onChange={(_, newValue) => {
-                  if (newValue && EMBARCATION_TYPES.includes(newValue as typeof EMBARCATION_TYPES[number])) {
-                    handleInputChange('embarcation', { type: newValue as typeof EMBARCATION_TYPES[number] })
-                  }
-                }}
+                // onChange={(_, newValue) => {
+                //   if (newValue && ENUMS_LACS_EMBARCATION.includes(newValue as typeof ENUMS_LACS_EMBARCATION[number])) {
+                //     handleInputChange('embarcation', { type: newValue as typeof ENUMS_LACS_EMBARCATION[number] })
+                //   }
+                // }}
+                onChange={(_, val) => setEmbarcation({ type: val })}
                 renderInput={(params) => (
                   <TextField {...params} label="Type d'embarcation" />
                 )}
@@ -466,22 +520,23 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
             <Box sx={{ flex: '1 1 300px' }}>
               <Autocomplete
                 fullWidth
-                options={MOTORISATION_TYPES}
+                options={ENUMS_LACS_EMBARCATION_MOTORISATION_NECESSAIRE}
                 value={formData.embarcation.motorisation.necessaire}
-                onChange={(_, newValue) => {
-                  if (newValue && MOTORISATION_TYPES.includes(newValue as typeof MOTORISATION_TYPES[number])) {
-                    const existingPuissance = formData.embarcation.motorisation.puissance;
-                    handleInputChange('embarcation', {
-                      motorisation: {
-                        necessaire: newValue as typeof MOTORISATION_TYPES[number],
-                        puissance: existingPuissance ? {
-                          minimum: existingPuissance.minimum === null ? undefined : existingPuissance.minimum,
-                          maximum: existingPuissance.maximum === null ? undefined : existingPuissance.maximum
-                        } : undefined
-                      }
-                    })
-                  }
-                }}
+                // onChange={(_, newValue) => {
+                //   if (newValue && ENUMS_LACS_EMBARCATION_MOTORISATION_NECESSAIRE.includes(newValue as typeof ENUMS_LACS_EMBARCATION_MOTORISATION_NECESSAIRE[number])) {
+                //     const existingPuissance = formData.embarcation.motorisation.puissance;
+                //     handleInputChange('embarcation', {
+                //       motorisation: {
+                //         necessaire: newValue as typeof ENUMS_LACS_EMBARCATION_MOTORISATION_NECESSAIRE[number],
+                //         puissance: existingPuissance ? {
+                //           minimum: existingPuissance.minimum === null ? undefined : existingPuissance.minimum,
+                //           maximum: existingPuissance.maximum === null ? undefined : existingPuissance.maximum
+                //         } : undefined
+                //       }
+                //     })
+                //   }
+                // }}
+                onChange={(_, val) => setMotorisation({ necessaire: val })}
                 renderInput={(params) => (
                   <TextField {...params} label="Type de motorisation" />
                 )}
@@ -496,18 +551,21 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
                   label="Puissance minimale (CV)"
                   type="number"
                   value={formData.embarcation.motorisation.puissance?.minimum || ''}
-                  onChange={(e) => {
-                    const value = e.target.value ? parseInt(e.target.value) : undefined;
-                    const necessaire = formData.embarcation.motorisation.necessaire;
-                    if (necessaire && MOTORISATION_TYPES.includes(necessaire as typeof MOTORISATION_TYPES[number])) {
-                      handleInputChange('embarcation', {
-                        motorisation: {
-                          necessaire: necessaire as typeof MOTORISATION_TYPES[number],
-                          puissance: value !== undefined ? { minimum: value } : undefined
-                        }
-                      });
-                    }
-                  }}
+                  // onChange={(e) => {
+                  //   const value = e.target.value ? parseInt(e.target.value) : undefined;
+                  //   const necessaire = formData.embarcation.motorisation.necessaire;
+                  //   if (necessaire && ENUMS_LACS_EMBARCATION_MOTORISATION_NECESSAIRE.includes(necessaire as typeof ENUMS_LACS_EMBARCATION_MOTORISATION_NECESSAIRE[number])) {
+                  //     handleInputChange('embarcation', {
+                  //       motorisation: {
+                  //         necessaire: necessaire as typeof ENUMS_LACS_EMBARCATION_MOTORISATION_NECESSAIRE[number],
+                  //         puissance: value !== undefined ? { minimum: value } : undefined
+                  //       }
+                  //     });
+                  //   }
+                  // }}
+                  onChange={(e) => setMotorisation({
+                    puissance: { minimum: parseInt(e.target.value) || undefined, maximum: formData.embarcation.motorisation.puissance?.maximum }
+                  })}
                 />
               </Box>
             )}
@@ -518,10 +576,11 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
             multiple
             fullWidth
             options={especes || []}
-            value={especes?.filter(e => formData.especeIds.includes(e._id)) || []}
-            onChange={(_, newValue) => {
-              handleInputChange('especeIds', newValue.map(e => e._id));
-            }}
+            value={especes?.filter(e => formData.especeIds?.includes(e._id)) || []}
+            // onChange={(_, newValue) => {
+            //   handleInputChange('especeIds', newValue.map(e => e._id));
+            // }}
+            onChange={(_, newValue) => setField('especeIds', newValue.map(e => e._id))}
             getOptionLabel={(option) => option.nomCommun}
             renderInput={(params) => (
               <TextField {...params} label="Espèces présentes" placeholder="Sélectionner les espèces..." />
@@ -597,15 +656,15 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
                 <Autocomplete
                   fullWidth
                   options={campings?.filter(camping =>
-                    // Compare either enriched _id or simple campingId
                     !lac.hebergements.some(h => ((h as { _id?: Id<"campings"> })._id ?? (h as { campingId?: Id<"campings"> }).campingId) === camping._id)
                   ) || []}
                   value={campings?.find(c => c._id === hebergement.campingId) || null}
-                  onChange={(_, newValue) => {
-                    if (newValue) {
-                      handleHebergementChange('campingId', newValue._id);
-                    }
-                  }}
+                  // onChange={(_, newValue) => {
+                  //   if (newValue) {
+                  //     handleHebergementChange('campingId', newValue._id);
+                  //   }
+                  // }}
+                  onChange={(_, newValue) => setHebergementCamping(newValue?._id ?? null)}
                   getOptionLabel={(option) => option.nom}
                   renderInput={(params) => (
                     <TextField
@@ -631,20 +690,22 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
                   type="number"
                   label="Distance (km)"
                   value={hebergement.distanceDepuisLac?.kilometrage || ''}
-                  onChange={(e) => handleHebergementChange('distanceDepuisLac', {
-                    kilometrage: parseFloat(e.target.value),
-                    temps: hebergement.distanceDepuisLac?.temps || 0
-                  })}
+                  // onChange={(e) => handleHebergementChange('distanceDepuisLac', {
+                  //   kilometrage: parseFloat(e.target.value),
+                  //   temps: hebergement.distanceDepuisLac?.temps || 0
+                  // })}
+                  onChange={(e) => setHebergementDistance({ kilometrage: parseFloat(e.target.value) })}
                   sx={{ width: '150px' }}
                 />
                 <TextField
                   type="number"
                   label="Temps (min)"
                   value={hebergement.distanceDepuisLac?.temps || ''}
-                  onChange={(e) => handleHebergementChange('distanceDepuisLac', {
-                    temps: parseFloat(e.target.value),
-                    kilometrage: hebergement.distanceDepuisLac?.kilometrage || 0
-                  })}
+                  // onChange={(e) => handleHebergementChange('distanceDepuisLac', {
+                  //   temps: parseFloat(e.target.value),
+                  //   kilometrage: hebergement.distanceDepuisLac?.kilometrage || 0
+                  // })}
+                  onChange={(e) => setHebergementDistance({ temps: parseFloat(e.target.value) })}
                   sx={{ width: '150px' }}
                 />
                 <Tooltip title={"Ajouter l'hébergement"}>
@@ -667,13 +728,15 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
                   fullWidth
                   label="distance (km)"
                   value={formData.distanceMaisonLac?.kilometrage || ''}
-                  onChange={(e) => handleInputChange('distanceMaisonLac', { kilometrage: parseFloat(e.target.value) || 0, temps: formData.distanceMaisonLac?.temps || 0 })}
+                  // onChange={(e) => handleInputChange('distanceMaisonLac', { kilometrage: parseFloat(e.target.value) || 0, temps: formData.distanceMaisonLac?.temps || 0 })}
+                  onChange={(e) => setDistanceMaisonLac({ kilometrage: parseFloat(e.target.value) || 0 })}
                 />
                 <TextField
                   fullWidth
                   label="temps (min)"
                   value={formData.distanceMaisonLac?.temps || ''}
-                  onChange={(e) => handleInputChange('distanceMaisonLac', { temps: parseFloat(e.target.value) || 0, kilometrage: formData.distanceMaisonLac?.kilometrage || 0 })}
+                  // onChange={(e) => handleInputChange('distanceMaisonLac', { temps: parseFloat(e.target.value) || 0, kilometrage: formData.distanceMaisonLac?.kilometrage || 0 })}
+                  onChange={(e) => setDistanceMaisonLac({ temps: parseFloat(e.target.value) || 0 })}
                 />
               </Box>
             </>

@@ -1,4 +1,4 @@
-export const OPTIONS_REGION_ADMINISTRATIVE = [
+export const ENUMS_REGION_ADMINISTRATIVE = [
   "Capitale-Nationale",
   "Chaudière-Appalaches",
   "Lanaudière",

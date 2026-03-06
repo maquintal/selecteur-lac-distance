@@ -17,8 +17,8 @@ import {
   SelectChangeEvent,
 } from "@mui/material";
 import FilterListOffIcon from "@mui/icons-material/FilterListOff";
-import { siteOptions } from "../components/LacDialog"; // todo ces valeurs devraient venir de la definition du schema convex
 import LakesSearchCards from "./LakesSearchCards";
+import { ENUMS_LACS_SITE } from "@/convex/schemas/lacs.schema";
 
 const MOTORISATION_OPTIONS = [ // todoces valeurs devraient venir de la definition du schema convex
   { label: "Toutes motorisations", value: "" },
@@ -116,7 +116,7 @@ const SearchFilters = () => {
           >
             <MenuItem value="">Tous les Sites</MenuItem>
             <MenuItem value="__aucun__">Sans site assigné</MenuItem>
-            {siteOptions.map((opt) => (
+            {ENUMS_LACS_SITE.map((opt) => (
               <MenuItem key={opt} value={opt}>
                 {opt}
               </MenuItem>

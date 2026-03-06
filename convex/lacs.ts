@@ -1,12 +1,10 @@
-
-
-// convex/lacs.ts
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 import { checkReadOnlyModeConvex } from "./checkReadOnlyMode";
+import { lacsSchema } from "./schemas/lacs.schema";
 
 // ============================================
-// QUERIES CONVEX
+// QUERIES
 // ============================================
 
 export const getAllLacs = query({
@@ -18,154 +16,6 @@ export const getAllLacs = query({
     return lacs
   }
 })
-
-// export const getAllLacsSorted = query({
-//   handler: async (ctx) => {
-//     const lacs = await ctx.db
-//       .query("lacs")
-//       .withIndex("by_hebergements_electrique")
-//       .order("desc")
-//       .collect();
-
-//     // Tri secondaire en JS seulement pour les lacs avec même nb d'hébergements
-//     return lacs.sort((a, b) => {
-//       if (a.nbHebergements === b.nbHebergements) {
-//         return (b.isMoteurisationElectrique ? 1 : 0) - (a.isMoteurisationElectrique ? 1 : 0);
-//       }
-//       return 0; // Déjà trié par l'index
-//     });
-//   },
-// });
-
-// export const getLacsSortedOptimized = query({
-//   handler: async (ctx) => {
-
-//     // Récupérer tous les lacs
-//     const allLacs = await ctx.db.query("lacs").collect();
-
-//     // const filteredLacs = allLacs.filter(lac => lac.site === "Papineau-Labelle"); //.filter(lac => lac.hebergements.length <= 0);
-//     // const filteredLacs = allLacs.filter(lac => lac.site === "Mastigouche"); //.filter(lac => lac.hebergements.length <= 0);
-//     // const filteredLacs = allLacs.filter(lac => lac.site === "Portneuf"); //.filter(lac => lac.hebergements.length <= 0);
-//     // const filteredLacs = allLacs.filter(lac => lac.site === "Rouge-Matawin"); //.filter(lac => lac.hebergements.length <= 0);
-//     const filteredLacs = allLacs.filter(lac => lac.embarcation.motorisation.necessaire === "electrique"); //.filter(lac => lac.hebergements.length <= 0);
-
-//     // Collecter TOUS les IDs en une seule passe
-//     const allEspeceIds = [...new Set(filteredLacs.flatMap((lac) => lac.especeIds ?? []))];
-//     const allCampingIds = [...new Set(filteredLacs.flatMap((lac) => lac.hebergements?.map((h) => h.campingId) ?? []))];
-
-//     // Charger TOUT en parallèle (2 Promise.all au lieu de N*M)
-//     const [allEspeces, allCampings] = await Promise.all([
-//       Promise.all(allEspeceIds.map((id) => ctx.db.get(id))),
-//       Promise.all(allCampingIds.map((id) => ctx.db.get(id))),
-//     ]);
-
-//     // Construire des maps pour lookup O(1)
-//     const especesMap = new Map(
-//       allEspeceIds.map((id, i) => [id, allEspeces[i]])
-//     );
-//     const campingsMap = new Map(
-//       allCampingIds.map((id, i) => [id, allCampings[i]])
-//     );
-
-//     // Enrichir sans aucune requête DB supplémentaire
-//     const enrichedLacs = filteredLacs.map((lac) => {
-//       const especes = (lac.especeIds ?? [])
-//         .map((id) => especesMap.get(id))
-//         .filter((e) => e != null);
-
-//       const hebergements = (lac.hebergements ?? []).map((h) => ({
-//         ...campingsMap.get(h.campingId),
-//         distanceDepuisAcceuil: h.distanceDepuisAcceuil,
-//         distanceDepuisLac: h.distanceDepuisLac,
-//       }));
-
-//       return { ...lac, especes, hebergements };
-//     });
-
-//     const sejour = enrichedLacs.sort((a, b) => {
-//       // const motorA = a.embarcation?.motorisation?.necessaire;
-//       // const motorB = b.embarcation?.motorisation?.necessaire;
-//       // const priorityA = motorA === 'electrique' ? 1 : motorA === 'essence' ? 2 : 3;
-//       // const priorityB = motorB === 'electrique' ? 1 : motorB === 'essence' ? 2 : 3;
-
-//       // 1. Tri par type de motorisation (électrique > essence > reste)
-//       // if (priorityA !== priorityB) return priorityA - priorityB;
-
-//       // 2. Sous-tris uniquement dans le groupe électrique
-//       // if (motorA === 'electrique' && motorB === 'electrique') {
-
-//       // 2a. Accessibilité (auto|VUS en premier)
-//       const getAccessPriority = (accessible: string | undefined) => {
-//         if (accessible === "auto" || accessible === "véhicule utilitaire sport (VUS)") return 1;
-//         if (accessible === "camion 4x4") return 2;
-//         return 3;
-//       };
-
-//       const accessSort = getAccessPriority(a.acces?.accessible) - getAccessPriority(b.acces?.accessible);
-//       if (accessSort !== 0) return accessSort;
-
-//       // 2b. Superficie (3-45 ha d'abord, puis < 3, puis > 45)
-//       const hectaresA = a.superficie?.hectares ?? 0;
-//       const hectaresB = b.superficie?.hectares ?? 0;
-
-//       const getSuperficiePriority = (ha: number) => {
-//         if (ha >= 4 && ha <= 30) return 1;  // Idéal
-//         if (ha >= 30 && ha <= 80) return 2; // Grand
-//         if (ha > 80) return 4;              // Trop grand
-//         if (ha < 4) return 3                // Trop petit
-//         return 5;                           // Non défini
-//       };
-
-//       const supPriorityA = getSuperficiePriority(hectaresA);
-//       const supPriorityB = getSuperficiePriority(hectaresB);
-
-//       if (supPriorityA !== supPriorityB) return supPriorityA - supPriorityB;
-
-//       // 2c. Temps minimum depuis le lac (croissant), dans le sous-groupe auto|VUS
-//       const minTempsA = Math.min(
-//         ...(a.hebergements?.map((h) => h.distanceDepuisLac?.temps ?? Infinity) ?? [Infinity])
-//       );
-//       const minTempsB = Math.min(
-//         ...(b.hebergements?.map((h) => h.distanceDepuisLac?.temps ?? Infinity) ?? [Infinity])
-//       );
-
-//       if (minTempsA !== minTempsB) return minTempsA - minTempsB;
-
-//       // }
-
-//       return 0;
-//     });
-
-
-//     let journeeEnrichedLacs = enrichedLacs.filter((lac) => {
-//       return (
-//         lac.embarcation.type === "Embarcation Sépaq fournie" &&
-//         lac?.superficie?.hectares <= 30 &&
-//         lac.acces?.accessible !== "camion 4x4"
-//       )
-//     })
-
-//     journeeEnrichedLacs = journeeEnrichedLacs.sort((a, b) => {
-
-//       // Temps minimum depuis le lac (croissant)
-//       const minTempsA = Math.min(
-//         ...(a.distanceMaisonLac ? [a.distanceMaisonLac.temps] : [Infinity])
-//       );
-//       const minTempsB = Math.min(
-//         ...(b.distanceMaisonLac ? [b.distanceMaisonLac.temps] : [Infinity])
-//       );
-
-//       if (minTempsA !== minTempsB) return minTempsA - minTempsB;
-
-//       return 0;
-//     });
-
-//     // return sejour
-
-//     return journeeEnrichedLacs;
-
-//   },
-// });
 
 export const getAllLacsDynamicFilters = query({
   args: {
@@ -342,7 +192,7 @@ export const getLakesStats = query({
     const enrichedLacs = await Promise.all(
       lacs.map(async (lac) => {
         const especes = await Promise.all(
-          lac.especeIds.map((id) => ctx.db.get(id))
+          lac.especeIds?.map((id) => ctx.db.get(id)) ?? []
         );
         const hebergements = await Promise.all(
           lac.hebergements.map(async (h) => {
@@ -565,82 +415,11 @@ export const removeCampingFromLac = mutation({
   },
 });
 
-// ============================================
-// MUTATIONS CONVEX
-// ============================================
-
 // Ajouter un nouveau lac
 export const addLac = mutation({
-  args: {
-    nomDuLac: v.string(),
-    regionAdministrativeQuebec: v.string(),
-    coordonnees: v.object({
-      latitude: v.number(),
-      longitude: v.number(),
-    }),
-    zone: v.optional(v.number()),
-    site: v.optional(v.string()),
-    superficie: v.optional(v.object({
-      hectares: v.number(),
-      km2: v.number(),
-    })),
-    especeIds: v.optional(v.array(v.id("especes"))),
-    hebergements: v.optional(v.array(v.object({
-      campingId: v.id("campings"),
-      distanceDepuisLac: v.optional(v.object({
-        temps: v.number(),
-        kilometrage: v.number(),
-      })),
-    }))),
-    acces: v.object({
-      portage: v.string(),
-      acceuil: v.string(),
-      distanceAcceuilLac: v.union(
-        v.object({
-          temps: v.number(),
-          kilometrage: v.number(),
-        })
-      ),
-      accessible: v.union(
-        v.literal("véhicule utilitaire sport (VUS)"),
-        v.literal("auto"),
-        v.literal("camion 4x4")
-      ),
-    }),
-    embarcation: v.object({
-      type: v.union(
-        v.literal("Embarcation Sépaq fournie"),
-        v.literal("Embarcation Pourvoirie fournie"),
-        v.literal("Location"),
-        v.literal("Embarcation personnelle"),
-        v.literal("À Gué")
-      ),
-      motorisation: v.object({
-        puissance: v.optional(
-          v.object({
-            minimum: v.optional(v.union(v.number(), v.null())),
-            maximum: v.optional(v.union(v.number(), v.null())),
-          })
-        ),
-        necessaire: v.optional(
-          v.union(
-            v.literal("electrique"),
-            v.literal("essence"),
-            v.literal("a determiner"),
-            v.literal("à gué")
-          )
-        )
-      }),
-    }),
-    distanceMaisonLac: v.optional(v.object({
-      temps: v.number(),
-      kilometrage: v.number(),
-    }))
-  },
+  args: lacsSchema,
   handler: async (ctx, args) => {
     checkReadOnlyModeConvex()
-
-    // console.log(checkReadOnlyModeConvex())
 
     return await ctx.db.insert("lacs", {
       ...args,
@@ -654,69 +433,10 @@ export const addLac = mutation({
 export const updateLac = mutation({
   args: {
     lacId: v.id("lacs"),
-    nomDuLac: v.string(),
-    regionAdministrativeQuebec: v.optional(v.string()),
-    coordonnees: v.object({
-      latitude: v.optional(v.number()),
-      longitude: v.optional(v.number()),
-    }),
-    acces: v.object({
-      portage: v.optional(v.string()),
-      acceuil: v.optional(v.string()),
-      distanceAcceuilLac: v.union(
-        v.object({
-          temps: v.optional(v.number()),
-          kilometrage: v.optional(v.number()),
-        })
-      ),
-      accessible: v.union(
-        v.literal("véhicule utilitaire sport (VUS)"),
-        v.literal("auto"),
-        v.literal("camion 4x4")
-      ),
-    }),
-    embarcation: v.object({
-      type: v.union(
-        v.literal("Embarcation Sépaq fournie"),
-        v.literal("Embarcation Pourvoirie fournie"),
-        v.literal("Location"),
-        v.literal("Embarcation personnelle"),
-        v.literal("À Gué")
-      ),
-      motorisation: v.object({
-        puissance: v.optional(
-          v.object({
-            minimum: v.optional(v.union(v.number(), v.null())),
-            maximum: v.optional(v.union(v.number(), v.null())),
-          })
-        ),
-        necessaire: v.optional(
-          v.union(
-            v.literal("electrique"),
-            v.literal("essence"),
-            v.literal("a determiner"),
-            v.literal("à gué")
-          )
-        )
-      }),
-    }),
-    zone: v.optional(v.number()),
-    site: v.optional(v.string()),
-    superficie: v.optional(
-      v.object({
-        hectares: v.number(),
-        km2: v.number(),
-      })
-    ),
-    especeIds: v.optional(v.array(v.id("especes"))),
-    distanceMaisonLac: v.optional(v.object({
-      temps: v.optional(v.number()),
-      kilometrage: v.optional(v.number()),
-    }))
+    ...lacsSchema
   },
   handler: async (ctx, args) => {
     checkReadOnlyModeConvex()
-    // console.log(checkReadOnlyModeConvex())
     const { lacId, ...updateData } = args;
 
     await ctx.db.patch(lacId, {

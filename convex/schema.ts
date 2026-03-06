@@ -1,66 +1,16 @@
-// convex/schema.ts
 // Schéma optimisé pour tes données de lacs du Québec
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 import { especesSchema } from "@/convex/schemas/especes.schema";
 import { hebergementsSchema } from "./schemas/hebergements.schema";
+import { lacsSchema } from "./schemas/lacs.schema";
 
 export default defineSchema({
   // ============================================
   // TABLE: campings
   // Stocke tous les campings une seule fois
   // ============================================
-  campings: defineTable(hebergementsSchema
-  //   {
-  //   nom: v.string(),
-  //   organisme: v.union(
-  //     v.literal("privé"),
-  //     v.literal("SEPAQ"),
-  //     v.literal("Camping"),
-  //     v.literal("Pourvoirie")
-  //   ),
-  //   coordonnees: v.object({
-  //     latitude: v.number(),
-  //     longitude: v.number(),
-  //   }),
-  //   terrains: v.optional(
-  //     v.array(
-  //       v.object({
-  //         nom: v.string(),
-  //         equipementAdmissible: v.optional(v.array(v.string())),
-  //         services: v.optional(v.array(v.string())),
-  //         capaciteMaximale: v.optional(v.string()),
-  //         acces: v.optional(v.array(v.string())),
-  //         selections: v.optional(v.array(v.string())),
-  //         description: v.optional(v.array(v.string())),
-  //         important: v.optional(v.array(v.string())),
-  //       })
-  //     )
-  //   ),
-  //   typeEmplacement: v.optional(
-  //     v.union(
-  //       v.literal("Tente-roulotte"),
-  //       v.literal("moins de 4,5 mètres (15 pieds)"),
-  //       v.literal("moins de 6 mètres (20 pieds)"),
-  //       v.literal("moins de 8 mètres (25 pieds)"),
-  //       v.literal("moins de 9 mètres (30 pieds)"),
-  //       v.literal("9 mètres (30 pieds) et plus")
-  //     )
-  //   ),
-  //   commodites: v.object({
-  //     eau: v.boolean(),
-  //     electricite: v.boolean(),
-  //   }),
-  //   regionAdministrative: v.optional(v.string()),
-  //   distanceMaisonCamping: v.optional(
-  //     v.object({
-  //       temps: v.number(), // en minutes
-  //       kilometrage: v.number(),
-  //     }),
-  //   ),
-  //   inactif: v.optional(v.boolean())
-  // }
-)
+  campings: defineTable(hebergementsSchema)
     .index("by_nom", ["nom"])
     .searchIndex("search_nom", {
       searchField: "nom",
@@ -82,7 +32,7 @@ export default defineSchema({
   // ============================================
   // TABLE: lacs (optimisée)
   // ============================================
-  lacs: defineTable({
+  lacs: defineTable(lacsSchema/* {
     nomDuLac: v.string(),
 
     // Informations juridiques
@@ -189,7 +139,7 @@ export default defineSchema({
       v.null()
     )),
 
-  })
+  } */)
     // .index("by_region", ["regionAdministrativeQuebec"])
     .index("by_site", ["site"])
     // .index("by_zone", ["zone"])
@@ -200,32 +150,4 @@ export default defineSchema({
   //   searchField: "nomDuLac",
   //   // filterFields: ["regionAdministrativeQuebec", "site"],
   // }),
-
-  // ============================================
-  // TABLE: hebergement_lacs (table de jonction)
-  // Alternative pour des requêtes plus flexibles
-  // ============================================
-  // hebergement_lacs: defineTable({
-  //   lacId: v.id("lacs"),
-  //   campingId: v.id("campings"),
-  //   distanceDepuisAcceuil: v.optional(
-  //     v.union(
-  //       v.object({
-  //         temps: v.number(),
-  //         kilometrage: v.number(),
-  //       })
-  //     )
-  //   ),
-  //   distanceDepuisLac: v.optional(
-  //     v.union(
-  //       v.object({
-  //         temps: v.number(),
-  //         kilometrage: v.number(),
-  //       })
-  //     )
-  //   ),
-  // })
-  //   .index("by_lac", ["lacId"])
-  //   .index("by_camping", ["campingId"])
-  //   .index("by_lac_camping", ["lacId", "campingId"]),
 });

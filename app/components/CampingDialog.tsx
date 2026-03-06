@@ -18,6 +18,7 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { defaultCampingInput, HebergementDoc, HebergementFormData, normalizeHebergement, TerrainInput } from '../types/hebergements.type';
+import { ENUMS_REGION_ADMINISTRATIVE } from '@/convex/schemas/enums';
 
 type CampingDialogProps = {
   open: boolean;
@@ -332,13 +333,9 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
               label="Région Administrative"
               onChange={(e) => handleInputChange('regionAdministrative', e.target.value)}
             >
-              <MenuItem value="Capitale-Nationale">Capitale-Nationale</MenuItem>
-              <MenuItem value="Chaudière-Appalaches">Chaudière-Appalaches</MenuItem>
-              <MenuItem value="Lanaudiere">Lanaudière</MenuItem>
-              <MenuItem value="Laurentides">Laurentides</MenuItem>
-              <MenuItem value="Mauricie">Mauricie</MenuItem>
-              <MenuItem value="Outaouais">Outaouais</MenuItem>
-              <MenuItem value="Centre-du-Québec">Centre-du-Québec</MenuItem>
+              {ENUMS_REGION_ADMINISTRATIVE.map((item) => {
+                return (<MenuItem key={item} value={item}>{item}</MenuItem>)
+              })}
             </Select>
           </FormControl>
 

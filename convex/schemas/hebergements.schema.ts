@@ -1,11 +1,11 @@
 import { v } from "convex/values";
-import { OPTIONS_REGION_ADMINISTRATIVE } from "./options.schema";
+import { ENUMS_REGION_ADMINISTRATIVE } from "./enums";
 
-export const HEBERGEMENTS_ORGANISME = ["privé", "SEPAQ", "Camping", "Pourvoirie"] as const;
+export const ENUMS_HEBERGEMENTS_ORGANISME = ["privé", "SEPAQ", "Camping", "Pourvoirie"] as const;
 
 export const hebergementsSchema = {
   nom: v.string(),
-  organisme: v.union(...HEBERGEMENTS_ORGANISME.map(item => v.literal(item))
+  organisme: v.union(...ENUMS_HEBERGEMENTS_ORGANISME.map(item => v.literal(item))
   ),
   coordonnees: v.object({
     latitude: v.number(),
@@ -32,8 +32,7 @@ export const hebergementsSchema = {
     eau: v.boolean(),
     electricite: v.boolean(),
   }),
-  // regionAdministrative: v.optional(v.string()), // enums
-  regionAdministrative: v.optional(v.union(...OPTIONS_REGION_ADMINISTRATIVE.map(item => v.literal(item)))), // enums
+  regionAdministrative: v.optional(v.union(...ENUMS_REGION_ADMINISTRATIVE.map(item => v.literal(item)))),
   distanceMaisonCamping: v.optional(
     v.object({
       temps: v.number(), // en minutes

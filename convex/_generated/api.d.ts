@@ -17,6 +17,7 @@ import type * as checkReadOnlyMode from "../checkReadOnlyMode.js";
 import type * as especes from "../especes.js";
 import type * as heberements from "../heberements.js";
 import type * as lacs from "../lacs.js";
+import type * as schemas_enums from "../schemas/enums.js";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -31,6 +32,7 @@ declare const fullApi: ApiFromModules<{
   especes: typeof especes;
   heberements: typeof heberements;
   lacs: typeof lacs;
+  "schemas/enums": typeof schemas_enums;
 }>;
 export declare const api: FilterApi<
   typeof fullApi,
