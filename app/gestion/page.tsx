@@ -14,13 +14,13 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import LacDialog from '@/app/components/LacDialog';
 import GestionNavBar from '@/app/components/GestionNavBar';
-import { LacDoc, LacWithDetails } from '@/app/types/schema.types';
 import { useMobileDetect } from '@/app/hooks/useMobileDetect';
 import { isReadOnlyConvex } from '@/convex/checkReadOnlyMode';
+import { LacDoc, LacEnriched } from "@/app/types/lacs.type"
 
 export default function GestionLacs() {
   const [openDialog, setOpenDialog] = useState(false);
-  const [selectedLac, setSelectedLac] = useState<LacDoc | LacWithDetails | undefined>(undefined);
+  const [selectedLac, setSelectedLac] = useState<LacDoc | LacEnriched | undefined>(undefined);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
   const [dialogMode, setDialogMode] = useState<'create' | 'edit'>('create');
 
@@ -30,7 +30,7 @@ export default function GestionLacs() {
   // const lacs = useQuery(api.lacs.getAllLacs) || [];
   const lacs = useQuery(api.lacs.getAllLacs) || [];
 
-  const handleOpenDialog = (mode: 'create' | 'edit', lac?: LacDoc | LacWithDetails) => {
+  const handleOpenDialog = (mode: 'create' | 'edit', lac?: LacDoc | LacEnriched) => {
     setDialogMode(mode);
     setSelectedLac(lac);
     setOpenDialog(true);
@@ -105,7 +105,7 @@ export default function GestionLacs() {
                     <TableCell>{lac.superficie?.hectares || 'N/A'}</TableCell>
                     <TableCell>
                       <Button
-                        ref={(el) => (buttonRefs.current[index] = el)}
+                        ref={(el) => { buttonRefs.current[index] = el; }}
                         onClick={(e) => handleButtonClick2(e, lac.coordonnees.latitude, lac.coordonnees.longitude, index)}
                       >
                         Voir sur OpenStreetMap

@@ -6,10 +6,7 @@ export type HebergementFormData = Omit<HebergementDoc, "_id" | "_creationTime">
 
 export type TerrainInput = NonNullable<HebergementFormData["terrains"]>[number];
 
-export type Commodites = {
-  eau: boolean;
-  electricite: boolean;
-};
+export type HebergementCommodites = HebergementFormData["commodites"]
 
 export const defaultCampingInput: HebergementFormData = {
   nom: "",
@@ -24,8 +21,6 @@ export const defaultCampingInput: HebergementFormData = {
   },
   terrains: [],
 };
-
-// hebergements.type.ts
 
 const toArray = (val: unknown): string[] => {
   if (Array.isArray(val)) return val;
@@ -48,7 +43,7 @@ const normalizeTerrain = (tr: unknown): TerrainInput => {
 };
 
 export const normalizeHebergement = (camping: HebergementDoc): HebergementFormData => {
-  const { _id, _creationTime, ...rest } = camping;
+  const { ...rest } = camping;
   return {
     ...rest,
     terrains: (rest.terrains ?? []).map(normalizeTerrain),

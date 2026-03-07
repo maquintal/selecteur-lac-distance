@@ -21,7 +21,7 @@ import { ButtonBase } from '@mui/material';
 import ReplyOutlinedIcon from '@mui/icons-material/ReplyOutlined';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import EditIcon from '@mui/icons-material/Edit';
-import { useMutation, useQuery } from 'convex/react';
+import { useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import LacDialog from '../components/LacDialog';
 import StarIcon from '@mui/icons-material/Star';
@@ -36,7 +36,8 @@ import { formatTemps } from '../utils/utils.util';
 import OtherHousesIcon from '@mui/icons-material/OtherHouses';
 import WaterIcon from '@mui/icons-material/Water';
 import DangerousOutlinedIcon from '@mui/icons-material/DangerousOutlined';
-import { LacEnriched } from '../types/lacs.type';
+import { LacEnriched, LacHebergementItem, LacSuperficie } from '../types/lacs.type';
+import { EspeceDoc } from '../types/especes.type';
 
 const LakesSearchCards = ({ data, scenario }: {
   data: LacEnriched[],
@@ -102,12 +103,7 @@ const LakesSearchCards = ({ data, scenario }: {
     );
   };
 
-  // todo devrait etre defini dans le schema convex
-  interface Superficie {
-    hectares: number;
-  }
-
-  const getLakeSizeCategory = (superficie: Superficie | null) => {
+  const getLakeSizeCategory = (superficie: LacSuperficie | null) => {
     if (!superficie || !superficie.hectares) {
       return {
         label: 'Superficie inconnue',
@@ -199,30 +195,7 @@ const LakesSearchCards = ({ data, scenario }: {
     };
   };
 
-  // todo type devrait venir du schema convex
-  const getHebergement = (
-    // acces: Acces | undefined,
-    hebergement: Array<{
-      nom?: string;
-      camping?: string;
-      organisme?: string;
-      commodites?: {
-        eau?: boolean;
-        electricite?: boolean;
-      };
-      coordonnees?: {
-        latitude: number;
-        longitude: number;
-      };
-      distanceDepuisLac?: {
-        kilometrage: number;
-        temps: number;
-      };
-      terrains?: Array<{
-        nom: string;
-        equipementAdmissible?: string[];
-      }>;
-    }> | null) => {
+  const getHebergement = (hebergement: LacHebergementItem[] | null) => {
     if (!Array.isArray(hebergement) || hebergement.length === 0) {
       return <Typography variant="body2" color="text.secondary">—</Typography>;
     }
@@ -242,10 +215,10 @@ const LakesSearchCards = ({ data, scenario }: {
       <Box sx={{ display: 'flex', flexDirection: 'column' }}>
         {sortedHebergement.map((h, index) => {
           // h contient déjà les données du camping enrichies par getLacsSortedOptimized
-          const campingNom = h.nom || h.camping || 'N/A';
+          const campingNom = h.nom || 'N/A';
           const organisme = h.organisme || 'privé';
 
-          const terrainsCount = ((h as any).terrains || []).length;
+          const terrainsCount = (h.terrains || []).length;
 
           return (
             <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -295,11 +268,11 @@ const LakesSearchCards = ({ data, scenario }: {
     window.open(googleMapsUrl, '_blank', 'noopener,noreferrer');
   };
 
-  const handleButtonClick2 = (e: React.MouseEvent, latitude: number, longitude: number) => {
-    e.preventDefault();
-    const googleMapsUrl = `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&accept-language=fr`;
-    window.open(googleMapsUrl, '_blank', 'noopener,noreferrer');
-  };
+  // const handleButtonClick2 = (e: React.MouseEvent, latitude: number, longitude: number) => {
+  //   e.preventDefault();
+  //   const googleMapsUrl = `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&accept-language=fr`;
+  //   window.open(googleMapsUrl, '_blank', 'noopener,noreferrer');
+  // };
 
   const handleFlip = (id: string) => {
     setFlippedCards(prev => ({ ...prev, [id]: !prev[id] }));

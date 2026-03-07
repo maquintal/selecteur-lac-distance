@@ -14,7 +14,6 @@ import {
   InputLabel,
   Button,
   Stack,
-  Chip,
   CircularProgress,
   SelectChangeEvent,
 } from "@mui/material";
@@ -42,8 +41,8 @@ const SearchFilters = () => {
   const [motorisation, setMotorisation] = useState("electrique");
   const [typeEmbarcation, setTypeEmbarcation] = useState("Embarcation Sépaq fournie");
   const [site, setSite] = useState("Mastigouche");
-  const [superficieMin, setSuperficieMin] = useState<number | "">(4);
-  const [superficieMax, setSuperficieMax] = useState<number | "">(30);
+  const [superficieMin, setSuperficieMin] = useState<number | undefined>(4);
+  const [superficieMax, setSuperficieMax] = useState<number | undefined>(30);
   const [accessible, setAccessible] = useState("auto_vus");
   const [scenario, setScenario] = useState("");
 
@@ -54,8 +53,8 @@ const SearchFilters = () => {
     motorisation,
     typeEmbarcation,
     site,
-    superficieMin: superficieMin === "" ? undefined : superficieMin,
-    superficieMax: superficieMax === "" ? undefined : superficieMax,
+    superficieMin: superficieMin, //=== "" ? undefined : superficieMin,
+    superficieMax: superficieMax, // === "" ? undefined : superficieMax,
     accessible,
     scenario,
   });
@@ -74,12 +73,13 @@ const SearchFilters = () => {
     setMotorisation("");
     setTypeEmbarcation("");
     setSite("");
-    setSuperficieMin("");
-    setSuperficieMax("");
+    setSuperficieMin(undefined);
+    setSuperficieMax(undefined);
     setAccessible("");
     setScenario("");
   };
 
+  const resultLabel = `${results?.length} ${results?.length === 1 ? 'résultat' : 'résultats'}`;
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 3, p: 2 }}>
 
@@ -102,10 +102,10 @@ const SearchFilters = () => {
             label="Scénario"
             onChange={(e: SelectChangeEvent) => setScenario(e.target.value)}
           >
-            <MenuItem value="">Tous les scénarios</MenuItem>
-            <MenuItem value="journee">Pêche d'un jour</MenuItem>
-            <MenuItem value="sejour">Séjour de Pêche</MenuItem>
-            <MenuItem value="sejour2">Séjour de Pêche non Sepaq</MenuItem>
+            <MenuItem value="">{"Tous les scénarios"}</MenuItem>
+            <MenuItem value="journee">{"Pêche d'un jour"}</MenuItem>
+            <MenuItem value="sejour">{"Séjour de Pêche"}</MenuItem>
+            <MenuItem value="sejour2">{"Séjour de Pêche non Sepaq"}</MenuItem>
           </Select>
         </FormControl>
 
@@ -129,9 +129,11 @@ const SearchFilters = () => {
         <FormControl size="small" sx={{ width: 220 }}>
           <InputLabel>Superficie minimum</InputLabel>
           <Select
-            value={superficieMin} // todo ajuster le type pour permettre "" ou number
-            label="Superficie min"
-            onChange={(e: SelectChangeEvent) => setSuperficieMin(e.target.value as number | "")}
+            value={superficieMin ?? ""}
+            onChange={(e: SelectChangeEvent<number | "">) => {
+              const val = e.target.value;
+              setSuperficieMin(val === "" ? undefined : Number(val));
+            }}
           >
             <MenuItem value="">Tous les supercifies</MenuItem>
             <MenuItem value={4}>≥ 4 ha</MenuItem>
@@ -145,9 +147,11 @@ const SearchFilters = () => {
         <FormControl size="small" sx={{ width: 220 }}>
           <InputLabel>Superficie maximum</InputLabel>
           <Select
-            value={superficieMax} // todo ajuster le type pour permettre "" ou number
-            label="Superficie max"
-            onChange={(e: SelectChangeEvent) => setSuperficieMax(e.target.value as number | "")}
+            value={superficieMax ?? ""}
+            onChange={(e: SelectChangeEvent<number | "">) => {
+              const val = e.target.value;
+              setSuperficieMin(val === "" ? undefined : Number(val));
+            }}
           >
             <MenuItem value="">Tous les supercifies</MenuItem>
             <MenuItem value={4}>≤ 4 ha</MenuItem>
@@ -187,7 +191,7 @@ const SearchFilters = () => {
         </FormControl>
 
         <FormControl size="small" sx={{ width: 250 }}>
-          <InputLabel>Type d'embarcation</InputLabel>
+          <InputLabel>{"Type d'embarcation"}</InputLabel>
           <Select
             value={typeEmbarcation}
             label="Type d'embarcation"
@@ -212,7 +216,7 @@ const SearchFilters = () => {
             >
               Réinitialiser
             </Button>
-            {results?.length} {results?.length === 1 ? 'résultat' : 'résultats'}
+            {resultLabel}
           </>
 
         )}
@@ -224,7 +228,6 @@ const SearchFilters = () => {
           <CircularProgress />
         </Box>
       ) : (
-        // todo ajuster le type des données passées à LakesSearchCards
         <LakesSearchCards data={results} scenario={scenario} />
       )}
 

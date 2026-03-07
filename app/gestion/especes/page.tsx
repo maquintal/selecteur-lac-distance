@@ -11,11 +11,11 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
-import { EspeceDoc } from '@/app/types/schema.types';
 import GestionNavBar from '@/app/components/GestionNavBar';
 import EspeceDialog from '@/app/components/EspeceDialog';
 import { useMobileDetect } from '@/app/hooks/useMobileDetect';
 import { isReadOnlyConvex } from '@/convex/checkReadOnlyMode';
+import { EspeceDoc } from '@/app/types/especes.type';
 
 export default function GestionEspeces() {
   const [openDialog, setOpenDialog] = useState(false);

@@ -27,7 +27,7 @@ export default function EspeceDialog({ open, onClose, espece, mode }: EspeceDial
     if (open) {
       if (espece) {
         // Extraire seulement les champs de EspeceFormData
-        const { _id, _creationTime, ...especeData } = espece;
+        const { ...especeData } = espece;
         setFormData(especeData);
       } else {
         setFormData(defaultEspeceInput);

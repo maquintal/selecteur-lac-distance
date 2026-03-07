@@ -1,6 +1,4 @@
-import { Doc, Id } from "../../convex/_generated/dataModel";
-
-// export type { Doc } from "../../convex/_generated/dataModel";
+import { Doc } from "../../convex/_generated/dataModel";
 
 import { ESPECES_CATEGORIES } from "@/convex/schemas/especes.schema";
 

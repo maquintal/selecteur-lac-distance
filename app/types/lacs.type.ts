@@ -12,19 +12,25 @@ export type LacHebergementFormData = {
   distanceDepuisAcceuil?: { temps: number; kilometrage: number };
 };
 
+export type LacHebergementItem = Partial<Omit<HebergementDoc, "_id" | "nom">> & {
+  _id?: Id<"campings">;
+  campingId?: Id<"campings">;
+  nom?: string,
+  distanceDepuisLac?: LacDistance;
+  distanceDepuisAcceuil?: LacDistance;
+};
+
 export type LacDistance = { temps: number; kilometrage: number };
 
 export type LacEmbarcation = LacFormData["embarcation"];
 export type LacMotorisation = LacFormData["embarcation"]["motorisation"];
 export type LacAcces = LacFormData["acces"];
+export type LacSuperficie = LacFormData["superficie"];
 
 export interface LacEnriched extends Omit<LacDoc, "hebergements"> {
   especes: EspeceDoc[];
-  hebergements: (HebergementDoc & {
-    campingId: Id<"campings">;
-    distanceDepuisLac?: LacDistance;
-    distanceDepuisAcceuil?: LacDistance;
-  })[];
+  hebergements: LacHebergementItem[];
+  hebergementsNonSepaq: LacHebergementItem[];
 }
 
 export const defaultLacInput: LacFormData = {
