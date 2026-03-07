@@ -1,9 +1,9 @@
-import { Doc, Id } from "../../convex/_generated/dataModel";
-import { EspeceDoc } from "./especes.type";
-import { HebergementDoc } from "./hebergements.type";
+// import { Doc, Id } from "../../convex/_generated/dataModel";
+// import { EspeceDoc } from "./especes.type";
+// import { HebergementDoc } from "./hebergements.type";
 
 // Types enrichis avec les champs Convex (_id, _creationTime)
-export type { Doc } from "../../convex/_generated/dataModel";
+// export type { Doc } from "../../convex/_generated/dataModel";
 // export type LacDoc = Doc<"lacs">;
 // export type CampingDoc = Doc<"campings">;
 

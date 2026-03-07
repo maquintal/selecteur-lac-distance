@@ -1,15 +1,12 @@
-import React, { useMemo, useState } from 'react';
-import { LacWithDetails, EspeceDoc } from '../types/schema.types';
+import React, { useState } from 'react';
 import { Id } from "../../convex/_generated/dataModel";
 import {
   Box,
-  TextField,
   Card,
   CardContent,
   CardHeader,
   Typography,
   Chip,
-  CircularProgress,
   Tooltip,
   CardActions,
   IconButton,
@@ -33,22 +30,25 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import WaterDropOutlinedIcon from '@mui/icons-material/WaterDropOutlined';
 import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
 import DoNotDisturbAltOutlinedIcon from '@mui/icons-material/DoNotDisturbAltOutlined';
-import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
 import ShuffleIcon from '@mui/icons-material/Shuffle';
 import { useMobileDetect } from '../hooks/useMobileDetect';
 import { formatTemps } from '../utils/utils.util';
 import OtherHousesIcon from '@mui/icons-material/OtherHouses';
 import WaterIcon from '@mui/icons-material/Water';
 import DangerousOutlinedIcon from '@mui/icons-material/DangerousOutlined';
+import { LacEnriched } from '../types/lacs.type';
 
-const LakesSearchCards = ({ data, scenario }: { data: LacWithDetails[] }) => {
+const LakesSearchCards = ({ data, scenario }: {
+  data: LacEnriched[],
+  scenario: string
+}) => {
 
   const [flippedCards, setFlippedCards] = useState<{ [key: string]: boolean }>({});
   const [highlightedLacId, setHighlightedLacId] = useState<string | null>(null);
 
   // État pour le dialog d'édition
   const [openDialog, setOpenDialog] = useState(false);
-  const [selectedLac, setSelectedLac] = useState<LacWithDetails | undefined>(undefined);
+  const [selectedLac, setSelectedLac] = useState<LacEnriched | undefined>(undefined);
 
   const { isMobile } = useMobileDetect();
 
@@ -64,7 +64,7 @@ const LakesSearchCards = ({ data, scenario }: { data: LacWithDetails[] }) => {
   };
 
   // Fonction pour ouvrir le dialog d'édition
-  const handleOpenEditDialog = (lac: LacWithDetails) => {
+  const handleOpenEditDialog = (lac: LacEnriched) => {
     setSelectedLac(lac);
     setOpenDialog(true);
   };
@@ -75,16 +75,16 @@ const LakesSearchCards = ({ data, scenario }: { data: LacWithDetails[] }) => {
   };
 
   // Helper getters
-  const getLatitude = (l: LacWithDetails) => l.coordonnees.latitude ?? null;
-  const getLongitude = (l: LacWithDetails) => l.coordonnees.longitude ?? null;
-  const getEspeces = (l: LacWithDetails) => l.especes ?? [];
-  const getSuperficieText = (l: LacWithDetails) => {
+  const getLatitude = (l: LacEnriched) => l.coordonnees.latitude ?? null;
+  const getLongitude = (l: LacEnriched) => l.coordonnees.longitude ?? null;
+  const getEspeces = (l: LacEnriched) => l.especes ?? [];
+  const getSuperficieText = (l: LacEnriched) => {
     const s = l.superficie;
     if (!s) return null;
     return `${s.hectares} ha`;
   };
 
-  const getMotorisationChip = (l: LacWithDetails) => {
+  const getMotorisationChip = (l: LacEnriched) => {
     const m = l.embarcation?.motorisation ?? null;
     if (!m) return <Chip label="—" size="small" />;
 
