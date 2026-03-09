@@ -27,17 +27,15 @@ import LacDialog from '../components/LacDialog';
 import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import WaterDropOutlinedIcon from '@mui/icons-material/WaterDropOutlined';
-import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
-import DoNotDisturbAltOutlinedIcon from '@mui/icons-material/DoNotDisturbAltOutlined';
 import ShuffleIcon from '@mui/icons-material/Shuffle';
 import { useMobileDetect } from '../hooks/useMobileDetect';
 import { formatTemps } from '../utils/utils.util';
 import OtherHousesIcon from '@mui/icons-material/OtherHouses';
 import WaterIcon from '@mui/icons-material/Water';
-import DangerousOutlinedIcon from '@mui/icons-material/DangerousOutlined';
-import { LacEnriched, LacHebergementItem, LacSuperficie } from '../types/lacs.type';
+import { LacEnriched, LacHebergementItem } from '../types/lacs.type';
 import { EspeceDoc } from '../types/especes.type';
+import { assessISO12217NavigationSafety, getDangerLabel } from './NavigationSafetyAssessment';
+import NavigationSafetyLegend from './NavigationSafetyLegend';
 
 const LakesSearchCards = ({ data, scenario }: {
   data: LacEnriched[],
@@ -101,98 +99,6 @@ const LakesSearchCards = ({ data, scenario }: {
           </Tooltip>
         </>
     );
-  };
-
-  const getLakeSizeCategory = (superficie: LacSuperficie | null) => {
-    if (!superficie || !superficie.hectares) {
-      return {
-        label: 'Superficie inconnue',
-        level: 0,
-        icon: null,
-        recommendation: 'Données manquantes'
-      };
-    }
-
-    const superficieHa = superficie.hectares;
-
-    // 1️⃣ Micro-lac
-    if (superficieHa < 3) return {
-      label: 'Micro-lac',
-      level: 1,
-      icon: (
-        <WaterDropOutlinedIcon sx={{ fontSize: 18, color: 'success.main' }} />
-      ),
-      recommendation: 'Parfait pour exploration tranquille'
-    };
-
-    // 2️⃣ Petit lac
-    if (superficieHa < 15) return {
-      label: 'Petit lac',
-      level: 2,
-      icon: (
-        <>
-          <WaterDropOutlinedIcon sx={{ fontSize: 18, color: 'success.main' }} />
-          <WaterDropOutlinedIcon sx={{ fontSize: 22, color: 'success.main' }} />
-        </>
-      ),
-      recommendation: 'Très bon pour pêche et navigation'
-    };
-
-    // 3️⃣ Lac modeste (seuil critique < 30 ha)
-    if (superficieHa < 30) return {
-      label: 'Lac modeste',
-      level: 3,
-      icon: (
-        <>
-          <WaterDropOutlinedIcon sx={{ fontSize: 22, color: 'success.main' }} />
-          <WaterDropOutlinedIcon sx={{ fontSize: 26, color: 'success.main' }} />
-        </>
-      ),
-      recommendation: 'Adapté à un moteur électrique modeste (conditions normales)'
-    };
-
-    // 4️⃣ Lac ouvert
-    if (superficieHa < 60) return {
-      label: 'Lac ouvert',
-      level: 4,
-      icon: (
-        <WarningAmberOutlinedIcon sx={{ fontSize: 22, color: 'warning.main' }} />
-      ),
-      recommendation: 'Prudence recommandée — vent et retour à anticiper'
-    };
-
-    // 5️⃣ Lac exposé
-    if (superficieHa < 100) return {
-      label: 'Lac exposé',
-      level: 5,
-      icon: (
-        <>
-          <WarningAmberOutlinedIcon sx={{ fontSize: 22, color: 'warning.main' }} />
-          <WarningAmberOutlinedIcon sx={{ fontSize: 26, color: 'warning.main' }} />
-        </>
-      ),
-      recommendation: 'Limite atteinte — moteur électrique sous-dimensionné'
-    };
-
-    // 6️⃣ Grand lac
-    if (superficieHa < 300) return {
-      label: 'Grand lac',
-      level: 6,
-      icon: (
-        <DoNotDisturbAltOutlinedIcon sx={{ fontSize: 26, color: 'error.main' }} />
-      ),
-      recommendation: 'À éviter — marge de sécurité insuffisante'
-    };
-
-    // 7️⃣ Très grand lac / réservoir
-    return {
-      label: 'Très grand lac / réservoir',
-      level: 7,
-      icon: (
-        <DangerousOutlinedIcon sx={{ fontSize: 28, color: 'error.main' }} />
-      ),
-      recommendation: 'Dangereux — ne pas naviguer avec petit moteur électrique'
-    };
   };
 
   const getHebergement = (hebergement: LacHebergementItem[] | null) => {
@@ -328,7 +234,7 @@ const LakesSearchCards = ({ data, scenario }: {
           )}
 
           {data.map((l) => {
-            const { icon } = getLakeSizeCategory(l.superficie || null);
+            const { icon, recommendation, isoNote, isoCategory, waveHeightM, level, waveScenarios } = assessISO12217NavigationSafety(l.superficie || null);
 
             const cardHeader = (
               <CardHeader
@@ -399,7 +305,7 @@ const LakesSearchCards = ({ data, scenario }: {
 
             const iconSx = { fontSize: '0.85rem', verticalAlign: 'middle' };
 
-            return (
+            return (<>
               <Box
                 key={l._id}
                 id={`lac-card-${l._id}`}
@@ -463,12 +369,41 @@ const LakesSearchCards = ({ data, scenario }: {
                         </Box>
 
                         <Box sx={{ width: isMobile ? 90 : 140, textAlign: 'right' }}>
-                          <Box mt={0.6}>
+                          {/* <Box mt={0.6}>
                             <Typography variant="caption" color="textSecondary" sx={{ fontSize: '0.68rem' }}>
                               Superficie
                             </Typography>
                             <Typography variant="body2" sx={{ fontSize: '0.78rem' }}>{getSuperficieText(l) ?? '—'}</Typography>
                             {icon}
+                          </Box> */}
+                          <Box mt={0.6}>
+                            <Typography variant="caption" color="textSecondary" sx={{ fontSize: '0.68rem' }}>
+                              Superficie
+                            </Typography>
+                            <Typography variant="body2" sx={{ fontSize: '0.78rem' }}>
+                              {getSuperficieText(l) ?? '—'}
+                            </Typography>
+
+                            {/* ISO 12217 */}
+                            {/* Tooltip 1 — sur l'icône : recommendation + isoNote */}
+                            <Tooltip title={`${recommendation} — ${isoNote}`}>
+                              <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'help' }}>
+                                {icon} - {`ISO Cat. ${isoCategory}`}
+                              </Box>
+                            </Tooltip>
+
+                            {/* Tooltip 2 — sur le label : légende complète */}
+                            <Tooltip title={<NavigationSafetyLegend waveHeightM={waveHeightM} isoCategory={isoCategory} waveScenarios={waveScenarios} />}>
+                              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem', cursor: 'help' }}>
+                                {getDangerLabel(level)} — Hs {waveHeightM.toFixed(2)} m
+                              </Typography>
+                            </Tooltip>
+
+                            {waveHeightM > 0 && (
+                              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.62rem', display: 'block' }}>
+                                Hs ~{waveHeightM} m à B4
+                              </Typography>
+                            )}
                           </Box>
                           <Typography variant="caption" color="textSecondary" sx={{ fontSize: '0.68rem' }}>
                             Motorisation
@@ -544,7 +479,7 @@ const LakesSearchCards = ({ data, scenario }: {
                   </Card>
                 </ReactCardFlip>
               </Box>
-            )
+            </>)
           })}
         </Box>
       </Box>

@@ -73,17 +73,6 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
     'Roulotte de moins de 8 mètres (25 pieds)'
   ];
 
-  // type TerrainInput = {
-  //   nom: string;
-  //   equipementAdmissible?: string[];
-  //   services?: string[];
-  //   capaciteMaximale?: string;
-  //   acces?: string[];
-  //   selections?: string[];
-  //   description?: string[];
-  //   important?: string[];
-  // };
-
   // Mutations Convex
   const createCamping = useMutation(api.heberements.createCamping);
   const updateCamping = useMutation(api.heberements.updateCamping);

@@ -16,24 +16,47 @@ import {
   Stack,
   CircularProgress,
   SelectChangeEvent,
+  Typography,
 } from "@mui/material";
 import FilterListOffIcon from "@mui/icons-material/FilterListOff";
 import LakesSearchCards from "./LakesSearchCards";
-import { ENUMS_LACS_SITE } from "@/convex/schemas/lacs.schema";
+import {
+  ENUMS_LACS_EMBARCATION,
+  ENUMS_LACS_SITE,
+  ENUMS_LACS_EMBARCATION_MOTORISATION_NECESSAIRE,
+  ENUMS_LACS_ACCESSIBLE
+} from "@/convex/schemas/lacs.schema";
+import { ISOCategory } from "./NavigationSafetyAssessment";
 
-const MOTORISATION_OPTIONS = [ // todoces valeurs devraient venir de la definition du schema convex
-  { label: "Toutes motorisations", value: "" },
-  { label: "Électrique seulement", value: "electrique" },
-  { label: "Essence seulement", value: "essence" },
-  { label: "Aucune motorisation", value: "aucune" },
+const ENUMS_SCENARIOS = [
+  { label: "Tous les scénarios", value: "" },
+  { label: "Pêche d'un jour", value: "journee" },
+  { label: "Séjour de Pêche", value: "sejour" },
+  { label: "Séjour de Pêche non Sepaq", value: "sejour2" },
+]
+
+// Source unique des seuils ISO 12217
+const SUPERFICIE_THRESHOLDS: { value: number; isoCategory: ISOCategory }[] = [
+  { value: 3, isoCategory: 'D' }, // Micro-lac
+  { value: 15, isoCategory: 'D' }, // Petit lac
+  { value: 40, isoCategory: 'D' }, // Lac modeste
+  { value: 80, isoCategory: 'D' }, // Lac ouvert ⚠️
+  { value: 200, isoCategory: 'C+' }, // Lac exposé 🔴
+  { value: 500, isoCategory: 'C' }, // Grand lac 🚫
 ];
 
-const TYPE_EMBARCATION_OPTIONS = [ // todo ces valeurs devraient venir de la definition du schema convex
-  { label: "Tous les types", value: "" },
-  { label: "Embarcation Sépaq fournie", value: "Embarcation Sépaq fournie" },
-  { label: "Embarcation personnelle", value: "Embarcation personnelle" },
-  { label: "Location", value: "Location" },
-];
+// Dérivés — seul l'opérateur change
+const SUPERFICIE_MIN_OPTIONS = SUPERFICIE_THRESHOLDS.map(({ value, isoCategory }) => ({
+  value,
+  isoCategory,
+  label: `≥ ${value} ha`,
+}));
+
+const SUPERFICIE_MAX_OPTIONS = SUPERFICIE_THRESHOLDS.map(({ value, isoCategory }) => ({
+  value,
+  isoCategory,
+  label: `≤ ${value} ha`,
+}));
 
 const SearchFilters = () => {
   const [nomLac, setNomLac] = useState("");
@@ -42,7 +65,7 @@ const SearchFilters = () => {
   const [typeEmbarcation, setTypeEmbarcation] = useState("Embarcation Sépaq fournie");
   const [site, setSite] = useState("Mastigouche");
   const [superficieMin, setSuperficieMin] = useState<number | undefined>(4);
-  const [superficieMax, setSuperficieMax] = useState<number | undefined>(30);
+  const [superficieMax, setSuperficieMax] = useState<number | undefined>(40);
   const [accessible, setAccessible] = useState("auto_vus");
   const [scenario, setScenario] = useState("");
 
@@ -53,8 +76,8 @@ const SearchFilters = () => {
     motorisation,
     typeEmbarcation,
     site,
-    superficieMin: superficieMin, //=== "" ? undefined : superficieMin,
-    superficieMax: superficieMax, // === "" ? undefined : superficieMax,
+    superficieMin: superficieMin,
+    superficieMax: superficieMax,
     accessible,
     scenario,
   });
@@ -102,10 +125,9 @@ const SearchFilters = () => {
             label="Scénario"
             onChange={(e: SelectChangeEvent) => setScenario(e.target.value)}
           >
-            <MenuItem value="">{"Tous les scénarios"}</MenuItem>
-            <MenuItem value="journee">{"Pêche d'un jour"}</MenuItem>
-            <MenuItem value="sejour">{"Séjour de Pêche"}</MenuItem>
-            <MenuItem value="sejour2">{"Séjour de Pêche non Sepaq"}</MenuItem>
+            {ENUMS_SCENARIOS.map((item) => {
+              return <MenuItem value={item.value}>{item.label}</MenuItem>
+            })}
           </Select>
         </FormControl>
 
@@ -135,12 +157,15 @@ const SearchFilters = () => {
               setSuperficieMin(val === "" ? undefined : Number(val));
             }}
           >
-            <MenuItem value="">Tous les supercifies</MenuItem>
-            <MenuItem value={4}>≥ 4 ha</MenuItem>
-            <MenuItem value={10}>≥ 10 ha</MenuItem>
-            <MenuItem value={30}>≥ 30 ha</MenuItem>
-            <MenuItem value={50}>≥ 50 ha</MenuItem>
-            <MenuItem value={100}>≥ 100 ha</MenuItem>
+            <MenuItem value="">Toutes les superficies</MenuItem>
+            {SUPERFICIE_MIN_OPTIONS.map(({ value, label, isoCategory }) => (
+              <MenuItem key={value} value={value}>
+                {label}
+                <Typography variant="caption" sx={{ ml: 1, color: 'text.secondary' }}>
+                  ISO Cat. {isoCategory}
+                </Typography>
+              </MenuItem>
+            ))}
           </Select>
         </FormControl>
 
@@ -150,15 +175,18 @@ const SearchFilters = () => {
             value={superficieMax ?? ""}
             onChange={(e: SelectChangeEvent<number | "">) => {
               const val = e.target.value;
-              setSuperficieMin(val === "" ? undefined : Number(val));
+              setSuperficieMax(val === "" ? undefined : Number(val)); // ← bug corrigé : setSuperficieMax
             }}
           >
-            <MenuItem value="">Tous les supercifies</MenuItem>
-            <MenuItem value={4}>≤ 4 ha</MenuItem>
-            <MenuItem value={10}>≤ 10 ha</MenuItem>
-            <MenuItem value={30}>≤ 30 ha</MenuItem>
-            <MenuItem value={50}>≤ 50 ha</MenuItem>
-            <MenuItem value={100}>≤ 100 ha</MenuItem>
+            <MenuItem value="">Toutes les superficies</MenuItem>
+            {SUPERFICIE_MAX_OPTIONS.map(({ value, label, isoCategory }) => (
+              <MenuItem key={value} value={value}>
+                {label}
+                <Typography variant="caption" sx={{ ml: 1, color: 'text.secondary' }}>
+                  ISO Cat. {isoCategory}
+                </Typography>
+              </MenuItem>
+            ))}
           </Select>
         </FormControl>
 
@@ -169,11 +197,10 @@ const SearchFilters = () => {
             label="Motorisation"
             onChange={(e: SelectChangeEvent) => setMotorisation(e.target.value)}
           >
-            {MOTORISATION_OPTIONS.map((opt) => (
-              <MenuItem key={opt.value} value={opt.value}>
-                {opt.label}
-              </MenuItem>
-            ))}
+            <MenuItem value="">{"Tous"}</MenuItem>
+            {ENUMS_LACS_EMBARCATION_MOTORISATION_NECESSAIRE.map((item) => {
+              return <MenuItem key={item} value={item}>{item}</MenuItem>
+            })}
           </Select>
         </FormControl>
 
@@ -185,8 +212,9 @@ const SearchFilters = () => {
             onChange={(e: SelectChangeEvent) => setAccessible(e.target.value)}
           >
             <MenuItem value="">Tous</MenuItem>
-            <MenuItem value="auto_vus">Auto / VUS</MenuItem>
-            <MenuItem value="camion 4x4">Camion 4x4</MenuItem>
+            {ENUMS_LACS_ACCESSIBLE.map((item) => {
+              return <MenuItem key={item} value={item} >{item}</MenuItem>
+            })}
           </Select>
         </FormControl>
 
@@ -197,11 +225,10 @@ const SearchFilters = () => {
             label="Type d'embarcation"
             onChange={(e: SelectChangeEvent) => setTypeEmbarcation(e.target.value)}
           >
-            {TYPE_EMBARCATION_OPTIONS.map((opt) => (
-              <MenuItem key={opt.value} value={opt.value}>
-                {opt.label}
-              </MenuItem>
-            ))}
+            <MenuItem value="">{"Tous"}</MenuItem>
+            {ENUMS_LACS_EMBARCATION.map((item) => {
+              return <MenuItem key={item} value={item}>{item}</MenuItem>
+            })}
           </Select>
         </FormControl>
 

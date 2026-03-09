@@ -415,21 +415,6 @@ export const removeCampingFromLac = mutation({
   },
 });
 
-// // Ajouter un nouveau lac
-// export const addLac = mutation({
-//   args: lacsSchema,
-//   handler: async (ctx, args) => {
-//     checkReadOnlyModeConvex()
-
-//     return await ctx.db.insert("lacs", {
-//       ...args,
-//       especeIds: args.especeIds || [],
-//       hebergements: args.hebergements || [],
-//       createdAt: Date.now(),
-//     });
-//   },
-// });
-
 export const addLac = mutation({
   args: lacsSchema,
   handler: async (ctx, args) => {
@@ -440,26 +425,6 @@ export const addLac = mutation({
     });
   },
 });
-
-// export const updateLac = mutation({
-//   args: {
-//     lacId: v.id("lacs"),
-//     ...lacsSchema
-//   },
-//   handler: async (ctx, args) => {
-//     checkReadOnlyModeConvex()
-//     const { lacId, ...updateData } = args;
-
-//     await ctx.db.patch(lacId, {
-//       ...updateData,
-//       updatedAt: Date.now(),
-//     });
-
-//     return lacId;
-//   },
-// });
-
-// Ajouter un camping à un lac
 
 export const updateLac = mutation({
   args: {
