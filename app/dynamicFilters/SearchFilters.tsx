@@ -126,7 +126,7 @@ const SearchFilters = () => {
             onChange={(e: SelectChangeEvent) => setScenario(e.target.value)}
           >
             {ENUMS_SCENARIOS.map((item) => {
-              return <MenuItem value={item.value}>{item.label}</MenuItem>
+              return <MenuItem key={item.value} value={item.value}>{item.label}</MenuItem>
             })}
           </Select>
         </FormControl>

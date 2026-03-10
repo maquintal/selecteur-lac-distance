@@ -37,6 +37,15 @@ import { EspeceDoc } from '../types/especes.type';
 import { assessISO12217NavigationSafety, getDangerLabel } from './NavigationSafetyAssessment';
 import NavigationSafetyLegend from './NavigationSafetyLegend';
 
+  const TOOLTIP_SX = {
+    bgcolor: 'background.paper',
+    color: 'text.primary',
+    boxShadow: 3,
+    border: '1px solid',
+    borderColor: 'grey.200',
+    p: 0,
+  };
+
 const LakesSearchCards = ({ data, scenario }: {
   data: LacEnriched[],
   scenario: string
@@ -305,7 +314,7 @@ const LakesSearchCards = ({ data, scenario }: {
 
             const iconSx = { fontSize: '0.85rem', verticalAlign: 'middle' };
 
-            return (<>
+            return (
               <Box
                 key={l._id}
                 id={`lac-card-${l._id}`}
@@ -386,24 +395,47 @@ const LakesSearchCards = ({ data, scenario }: {
 
                             {/* ISO 12217 */}
                             {/* Tooltip 1 — sur l'icône : recommendation + isoNote */}
-                            <Tooltip title={`${recommendation} — ${isoNote}`}>
+                            {/* <Tooltip title={`${recommendation} — ${isoNote}`}>
                               <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'help' }}>
                                 {icon} - {`ISO Cat. ${isoCategory}`}
                               </Box>
                             </Tooltip>
 
-                            {/* Tooltip 2 — sur le label : légende complète */}
+                            {/* Tooltip 2 — sur le label : légende complète /}
                             <Tooltip title={<NavigationSafetyLegend waveHeightM={waveHeightM} isoCategory={isoCategory} waveScenarios={waveScenarios} />}>
+                              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem', cursor: 'help' }}>
+                                {getDangerLabel(level)} — Hs {waveHeightM.toFixed(2)} m
+                              </Typography>
+                            </Tooltip> */}
+
+                            {/* Tooltip 1 — icône */}
+                            <Tooltip
+                              title={`${recommendation} — ${isoNote}`}
+                              componentsProps={{ tooltip: { sx: TOOLTIP_SX } }}
+                            >
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, cursor: 'help' }}>
+                                {icon}
+                                <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem' }}>
+                                  ISO Cat. {isoCategory}
+                                </Typography>
+                              </Box>
+                            </Tooltip>
+
+                            {/* Tooltip 2 — légende complète */}
+                            <Tooltip
+                              title={<NavigationSafetyLegend waveHeightM={waveHeightM} waveScenarios={waveScenarios} />}
+                              componentsProps={{ tooltip: { sx: TOOLTIP_SX } }}
+                            >
                               <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem', cursor: 'help' }}>
                                 {getDangerLabel(level)} — Hs {waveHeightM.toFixed(2)} m
                               </Typography>
                             </Tooltip>
 
-                            {waveHeightM > 0 && (
+                            {/* waveHeightM > 0 && (
                               <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.62rem', display: 'block' }}>
                                 Hs ~{waveHeightM} m à B4
                               </Typography>
-                            )}
+                            ) */}
                           </Box>
                           <Typography variant="caption" color="textSecondary" sx={{ fontSize: '0.68rem' }}>
                             Motorisation
@@ -479,7 +511,7 @@ const LakesSearchCards = ({ data, scenario }: {
                   </Card>
                 </ReactCardFlip>
               </Box>
-            </>)
+            )
           })}
         </Box>
       </Box>

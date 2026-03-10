@@ -1,21 +1,15 @@
 import { Box, Typography, Divider } from '@mui/material';
-import { WAVE_SCALE, ISO_CATEGORY_SCALE } from './NavigationSafetyAssessment';
-import { ISOCategory } from './NavigationSafetyAssessment';
+import { WAVE_SCALE, WaveScenario } from './NavigationSafetyAssessment';
+
+type NavigationSafetyLegendProps = {
+  waveHeightM: number;
+  waveScenarios: WaveScenario[];
+};
 
 const NavigationSafetyLegend = ({
   waveHeightM,
-  isoCategory,
   waveScenarios,
-}: {
-  waveHeightM: number;
-  isoCategory: ISOCategory;
-  waveScenarios: {
-    label: string;
-    beaufort: number;
-    waveHeightM: number;
-    description: string;
-  }[]
-}) => {
+}: NavigationSafetyLegendProps) => {
   return (
     <Box sx={{ px: 0.6, pb: 0.6, pt: 0.5, borderTop: '1px solid', borderColor: 'grey.200' }}>
 
@@ -72,21 +66,21 @@ const NavigationSafetyLegend = ({
       <Typography variant="caption" sx={{ fontSize: '0.62rem', fontWeight: 600, color: 'text.secondary', display: 'block', mb: 0.25 }}>
         Vagues estimées selon conditions
       </Typography>
-      {waveScenarios.map(({ label, beaufort, waveHeightM: hs, description }) => {
+      {waveScenarios.map(({ label, beaufort, windKmh, freqSaison, waveHeightM: hs, description }) => {
         const isReference = beaufort === 5;
         return (
-          <Box key={label} sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-            <Typography variant="caption" sx={{ fontSize: '0.60rem', minWidth: 55, fontWeight: isReference ? 700 : 400 }}>
-              B{beaufort} — {hs.toFixed(2)} m
-            </Typography>
-            <Typography variant="caption" sx={{ fontSize: '0.60rem', color: 'text.secondary', fontWeight: isReference ? 700 : 400 }}>
-              {description}
-            </Typography>
-            {isReference && (
-              <Typography variant="caption" sx={{ fontSize: '0.58rem', color: 'warning.main', fontWeight: 700 }}>
-                ← réf.
+          <Box key={label} sx={{ display: 'flex', flexDirection: 'column', mb: 0.5, opacity: isReference ? 1 : 0.75 }}>
+            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+              <Typography variant="caption" sx={{ fontSize: '0.62rem', fontWeight: 700, minWidth: 55 }}>
+                B{beaufort} — {hs.toFixed(2)} m
               </Typography>
-            )}
+              <Typography variant="caption" sx={{ fontSize: '0.60rem', color: isReference ? 'warning.main' : 'text.secondary', fontWeight: isReference ? 700 : 400 }}>
+                {description} {isReference && '← réf.'}
+              </Typography>
+            </Box>
+            <Typography variant="caption" sx={{ fontSize: '0.58rem', color: 'text.disabled' }}>
+              {windKmh} • {freqSaison} en saison de pêche
+            </Typography>
           </Box>
         );
       })}

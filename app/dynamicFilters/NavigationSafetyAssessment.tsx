@@ -21,26 +21,29 @@ import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
 import DoNotDisturbAltOutlinedIcon from '@mui/icons-material/DoNotDisturbAltOutlined';
 import DangerousOutlinedIcon from '@mui/icons-material/DangerousOutlined';
 
-// Types
 export type ISOCategory = 'D' | 'C+' | 'C' | 'B' | 'A';
 
-interface LakeISOAssessment {
+export type WaveScenario = {
+  label: string;
+  beaufort: number;
+  windMs: number;
+  windKmh: string;
+  freqSaison: string;
+  waveHeightM: number;
+  description: string;
+};
+
+export interface LakeISOAssessment {
   label: string;
   level: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
   isoCategory: ISOCategory;
   beaufort: number;
   fetchKm: number;
-  // waveHeightM: number;
   icon: React.ReactNode;
   recommendation: string;
   isoNote: string;
   waveHeightM: number;        // B5 — référence sécurité
-  waveScenarios: {            // les trois scénarios pour la légende
-    label: string;
-    beaufort: number;
-    waveHeightM: number;
-    description: string;
-  }[];
+  waveScenarios: WaveScenario[];
 }
 
 const estimateFetchKm = (hectares: number): number => {
@@ -84,9 +87,30 @@ export const estimateWaveHeightForScenario = (fetchKm: number, windMs: number): 
 };
 
 export const WIND_SCENARIOS = [
-  { label: 'Calme', beaufort: 2, windMs: 3, description: 'Matin typique — départ habituel' },
-  { label: 'Modéré', beaufort: 4, windMs: 7, description: 'Après-midi ordinaire au Québec' },
-  { label: 'Soutenu', beaufort: 5, windMs: 10, description: 'Scénario prudent — retour difficile' },
+  {
+    label: 'Calme',
+    beaufort: 2,
+    windMs: 3,
+    windKmh: '12–19 km/h',
+    freqSaison: '~30% des jours',  // mai–octobre Québec
+    description: 'Matin typique — départ habituel',
+  },
+  {
+    label: 'Modéré',
+    beaufort: 4,
+    windMs: 7,
+    windKmh: '20–28 km/h',
+    freqSaison: '~40% des jours',
+    description: 'Après-midi ordinaire au Québec',
+  },
+  {
+    label: 'Soutenu',
+    beaufort: 5,
+    windMs: 10,
+    windKmh: '29–38 km/h',
+    freqSaison: '~20% des jours',
+    description: 'Scénario prudent — retour difficile',
+  },
 ];
 
 // export const WAVE_SCALE = [
