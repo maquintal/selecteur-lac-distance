@@ -215,7 +215,6 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
             fullWidth
             label="Nom du lac"
             value={formData.nomDuLac}
-            // onChange={(e) => handleInputChange('nomDuLac', e.target.value)}
             onChange={(e) => setField('nomDuLac', e.target.value)}
             disabled={isReadOnlyConvex()}
           />
@@ -225,7 +224,6 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
               fullWidth
               options={ENUMS_REGION_ADMINISTRATIVE}
               value={formData.regionAdministrativeQuebec ?? null}
-              // onChange={(_, newValue) => handleInputChange('regionAdministrativeQuebec', newValue || '')}
               onChange={(_, val) => setField('regionAdministrativeQuebec', val)}
               disabled={isReadOnlyConvex()}
               renderInput={(params) => (
@@ -238,7 +236,6 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
               fullWidth
               options={ENUMS_LACS_SITE}
               value={formData.site ?? null}
-              // onChange={(_, newValue) => handleInputChange('site', newValue || '')}
               onChange={(_, val) => setField('site', val)}
               disabled={isReadOnlyConvex()}
               renderInput={(params) => (
@@ -255,7 +252,6 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
                 type="number"
                 label="Latitude"
                 value={formData.coordonnees.latitude || ''}
-                // onChange={(e) => handleCoordChange('latitude', e.target.value)}
                 onChange={(e) => setCoord('latitude', parseFloat(e.target.value) || 0)}
                 disabled={isReadOnlyConvex()}
               />
@@ -263,7 +259,6 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
                 type="number"
                 label="Longitude"
                 value={formData.coordonnees.longitude || ''}
-                // onChange={(e) => handleCoordChange('longitude', e.target.value)}
                 onChange={(e) => setCoord('longitude', parseFloat(e.target.value) || 0)}
                 disabled={isReadOnlyConvex()}
               />
@@ -289,7 +284,6 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
               type="number"
               label="Zone"
               value={formData.zone || ''}
-              // onChange={(e) => handleInputChange('zone', e.target.value ? parseInt(e.target.value) : 0)}
               onChange={(e) => setField('zone', parseInt(e.target.value) || 0)}
             />
             <TextField
@@ -297,7 +291,6 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
               type="number"
               label="Superficie (hectares)"
               value={formData.superficie?.hectares || ''}
-              // onChange={(e) => handleInputChange('superficie', e.target.value)}
               onChange={(e) => setSuperficie(parseFloat(e.target.value) || 0)}
             />
           </Box>
@@ -308,14 +301,12 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
               fullWidth
               label="Portage"
               value={formData.acces.portage}
-              // onChange={(e) => handleInputChange('acces', { portage: e.target.value })}
               onChange={(e) => setAcces({ portage: e.target.value })}
             />
             <TextField
               fullWidth
               label="Accueil"
               value={formData.acces.acceuil}
-              // onChange={(e) => handleInputChange('acces', { acceuil: e.target.value })}
               onChange={(e) => setAcces({ acceuil: e.target.value })}
             />
             <TextField
@@ -323,7 +314,6 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
               label="Distance d'accueil au lac (m)"
               type="number"
               value={formData.acces.distanceAcceuilLac.kilometrage || 0}
-              // onChange={(e) => handleInputChange('acces', { distanceAcceuilLac: { kilometrage: e.target.value ? parseInt(e.target.value) : 0, temps: formData.acces.distanceAcceuilLac.temps } })}
               onChange={(e) => setDistanceAcceuilLac({ kilometrage: parseInt(e.target.value) || 0 })}
             />
             <TextField
@@ -331,18 +321,12 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
               label="Temps d'accueil au lac (min)"
               type="number"
               value={formData.acces.distanceAcceuilLac.temps || 0}
-              // onChange={(e) => handleInputChange('acces', { distanceAcceuilLac: { kilometrage: formData.acces.distanceAcceuilLac.kilometrage, temps: e.target.value ? parseInt(e.target.value) : 0 } })}
               onChange={(e) => setDistanceAcceuilLac({ temps: parseInt(e.target.value) || 0 })}
             />
             <Autocomplete
               fullWidth
               options={ENUMS_LACS_ACCESSIBLE}
               value={formData.acces.accessible ?? null}
-              // onChange={(_, newValue) => {
-              //   if (newValue && ENUMS_LACS_ACCESSIBLE.includes(newValue as typeof ENUMS_LACS_ACCESSIBLE[number])) {
-              //     handleInputChange('acces', { accessible: newValue as typeof ENUMS_LACS_ACCESSIBLE[number] })
-              //   }
-              // }}
               onChange={(_, val) => setAcces({ accessible: val })}
               renderInput={(params) => (
                 <TextField {...params} label="Accessible" />
@@ -358,11 +342,6 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
                 fullWidth
                 options={ENUMS_LACS_EMBARCATION}
                 value={formData.embarcation.type ?? null}
-                // onChange={(_, newValue) => {
-                //   if (newValue && ENUMS_LACS_EMBARCATION.includes(newValue as typeof ENUMS_LACS_EMBARCATION[number])) {
-                //     handleInputChange('embarcation', { type: newValue as typeof ENUMS_LACS_EMBARCATION[number] })
-                //   }
-                // }}
                 onChange={(_, val) => setEmbarcation({ type: val })}
                 renderInput={(params) => (
                   <TextField {...params} label="Type d'embarcation" />
@@ -376,20 +355,6 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
                 fullWidth
                 options={ENUMS_LACS_EMBARCATION_MOTORISATION_NECESSAIRE}
                 value={formData.embarcation.motorisation.necessaire ?? null}
-                // onChange={(_, newValue) => {
-                //   if (newValue && ENUMS_LACS_EMBARCATION_MOTORISATION_NECESSAIRE.includes(newValue as typeof ENUMS_LACS_EMBARCATION_MOTORISATION_NECESSAIRE[number])) {
-                //     const existingPuissance = formData.embarcation.motorisation.puissance;
-                //     handleInputChange('embarcation', {
-                //       motorisation: {
-                //         necessaire: newValue as typeof ENUMS_LACS_EMBARCATION_MOTORISATION_NECESSAIRE[number],
-                //         puissance: existingPuissance ? {
-                //           minimum: existingPuissance.minimum === null ? undefined : existingPuissance.minimum,
-                //           maximum: existingPuissance.maximum === null ? undefined : existingPuissance.maximum
-                //         } : undefined
-                //       }
-                //     })
-                //   }
-                // }}
                 onChange={(_, val) => setMotorisation({ necessaire: val })}
                 renderInput={(params) => (
                   <TextField {...params} label="Type de motorisation" />
@@ -405,18 +370,6 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
                   label="Puissance minimale (CV)"
                   type="number"
                   value={formData.embarcation.motorisation.puissance?.minimum || ''}
-                  // onChange={(e) => {
-                  //   const value = e.target.value ? parseInt(e.target.value) : undefined;
-                  //   const necessaire = formData.embarcation.motorisation.necessaire;
-                  //   if (necessaire && ENUMS_LACS_EMBARCATION_MOTORISATION_NECESSAIRE.includes(necessaire as typeof ENUMS_LACS_EMBARCATION_MOTORISATION_NECESSAIRE[number])) {
-                  //     handleInputChange('embarcation', {
-                  //       motorisation: {
-                  //         necessaire: necessaire as typeof ENUMS_LACS_EMBARCATION_MOTORISATION_NECESSAIRE[number],
-                  //         puissance: value !== undefined ? { minimum: value } : undefined
-                  //       }
-                  //     });
-                  //   }
-                  // }}
                   onChange={(e) => setMotorisation({
                     puissance: { minimum: parseInt(e.target.value) || undefined, maximum: formData.embarcation.motorisation.puissance?.maximum }
                   })}
@@ -431,9 +384,6 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
             fullWidth
             options={especes || []}
             value={especes?.filter(e => formData.especeIds?.includes(e._id)) || []}
-            // onChange={(_, newValue) => {
-            //   handleInputChange('especeIds', newValue.map(e => e._id));
-            // }}
             onChange={(_, newValue) => setField('especeIds', newValue.map(e => e._id))}
             getOptionLabel={(option) => option.nomCommun}
             renderInput={(params) => (
@@ -506,11 +456,6 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
                     !lac.hebergements.some(h => ((h as { _id?: Id<"campings"> })._id ?? (h as { campingId?: Id<"campings"> }).campingId) === camping._id)
                   ) || []}
                   value={campings?.find(c => c._id === hebergement.campingId) || null}
-                  // onChange={(_, newValue) => {
-                  //   if (newValue) {
-                  //     handleHebergementChange('campingId', newValue._id);
-                  //   }
-                  // }}
                   onChange={(_, newValue) => setHebergementCamping(newValue?._id ?? null)}
                   getOptionLabel={(option) => option.nom}
                   renderInput={(params) => (
@@ -537,10 +482,6 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
                   type="number"
                   label="Distance (km)"
                   value={hebergement.distanceDepuisLac?.kilometrage || ''}
-                  // onChange={(e) => handleHebergementChange('distanceDepuisLac', {
-                  //   kilometrage: parseFloat(e.target.value),
-                  //   temps: hebergement.distanceDepuisLac?.temps || 0
-                  // })}
                   onChange={(e) => setHebergementDistance({ kilometrage: parseFloat(e.target.value) })}
                   sx={{ width: '150px' }}
                 />
@@ -548,10 +489,6 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
                   type="number"
                   label="Temps (min)"
                   value={hebergement.distanceDepuisLac?.temps || ''}
-                  // onChange={(e) => handleHebergementChange('distanceDepuisLac', {
-                  //   temps: parseFloat(e.target.value),
-                  //   kilometrage: hebergement.distanceDepuisLac?.kilometrage || 0
-                  // })}
                   onChange={(e) => setHebergementDistance({ temps: parseFloat(e.target.value) })}
                   sx={{ width: '150px' }}
                 />
@@ -575,14 +512,12 @@ export default function LacDialog({ open, onClose, lac, mode }: LacDialogProps) 
                   fullWidth
                   label="distance (km)"
                   value={formData.distanceMaisonLac?.kilometrage || ''}
-                  // onChange={(e) => handleInputChange('distanceMaisonLac', { kilometrage: parseFloat(e.target.value) || 0, temps: formData.distanceMaisonLac?.temps || 0 })}
                   onChange={(e) => setDistanceMaisonLac({ kilometrage: parseFloat(e.target.value) || 0 })}
                 />
                 <TextField
                   fullWidth
                   label="temps (min)"
                   value={formData.distanceMaisonLac?.temps || ''}
-                  // onChange={(e) => handleInputChange('distanceMaisonLac', { temps: parseFloat(e.target.value) || 0, kilometrage: formData.distanceMaisonLac?.kilometrage || 0 })}
                   onChange={(e) => setDistanceMaisonLac({ temps: parseFloat(e.target.value) || 0 })}
                 />
               </Box>

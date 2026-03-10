@@ -52,13 +52,6 @@ const estimateFetchKm = (hectares: number): number => {
   return (radiusM * 2) / 1000;
 };
 
-// const estimateWaveHeight = (fetchKm: number): number => {
-//   // JONSWAP simplifié à vent 20 km/h (Beaufort 4, seuil Cat. D)
-//   // Hs ≈ 0.0248 × √(fetch_m)
-//   const fetchM = fetchKm * 1000;
-//   return parseFloat((0.0248 * Math.sqrt(fetchM)).toFixed(2));
-// };
-
 /**
  * Formule SMB (Sverdrup-Munk-Bretschneider) adaptée aux lacs fetch-limités
  * Validée pour petits réservoirs et lacs intérieurs
@@ -69,16 +62,6 @@ const estimateFetchKm = (hectares: number): number => {
  * où F = fetch en mètres, U = vent en m/s
  * À Beaufort 4 = 7 m/s (~25 km/h)
  */
-// const estimateWaveHeight = (fetchKm: number): number => {
-//   const fetchM = fetchKm * 1000;
-//   const windMs = 7; // Beaufort 4 = ~7 m/s
-
-//   // SMB fetch-limité pour lacs intérieurs
-//   // Hs = 0.0163 × √(F) × (U/10)
-//   const Hs = 0.0163 * Math.sqrt(fetchM) * (windMs / 10);
-
-//   return parseFloat(Hs.toFixed(2));
-// };
 
 export const estimateWaveHeightForScenario = (fetchKm: number, windMs: number): number => {
   const fetchM = fetchKm * 1000;
@@ -112,14 +95,6 @@ export const WIND_SCENARIOS = [
     description: 'Scénario prudent — retour difficile',
   },
 ];
-
-// export const WAVE_SCALE = [
-//   { max: 0.10, label: 'Eau généralement calme', danger: 'Sécuritaire' },
-//   { max: 0.20, label: 'Légères vagues par vent modéré', danger: 'Prudence conseillée' },
-//   { max: 0.30, label: 'Vagues notables — surveiller météo', danger: 'Conditions limites' },
-//   { max: 0.50, label: 'Vagues importantes — difficiles', danger: 'Risqué' },
-//   { max: Infinity, label: 'Mer agitée — dangereux', danger: 'Dangereux' },
-// ];
 
 export const WAVE_SCALE = [
   { max: 0.05, label: 'Eau plate', danger: 'Sécuritaire' },
@@ -170,8 +145,6 @@ export const assessISO12217NavigationSafety = (superficie: LacSuperficie | null)
   }
 
   const ha = superficie.hectares;
-  // const fetchKm = estimateFetchKm(ha);
-  // const waveH = estimateWaveHeight(fetchKm);
   const fetchKm = estimateFetchKm(ha);
   const waveScenarios = WIND_SCENARIOS.map(s => ({
     ...s,
@@ -202,9 +175,6 @@ export const assessISO12217NavigationSafety = (superficie: LacSuperficie | null)
     fetchKm,
     waveHeightM: waveH,
     icon: <WaterDropOutlinedIcon sx={{ fontSize: 18, color: 'success.main' }} />,
-    // icon: (
-    //   <WaterDropOutlinedIcon sx={{ fontSize: 18, color: 'success.main' }} />
-    // ),
     recommendation: 'Navigation idéale — eau fermée, vagues nulles, retour toujours court',
     isoNote: 'ISO 12217 Cat. D ✓ — Hs estimée bien en dessous de 0,3 m',
     waveScenarios,

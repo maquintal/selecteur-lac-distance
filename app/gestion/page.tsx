@@ -27,7 +27,6 @@ export default function GestionLacs() {
   const { isMobile, isLoaded } = useMobileDetect();
 
   // Queries Convex
-  // const lacs = useQuery(api.lacs.getAllLacs) || [];
   const lacs = useQuery(api.lacs.getAllLacs) || [];
 
   const handleOpenDialog = (mode: 'create' | 'edit', lac?: LacDoc | LacEnriched) => {

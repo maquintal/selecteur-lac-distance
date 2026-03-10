@@ -22,7 +22,6 @@ export default function GestionEspeces() {
   const [selectedEspece, setSelectedEspece] = useState<EspeceDoc>();
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
   const [dialogMode, setDialogMode] = useState<'create' | 'edit'>('create');
-  // const isReadOnly = useReadOnlyMode();
 
   const { isMobile, isLoaded } = useMobileDetect();
 
@@ -40,10 +39,6 @@ export default function GestionEspeces() {
     setSelectedEspece(undefined);
   };
 
-  /* const handleSnackbar = (message: string, severity: 'success' | 'error') => {
-    setSnackbar({ open: true, message, severity });
-  }; */
-
   return (
     <>
       <GestionNavBar />
@@ -54,16 +49,6 @@ export default function GestionEspeces() {
             Gestion des espèces
           </Typography>
           <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', flexDirection: { xs: 'column', sm: 'row' }, width: { xs: '100%', sm: 'auto' } }}>
-            {/* isReadOnly && (
-              <Chip
-                icon={<LockIcon />}
-                label="Mode Read-Only"
-                color="error"
-                variant="outlined"
-                size="small"
-                sx={{ fontSize: '0.7rem' }}
-              />
-            ) */}
             <Button
               variant="contained"
               startIcon={<AddIcon />}

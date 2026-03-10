@@ -34,33 +34,6 @@ const NavigationSafetyLegend = ({
       <Divider sx={{ my: 0.5 }} />
 
       {/* Échelle ISO */}
-      {/* <Typography variant="caption" sx={{ fontSize: '0.62rem', fontWeight: 600, color: 'text.secondary', display: 'block', mb: 0.25 }}>
-        Catégorie ISO 12217
-      </Typography>
-      {ISO_CATEGORY_SCALE.map(({ category, label, superficieMin, superficieMax }) => {
-        const isActive = isoCategory === category;
-        const superficieLabel = superficieMin === null
-          ? '—'
-          : superficieMax === null
-            ? `> ${superficieMin} ha`
-            : `${superficieMin}–${superficieMax} ha`;
-
-        return (
-          <Box key={category} sx={{ display: 'flex', gap: 1, opacity: isActive ? 1 : 0.4 }}>
-            <Typography variant="caption" sx={{ minWidth: 30, fontWeight: isActive ? 700 : 400 }}>
-              Cat. {category}
-            </Typography>
-            <Typography variant="caption" sx={{ minWidth: 60, fontWeight: isActive ? 700 : 400, color: 'grey.400' }}>
-              {superficieLabel}
-            </Typography>
-            <Typography variant="caption" sx={{ fontWeight: isActive ? 700 : 400 }}>
-              {label}
-            </Typography>
-          </Box>
-        );
-      })}
-
-      <Divider sx={{ my: 0.5 }} /> */}
 
       {/* Scénarios de vent — nouveau bloc */}
       <Typography variant="caption" sx={{ fontSize: '0.62rem', fontWeight: 600, color: 'text.secondary', display: 'block', mb: 0.25 }}>

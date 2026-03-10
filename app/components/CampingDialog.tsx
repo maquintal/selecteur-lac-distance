@@ -12,7 +12,6 @@ import {
   Tooltip
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-// import { CampingDoc, NewCampingInput, defaultCampingInput } from '../types/schema.types';
 import { isReadOnlyConvex } from '@/convex/checkReadOnlyMode';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
@@ -105,7 +104,7 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
     // expand the newly added terrain (will be last index)
     setExpandedSet(prev => {
       const next = { ...prev };
-      const idx = (formData.terrains ?? []).length; // previous length
+      const idx = (formData.terrains ?? []).length;
       next[idx] = true;
       return next;
     });
@@ -131,11 +130,7 @@ export default function CampingDialog({ open, onClose, camping, mode }: CampingD
     setFormData(prev => {
       const terrains = [...(prev.terrains ?? [])];
       const t = { ...(terrains[index] || {}) } as TerrainInput & Record<string, unknown>;
-      // if (field.startsWith('terrain.')) {
-      //   t.terrain = { ...(t.terrain || {}), ["longueur"]: undefined, ["largeur"]: undefined, ["longueurAvecStationnement"]: undefined };
-      // } else {
       (t as Record<string, unknown>)[field] = value;
-      // }
       terrains[index] = t;
       return { ...prev, terrains };
     });
