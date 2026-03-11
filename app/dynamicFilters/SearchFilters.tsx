@@ -26,7 +26,7 @@ import {
   ENUMS_LACS_EMBARCATION_MOTORISATION_NECESSAIRE,
   ENUMS_LACS_ACCESSIBLE
 } from "@/convex/schemas/lacs.schema";
-import { ISOCategory } from "./NavigationSafetyAssessment";
+import { ISOCategory } from "../components/NavigationSafety/NavigationSafety.types";
 
 const ENUMS_SCENARIOS = [
   { label: "Tous les scénarios", value: "" },

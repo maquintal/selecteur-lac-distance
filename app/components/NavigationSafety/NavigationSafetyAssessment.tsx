@@ -14,14 +14,13 @@
  * Formule vague : Hs ≈ 0.0248 × √(fetch_m) (JONSWAP simplifié, vent 20 km/h)
  */
 
-import { LacSuperficie } from "../types/lacs.type";
+import { LacSuperficie } from "../../types/lacs.type";
 
 import WaterDropOutlinedIcon from '@mui/icons-material/WaterDropOutlined';
 import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
 import DoNotDisturbAltOutlinedIcon from '@mui/icons-material/DoNotDisturbAltOutlined';
 import DangerousOutlinedIcon from '@mui/icons-material/DangerousOutlined';
-
-export type ISOCategory = 'D' | 'C+' | 'C' | 'B' | 'A';
+import { ISOCategory } from "./NavigationSafety.types";
 
 export type WaveScenario = {
   label: string;

@@ -34,8 +34,8 @@ import OtherHousesIcon from '@mui/icons-material/OtherHouses';
 import WaterIcon from '@mui/icons-material/Water';
 import { LacEnriched, LacHebergementItem } from '../types/lacs.type';
 import { EspeceDoc } from '../types/especes.type';
-import { assessISO12217NavigationSafety, getDangerLabel } from './NavigationSafetyAssessment';
-import NavigationSafetyLegend from './NavigationSafetyLegend';
+import { assessISO12217NavigationSafety, getDangerLabel } from '../components/NavigationSafety/NavigationSafetyAssessment';
+import NavigationSafetyLegend from '../components/NavigationSafety/NavigationSafetyLegend';
 
   const TOOLTIP_SX = {
     bgcolor: 'background.paper',
