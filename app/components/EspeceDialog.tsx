@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import {
@@ -8,8 +8,9 @@ import {
   Dialog, DialogTitle, DialogContent, DialogActions,
   FormControl, InputLabel, Select, MenuItem,
 } from '@mui/material';
-import { EspeceDoc, NewEspeceInput, defaultEspeceInput } from '../types/schema.types';
+import { EspeceDoc, EspeceFormData, defaultEspeceInput } from '../types/especes.type';
 import { isReadOnlyConvex } from '@/convex/checkReadOnlyMode';
+import { ESPECES_CATEGORIES } from '@/convex/schemas/especes.schema';
 
 type EspeceDialogProps = {
   open: boolean;
@@ -19,13 +20,26 @@ type EspeceDialogProps = {
 };
 
 export default function EspeceDialog({ open, onClose, espece, mode }: EspeceDialogProps) {
-  const [formData, setFormData] = useState<NewEspeceInput>(espece || defaultEspeceInput);
+
+  const [formData, setFormData] = useState<EspeceFormData>(espece || defaultEspeceInput);
+
+  useEffect(() => {
+    if (open) {
+      if (espece) {
+        // Extraire seulement les champs de EspeceFormData
+        const { ...especeData } = espece;
+        setFormData(especeData);
+      } else {
+        setFormData(defaultEspeceInput);
+      }
+    }
+  }, [open, espece]);
 
   // Mutations Convex
-  const createEspece = useMutation(api.lacs.addEspece);
-  const updateEspece = useMutation(api.lacs.updateEspece);
+  const createEspece = useMutation(api.especes.addEspece);
+  const updateEspece = useMutation(api.especes.updateEspece);
 
-  const handleInputChange = (field: keyof NewEspeceInput, value: string) => {
+  const handleInputChange = (field: keyof EspeceFormData, value: string) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -34,12 +48,16 @@ export default function EspeceDialog({ open, onClose, espece, mode }: EspeceDial
 
   const handleSubmit = async () => {
     try {
+      const payload = {
+        ...formData,
+        categorie: formData.categorie || undefined,
+      };
       if (mode === 'create') {
-        await createEspece(formData);
+        await createEspece(payload);
       } else if (mode === 'edit' && espece) {
         await updateEspece({
           id: espece._id,
-          ...formData
+          ...payload
         });
       }
       onClose();
@@ -47,6 +65,8 @@ export default function EspeceDialog({ open, onClose, espece, mode }: EspeceDial
       console.error('Erreur:', error);
     }
   };
+
+
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
@@ -71,14 +91,14 @@ export default function EspeceDialog({ open, onClose, espece, mode }: EspeceDial
             <InputLabel id="categorie-label">Catégorie</InputLabel>
             <Select
               labelId="categorie-label"
-              value={formData.categorie}
+              value={formData.categorie ?? ''}
               onChange={(e) => handleInputChange('categorie', e.target.value)}
             >
-              <MenuItem value="poissons">Poissons</MenuItem>
-              <MenuItem value="amphibiens">Amphibiens</MenuItem>
-              <MenuItem value="reptiles">Reptiles</MenuItem>
-              <MenuItem value="oiseaux">Oiseaux</MenuItem>
-              <MenuItem value="mammiferes">Mammifères</MenuItem>
+              {ESPECES_CATEGORIES.map((item) => (
+                <MenuItem key={item} value={item}>
+                  {item}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
         </Box>

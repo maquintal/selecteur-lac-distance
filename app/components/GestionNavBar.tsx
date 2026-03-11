@@ -66,6 +66,19 @@ export default function GestionNavBar() {
             >
               Espèces
             </Button>
+
+            <Button
+              component={Link}
+              href="/components/NavigationSafety/graphique"
+              // startIcon={<Icon path={mdiFish} size={1} />}
+              color={isActive('/components/NavigationSafety/graphique') ? 'primary' : 'inherit'}
+              sx={{ 
+                color: isActive('/components/NavigationSafety/graphique') ? 'primary.main' : 'text.primary',
+                textDecoration: 'none'
+              }}
+            >
+              Classification ISO 12217
+            </Button>
           </Box>
         </Toolbar>
       </Container>

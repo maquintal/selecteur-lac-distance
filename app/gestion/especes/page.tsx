@@ -11,23 +11,22 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
-import { EspeceDoc } from '@/app/types/schema.types';
 import GestionNavBar from '@/app/components/GestionNavBar';
 import EspeceDialog from '@/app/components/EspeceDialog';
 import { useMobileDetect } from '@/app/hooks/useMobileDetect';
 import { isReadOnlyConvex } from '@/convex/checkReadOnlyMode';
+import { EspeceDoc } from '@/app/types/especes.type';
 
 export default function GestionEspeces() {
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedEspece, setSelectedEspece] = useState<EspeceDoc>();
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
   const [dialogMode, setDialogMode] = useState<'create' | 'edit'>('create');
-  // const isReadOnly = useReadOnlyMode();
 
   const { isMobile, isLoaded } = useMobileDetect();
 
   // Queries Convex
-  const especes = useQuery(api.lacs.getAllEspeces) || [];
+  const especes = useQuery(api.especes.getAllEspeces) || [];
 
   const handleOpenDialog = (mode: 'create' | 'edit', espece?: EspeceDoc) => {
     setDialogMode(mode);
@@ -40,10 +39,6 @@ export default function GestionEspeces() {
     setSelectedEspece(undefined);
   };
 
-  /* const handleSnackbar = (message: string, severity: 'success' | 'error') => {
-    setSnackbar({ open: true, message, severity });
-  }; */
-
   return (
     <>
       <GestionNavBar />
@@ -54,16 +49,6 @@ export default function GestionEspeces() {
             Gestion des espèces
           </Typography>
           <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', flexDirection: { xs: 'column', sm: 'row' }, width: { xs: '100%', sm: 'auto' } }}>
-            {/* isReadOnly && (
-              <Chip
-                icon={<LockIcon />}
-                label="Mode Read-Only"
-                color="error"
-                variant="outlined"
-                size="small"
-                sx={{ fontSize: '0.7rem' }}
-              />
-            ) */}
             <Button
               variant="contained"
               startIcon={<AddIcon />}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import {
@@ -14,23 +14,22 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import LacDialog from '@/app/components/LacDialog';
 import GestionNavBar from '@/app/components/GestionNavBar';
-import { LacDoc, LacWithDetails } from '@/app/types/schema.types';
 import { useMobileDetect } from '@/app/hooks/useMobileDetect';
 import { isReadOnlyConvex } from '@/convex/checkReadOnlyMode';
+import { LacDoc, LacEnriched } from "@/app/types/lacs.type"
 
 export default function GestionLacs() {
   const [openDialog, setOpenDialog] = useState(false);
-  const [selectedLac, setSelectedLac] = useState<LacDoc | LacWithDetails | undefined>(undefined);
+  const [selectedLac, setSelectedLac] = useState<LacDoc | LacEnriched | undefined>(undefined);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
   const [dialogMode, setDialogMode] = useState<'create' | 'edit'>('create');
 
   const { isMobile, isLoaded } = useMobileDetect();
 
   // Queries Convex
-  // const lacs = useQuery(api.lacs.getAllLacs) || [];
-  const lacs = useQuery(api.lacs.getAllLacsSorted) || [];
+  const lacs = useQuery(api.lacs.getAllLacs) || [];
 
-  const handleOpenDialog = (mode: 'create' | 'edit', lac?: LacDoc | LacWithDetails) => {
+  const handleOpenDialog = (mode: 'create' | 'edit', lac?: LacDoc | LacEnriched) => {
     setDialogMode(mode);
     setSelectedLac(lac);
     setOpenDialog(true);
@@ -41,14 +40,23 @@ export default function GestionLacs() {
     setSelectedLac(undefined);
   };
 
-  /* const handleDialogSuccess = (message: string) => {
-    setSnackbar({ open: true, message, severity: 'success' });
-    handleCloseDialog();
-  }; */
+  const handleButtonClick2 = (e: React.MouseEvent, latitude: number, longitude: number, index: number) => {
+    e.preventDefault();
+    const googleMapsUrl = `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&accept-language=fr`;
+    window.open(googleMapsUrl, '_blank', 'noopener,noreferrer');
 
-  /* const handleDialogError = (message: string) => {
-    setSnackbar({ open: true, message, severity: 'error' });
-  }; */
+    const button = buttonRefs.current[index];
+
+    // Exemples d'actions sur CE bouton spécifiquement
+    button?.setAttribute("disabled", "true");
+    button?.classList.add("active");
+
+    // Ou via l'event directement (plus simple)
+    const target = e.currentTarget as HTMLButtonElement;
+    target.textContent = "Chargement...";
+  };
+
+  const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   return (
     <>
@@ -86,7 +94,7 @@ export default function GestionLacs() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {lacs.map((lac: LacDoc) => (
+                {lacs.map((lac: LacDoc, index: number) => (
                   <TableRow key={lac._id} hover>
                     <TableCell>{lac.nomDuLac}</TableCell>
                     <TableCell>{lac.regionAdministrativeQuebec}</TableCell>
@@ -94,6 +102,14 @@ export default function GestionLacs() {
                       {lac.coordonnees.latitude.toFixed(4)}, {lac.coordonnees.longitude.toFixed(4)}
                     </TableCell>
                     <TableCell>{lac.superficie?.hectares || 'N/A'}</TableCell>
+                    <TableCell>
+                      <Button
+                        ref={(el) => { buttonRefs.current[index] = el; }}
+                        onClick={(e) => handleButtonClick2(e, lac.coordonnees.latitude, lac.coordonnees.longitude, index)}
+                      >
+                        Voir sur OpenStreetMap
+                      </Button>
+                    </TableCell>
                     <TableCell align="center">
                       <IconButton
                         size="small"

@@ -14,9 +14,10 @@ import type {
   FunctionReference,
 } from "convex/server";
 import type * as checkReadOnlyMode from "../checkReadOnlyMode.js";
+import type * as especes from "../especes.js";
+import type * as heberements from "../heberements.js";
 import type * as lacs from "../lacs.js";
-import type * as mutations_removeCampingFromLac from "../mutations/removeCampingFromLac.js";
-import type * as types from "../types.js";
+import type * as schemas_enums from "../schemas/enums.js";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -28,9 +29,10 @@ import type * as types from "../types.js";
  */
 declare const fullApi: ApiFromModules<{
   checkReadOnlyMode: typeof checkReadOnlyMode;
+  especes: typeof especes;
+  heberements: typeof heberements;
   lacs: typeof lacs;
-  "mutations/removeCampingFromLac": typeof mutations_removeCampingFromLac;
-  types: typeof types;
+  "schemas/enums": typeof schemas_enums;
 }>;
 export declare const api: FilterApi<
   typeof fullApi,

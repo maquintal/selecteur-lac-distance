@@ -7,8 +7,8 @@
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint",
-    "convex:dev": "dotenv -e .env -- npx convex dev"
-    ,"convex:refresh": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/run_refresh.ps1"
+    "convex:dev": "dotenv -e .env -- npx convex dev",
+    "convex:refresh": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/run_refresh.ps1"
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.51.0",
@@ -28,7 +28,9 @@
     "react": "18.3.1",
     "react-card-flip": "^1.2.3",
     "react-dom": "18.3.1",
-    "react-leaflet": "^4.2.1"
+    "react-leaflet": "^4.2.1",
+    "recharts": "^3.8.0",
+    "use-debounce": "^10.1.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
@@ -40,9 +42,6 @@
     "eslint-config-next": "15.5.4",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
-  }
-  ,
-  "optionalDependencies": {},
-  "peerDependencies": {},
+  },
   "engines": {}
 }
