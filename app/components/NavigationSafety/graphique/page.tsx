@@ -360,7 +360,11 @@ export default function NavigationSafetyChart() {
                       fontFamily: 'inherit',
                     }}
                     labelFormatter={(v) => `Superficie : ${v} ha`}
-                    formatter={(value: number, name: string) => [`${value.toFixed(3)} m`, name]}
+                    // formatter={(value: number, name: string) => [`${value.toFixed(3)} m`, name]}
+                    formatter={(value, name) => {
+                      const v = typeof value === 'number' ? value.toFixed(3) : '—';
+                      return [`${v} m`, name as string];
+                    }}
                   />
                   <Legend
                     wrapperStyle={{ fontSize: '0.7rem', paddingTop: '1rem' }}
